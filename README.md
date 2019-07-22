@@ -1,6 +1,5 @@
 # SPOCK
 
-**SP**eculoos **O**bservatory s**C**hedule ma**K**er
 
 ![Test Image 1](logo_SPOCK_2.png)
 
