@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib
 from datetime import date , datetime , timedelta
-from astropy.table import Table, Column
+DugsMDrA69mVSxRiExk4
 from astropy.table import join
 from astropy.table import unique
 from astropy import units as u
@@ -28,7 +28,6 @@ import yaml
 # from astroplan import download_IERS_A
 # download_IERS_A()
 
-# definition of the different fonctions
 def Diff_list(li1, li2):
     """
     Inform on the difference between two lists
