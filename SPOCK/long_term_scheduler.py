@@ -304,7 +304,7 @@ def Observability(j,time_range,observatory,targets,constraints):
     ##WARNING: Need to be replace by a np.where, but I can't find how
     [targets_observable.append(targets[int(obs)]) for obs in observable]
 
-    table_observability=observability_table(constraints, observatory, targets_observable, time_range=time_range) #calcul un edeuxieme fois is observable
+    table_observability=observability_table(constraints, observatory, targets_observable, time_range=time_range, time_grid_resolution = 0.5*u.hour) #calcul un edeuxieme fois is observable
     table_observability.remove_column('always observable')
     table_observability.remove_column('ever observable')
     table_observability.rename_column('fraction of time observable', 'Month' + str(j))
@@ -326,15 +326,25 @@ def reverse_Observability(observatory,targets,constraints,time_ranges):
         observability table with no NaN value (0 instead) inversed with targets as columns
         and elements of time_ranges (months) as rows
     """
-    #time_ranges = [Time(['2019-01-01 12:00:00', '2019-01-31 12:00:00']),Time(['2019-02-01 12:00:00', '2019-02-28 12:00:00']),Time(['2019-03-01 15:00:00', '2019-03-31 15:00:00']),Time(['2019-04-01 15:00:00', '2019-04-30 15:00:00']),Time(['2019-05-01 15:00:00', '2019-05-31 15:00:00']),Time(['2019-06-01 15:00:00', '2019-06-30 15:00:00']),Time(['2019-07-01 12:00:00', '2019-07-31 12:00:00']),Time(['2019-08-01 12:00:00', '2019-08-31 12:00:00']),Time(['2019-09-01 12:00:00', '2019-09-30 12:00:00']),Time(['2019-10-01 12:00:00', '2019-10-31 12:00:00']),Time(['2019-11-01 12:00:00', '2019-11-30 12:00:00']),Time(['2019-12-01 12:00:00', '2019-12-31 12:00:00'])]
-    tables_observability=list(map((lambda x: Observability(x,time_ranges[x],observatory,targets,constraints)), range(0,len(time_ranges))))
+    start_fmt = Time(time_ranges[0][0].iso , out_subfmt = 'date').iso
+    end_fmt =  Time(time_ranges[len(time_ranges)-1][1].iso , out_subfmt = 'date').iso
 
-    df=list(map((lambda x: pd.DataFrame(tables_observability[x].to_pandas())),range(0,len(time_ranges))))
-    a=reduce(functools.partial(pd.merge,how='outer', on='target name'), df)
-    df=a.replace(to_replace=float('NaN'), value=0.0)
-    df1 = df.set_index('target name')
-    reverse_df1=df1.T
-    return reverse_df1
+    if os.path.exists('reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) + '.csv'):
+        name_file = 'reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) +  '.csv'
+        reverse_df1 = pd.read_csv(name_file, delimiter = ',')
+        return reverse_df1
+
+    else:
+        #time_ranges = [Time(['2019-01-01 12:00:00', '2019-01-31 12:00:00']),Time(['2019-02-01 12:00:00', '2019-02-28 12:00:00']),Time(['2019-03-01 15:00:00', '2019-03-31 15:00:00']),Time(['2019-04-01 15:00:00', '2019-04-30 15:00:00']),Time(['2019-05-01 15:00:00', '2019-05-31 15:00:00']),Time(['2019-06-01 15:00:00', '2019-06-30 15:00:00']),Time(['2019-07-01 12:00:00', '2019-07-31 12:00:00']),Time(['2019-08-01 12:00:00', '2019-08-31 12:00:00']),Time(['2019-09-01 12:00:00', '2019-09-30 12:00:00']),Time(['2019-10-01 12:00:00', '2019-10-31 12:00:00']),Time(['2019-11-01 12:00:00', '2019-11-30 12:00:00']),Time(['2019-12-01 12:00:00', '2019-12-31 12:00:00'])]
+        tables_observability=list(map((lambda x: Observability(x,time_ranges[x],observatory,targets,constraints)), range(0,len(time_ranges))))
+
+        df=list(map((lambda x: pd.DataFrame(tables_observability[x].to_pandas())),range(0,len(time_ranges))))
+        a=reduce(functools.partial(pd.merge,how='outer', on='target name'), df)
+        df=a.replace(to_replace=float('NaN'), value=0.0)
+        df1 = df.set_index('target name')
+        reverse_df1=df1.T
+        reverse_df1.to_csv('reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) + '.csv', sep= ',')
+        return reverse_df1
 
 
 
@@ -396,7 +406,7 @@ def Ranking_month(priority,i,date_range_in_days,observatory,month_obs,months,mon
         or both, the altitude at sunset at the beginning of the month,
         the altitude at sunrise at the beginning of the month, the altitude at sunset at the end of the month,
         the altitude at sunrise at the end of the month
-        i: int, the day of the month
+        i: int, id target
         date_range_in_days : nb of days in the date range
         observatory: the observatory
         month obs: int, the number of the month of observation, among 0 to 11 (January to December)
@@ -433,6 +443,7 @@ def Ranking_month(priority,i,date_range_in_days,observatory,month_obs,months,mon
     else:
         factor_priospe_spc=1
 
+
     if (int(nb_hours_observed[i])>0) and (int(nb_hours_observed[i])<int(nb_hours_threshold[i])):
         factor_on_going=10**(1+1/(nb_hours_threshold[i]-nb_hours_observed[i]))
     if (int(nb_hours_observed[i])==0):
@@ -440,9 +451,9 @@ def Ranking_month(priority,i,date_range_in_days,observatory,month_obs,months,mon
     if (int(nb_hours_observed[i])>=int(nb_hours_threshold[i])):
         factor_on_going=-1
 
-    altaz_all_targets=[]
     if months[i]=='Month' + str(month_obs) :
-        times = _generate_24hr_grid(date_range[0], 0, date_range_in_days, date_range_in_days)
+        #times = _generate_24hr_grid(date_range[0], 0, date_range_in_days, date_range_in_days)
+        times = _generate_24hr_grid(date_range[0], 0, 1, 1)
         priority.add_row(((priospe_spc[i])**factor_priospe_spc*(2**(10*(reverse_df1[name_spc[i]][month_obs])))
         *max(observatory.altaz(times, targets[i], grid_times_targets=True).alt.value)*factor_on_going,name_spc[i],'None',
         observatory.altaz(observatory.twilight_evening_nautical(date_range[0],which='nearest'),targets[i]).alt.value,
@@ -452,7 +463,8 @@ def Ranking_month(priority,i,date_range_in_days,observatory,month_obs,months,mon
 
     else:
         if months_2nd_option[i]=='Month' + str(month_obs) or months_3rd_option[i]=='Month' + str(month_obs) or months_4th_option[i]=='Month' + str(month_obs) or months_5th_option[i]=='Month' + str(month_obs) :
-            times = _generate_24hr_grid(date_range[0], 0, date_range_in_days,date_range_in_days)
+            #times = _generate_24hr_grid(date_range[0], 0, date_range_in_days,date_range_in_days)
+            times = _generate_24hr_grid(date_range[0], 0, 1, 1)
             priority.add_row(((priospe_spc[i])**factor_priospe_spc*(2**(10*(reverse_df1[name_spc[i]][month_obs])))
             *max(observatory.altaz(times, targets[i], grid_times_targets=True).alt.value)*factor_on_going,name_spc[i],'None',
             observatory.altaz(observatory.twilight_evening_nautical(date_range[0],which='nearest'),targets[i]).alt.value,
@@ -510,12 +522,9 @@ class scheduling(object):
             second_target: row number idx_second_target in priority table
 
         """
-        # print('sunset/sunrise in idx_targets()',Time(self.observatory.twilight_evening_nautical(self.time_ranges[self.month_obs][0],which='nearest')).iso,Time(self.observatory.twilight_morning_nautical(self.time_ranges[self.month_obs][0]+dt,which='nearest')).iso)
         index_prio=np.argsort(self.priority['priority'])
         idx=1
         first_target=self.priority[index_prio[-idx]]
-        priority_prio=self.priority[index_prio]
-        # targets_prio=self.targets[index_prio]
         print('------------- targets PRIO ----------------',self.priority,self.targets)
         self.idx_first_target=index_prio[-idx]
         idx_2nd=2
@@ -1150,6 +1159,7 @@ class make_schedule:
         self.first_target_by_day = []
         self.second_target = None
         self.second_target_by_day = []
+        self.moon_and_visibility_contraint_table = None
         self.time_ranges = [Time(['2019-01-01 12:00:00', '2019-01-31 12:00:00']),Time(['2019-02-01 12:00:00', '2019-02-28 12:00:00']),Time(['2019-03-01 15:00:00', '2019-03-31 15:00:00']),Time(['2019-04-01 15:00:00', '2019-04-30 15:00:00']),Time(['2019-05-01 15:00:00', '2019-05-31 15:00:00']),Time(['2019-06-01 15:00:00', '2019-06-30 15:00:00']),Time(['2019-07-01 12:00:00', '2019-07-31 12:00:00']),Time(['2019-08-01 12:00:00', '2019-08-31 12:00:00']),Time(['2019-09-01 12:00:00', '2019-09-30 12:00:00']),Time(['2019-10-01 12:00:00', '2019-10-31 12:00:00']),Time(['2019-11-01 12:00:00', '2019-11-30 12:00:00']),Time(['2019-12-01 12:00:00', '2019-12-31 12:00:00'])]
 
     @property
@@ -1191,6 +1201,11 @@ class make_schedule:
         return date_range_in_days
 
     @property
+    def nb_hours_threshold(self):
+        nb_hours_threshold = [50]* len(self.target_table_spc)
+        return nb_hours_threshold
+
+    @property
     def date_ranges_day_by_day(self):
         date_format = "%Y-%m-%d %H:%M:%S.%f"
         d2 = datetime.strptime(self.date_range[1].value, date_format)
@@ -1219,25 +1234,41 @@ class make_schedule:
 
 
     def schedule(self, Altitude_constraint = None, Moon_constraint = None):
-
+        import time
+        start = time.time()
         if Altitude_constraint:
             self.constraints.append(AltitudeConstraint(min=float(Altitude_constraint)*u.deg))
         if Moon_constraint:
             self.constraints.append(MoonSeparationConstraint(min=float(Moon_constraint)*u.deg))
 
-        #observatories_format = charge_observatories(self.observatory)
         self.targets = target_list_good_coord_format(self.target_list)
+
+        if str(self.strategy) == 'alternative':
+            self.is_moon_and_visibility_contraint()
+            print()
 
         if str(self.strategy) == 'continuous':
 
-            print('date_range_in_days',self.date_range_in_days)
-
             self.reverse_df1=reverse_Observability(self.observatory,self.targets,self.constraints,self.time_ranges)
-            self.index_prio= self.table_priority_prio(self.reverse_df1)[0]
-            self.priority= self.table_priority_prio(self.reverse_df1)[1]
-            self.idx_targets()
+            end = time.time()
+            print('reverse_df1',end - start)
+
 
             for t in range(1,self.date_range_in_days):
+
+                product = self.table_priority_prio(self.date_ranges_day_by_day[t])
+                end = time.time()
+                print('index_prio', end - start)
+                self.index_prio = product[0]
+                self.priority = product[1]
+                end = time.time()
+                print('priority', end - start)
+                self.idx_targets()
+                end = time.time()
+                print('idx_targets', end - start)
+
+                self.moon_and_visibility_contraint_table = self.is_moon_and_visibility_contraint(self.date_ranges_day_by_day[t])
+
                 print('day number:',t)
 
                 self.priority_by_day.append(self.priority)
@@ -1343,44 +1374,158 @@ class make_schedule:
         # self.idx_set_targets_sorted=self.index_prio[idx_set_targets]
         # self.idx_rise_targets_sorted=self.index_prio[idx_rise_targets]
 
-    def table_priority_prio(self,reverse_df1):
+    def table_priority_prio(self,day):
 
         self.targets = target_list_good_coord_format(self.target_list)
-        nb_hours_threshold=[50]* len(self.target_table_spc)
-        alt_end_start_month=[]
-        alt_end_end_month=[]
-        alt_rise_start_month=[]
-        alt_rise_end_month=[]
-        b=[]
-
-        month_option_var=[b.append(month_option(self.target_table_spc['Name'][a],reverse_df1)) for a in range(0,len(self.target_table_spc))]
-        month_option_var=vstack(Table(b))
-        months=month_option_var['months']
-        months_2nd_option=month_option_var['months_2nd_option']
-        months_3rd_option=month_option_var['months_3rd_option']
-        months_4th_option=month_option_var['months_4th_option']
-        months_5th_option=month_option_var['months_5th_option']
         self.priority=Table(names=('priority','target name','set or rise','alt set start','alt rise start','alt set end','alt rise end'),dtype=('f4','S11','S4','f4','f4','f4','f4'))
+        self.Ranking_month(day)
 
-        self.priority=[Ranking_month(self.priority,i,self.date_range_in_days,self.observatory,self.months_obs,months,months_2nd_option,months_3rd_option,months_4th_option,months_5th_option,self.date_range,\
-            self.targets,self.target_table_spc['Name'],self.target_table_spc['prio_spc'],reverse_df1,self.target_table_spc['nb_hours_surved'],nb_hours_threshold,self.target_table_spc['Kmag'],\
-            self.target_table_spc['spc_type']) for i in range(0,len(months))]
-
-        self.priority=self.priority[0]
-        set_targets_index=(self.priority['alt set start']>20) & (self.priority['alt set end']>20)
-        self.priority['set or rise'][set_targets_index]='set'
-        rise_targets_index=(self.priority['alt rise start']>20) & (self.priority['alt rise end']>20)
+        #self.priority = self.priority[0]
+        set_targets_index = (self.priority['alt set start']>20) & (self.priority['alt set end']>20)
+        self.priority['set or rise'][set_targets_index] = 'set'
+        rise_targets_index = (self.priority['alt rise start']>20) & (self.priority['alt rise end']>20)
         self.priority['set or rise'][rise_targets_index]='rise'
         both_targets_index=(self.priority['alt rise start']>20) & (self.priority['alt set start']>20) & (self.priority['alt rise end']>20) & (self.priority['alt set end']>20)
-        self.priority['set or rise'][both_targets_index]='both'
-        self.priority['priority'][both_targets_index]=self.priority['priority'][both_targets_index]*10
-        priority_non_observable_idx=(self.priority['set or rise']=='None')
-        self.priority['priority'][priority_non_observable_idx]=0.5
-        self.index_prio=np.argsort(self.priority['priority'])
-        self.priority_ranked=self.priority[self.index_prio]
+        self.priority['set or rise'][both_targets_index] = 'both'
+        self.priority['priority'][both_targets_index] = self.priority['priority'][both_targets_index]*10
+        priority_non_observable_idx = (self.priority['set or rise']=='None')
+        self.priority['priority'][priority_non_observable_idx] = 0.5
+        self.index_prio = np.argsort(self.priority['priority'])
+        self.priority_ranked = self.priority[self.index_prio]
 
         return self.index_prio, self.priority, self.priority_ranked
 
+    def Ranking_month(self,day):
+        """
+            Rank all targets with respect to their altitude (whether they are up or not),
+            also if their best month score is in agreement with the desired month of observation,
+            if their Kmag is inferior to 10.5, if the priospe (equivalent to JWST SNR) is high,
+            and if the numer of hours oserved is lower than the threshold (50 hours for the present strategy)
+
+        Parameters
+        ----------
+            priority: astopy table, gives the observation priority, whether the target is
+            more a set target (up a sunset for the whole month) a rise target (up at sunrise for the whole month)
+            or both, the altitude at sunset at the beginning of the month,
+            the altitude at sunrise at the beginning of the month, the altitude at sunset at the end of the month,
+            the altitude at sunrise at the end of the month
+            i: int, id target
+            date_range_in_days : nb of days in the date range
+            observatory: the observatory
+            month obs: int, the number of the month of observation, among 0 to 11 (January to December)
+            months: the best score of each target for each month
+            months_2nd_option: the second best score of each target for each month
+            months_3rd_option: the third best score of each target for each month
+            months_4th_option: the fourth best score of each target for each month
+            months_5th_option: the fifth best score of each target for each month
+            time_ranges: list of astropy.Time range with start and end times
+            targets : target list on the FixedTarget() format from astroplan
+            name_spc: all the name of the targets in the target list
+            priospe_spc: SNR JWST * 100, for the targets in the target list
+            reverse_df1: inverse of observaility table
+            nb_hours_observed: number of hours observed for each target of the target list
+            nb_hours_threshold: number of hours to complete for each target of the target list
+            Kmag_spc: Kmagnitude of each target of the target list
+
+        Returns
+        -------
+            priority: the same priority as given in function arguments with updated first columns
+            with values:
+            -0.5 for non observable targets, <0 for targets where the numer of hours observed > nb hours nb_hours_threshold
+            >0 for the others, the highest value belonging to the highest priority target
+
+        """
+
+        # if Sptype_spc[i]=='M6':
+        #     factor_spctype=1
+        # else:
+        #     factor_spctype=2
+        b = []
+        nb_days = 1
+        dt_1day = Time('2018-01-02 00:00:00', scale='tcg') - Time('2018-01-01 00:00:00', scale='tcg')
+        day_fmt = Time(day.iso , out_subfmt = 'date').iso
+
+        if os.path.exists('Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) + '_' + str(len(self.targets)) + '.csv'):
+            name_file = 'Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) + '_' + str(len(self.targets)) + '.csv'
+            dataframe_ranking_months = pd.read_csv(name_file, delimiter=',')
+            self.priority = Table.from_pandas(dataframe_ranking_months)
+
+        else:
+            for i in range(len(self.target_table_spc['Name'])):
+
+                print(self.target_table_spc['Name'][i])
+                target = self.targets[i]
+                b.append(month_option(self.target_table_spc['Name'][i], self.reverse_df1))
+                month_option_var = vstack(Table(b))
+                months = month_option_var['months']
+                print(months)
+                months_2nd_option = month_option_var['months_2nd_option']
+                months_3rd_option = month_option_var['months_3rd_option']
+                months_4th_option = month_option_var['months_4th_option']
+                months_5th_option = month_option_var['months_5th_option']
+
+                if self.target_table_spc['prio_spc'][i] >= 100:
+                    factor_priospe_spc = 4
+                else:
+                    factor_priospe_spc = 1
+
+                if (int(self.target_table_spc['nb_hours_surved'][i]) > 0) and (int(self.target_table_spc['nb_hours_surved'][i]) < int(self.nb_hours_threshold[i])):
+                    factor_on_going = 10 ** (1 + 1 / (self.nb_hours_threshold[i] - self.target_table_spc['nb_hours_surved'][i]))
+
+                if (int(self.target_table_spc['nb_hours_surved'][i]) == 0):
+                    factor_on_going = 10 ** (1 / (self.nb_hours_threshold[i] - self.target_table_spc['nb_hours_surved'][i]))
+
+                if (int(self.target_table_spc['nb_hours_surved'][i]) >= int(self.nb_hours_threshold[i])):
+                    factor_on_going = -1
+
+                if months[i] == 'Month' + str(self.months_obs):
+                    # times = _generate_24hr_grid(day, 0, date_range_in_days, date_range_in_days)
+                    times = _generate_24hr_grid(day, 0, nb_days, 1)
+                    self.priority.add_row(
+                        ((self.target_table_spc['prio_spc'][i]) ** factor_priospe_spc * (2 ** (10 * (self.reverse_df1[self.target_table_spc['Name'][i]][self.months_obs])))
+                         * max(self.observatory.altaz(times, target, grid_times_targets=True).alt.value) * factor_on_going,
+                         self.target_table_spc['Name'][i], 'None',
+                         self.observatory.altaz(self.observatory.twilight_evening_nautical(day, which='nearest'),
+                                           target).alt.value,
+                         self.observatory.altaz(self.observatory.twilight_morning_nautical(day, which='next'),
+                                           target).alt.value,
+                         self.observatory.altaz(self.observatory.twilight_evening_nautical(day + nb_days * dt_1day, which='nearest'),
+                                           target).alt.value,
+                         self.observatory.altaz(self.observatory.twilight_morning_nautical(day + nb_days * dt_1day, which='next'),
+                                           target).alt.value))
+
+                else:
+                    if months_2nd_option[i] == str(self.months_obs) or months_3rd_option[i] ==  str(self.months_obs) or \
+                            months_4th_option[i] == str(self.months_obs) or months_5th_option[i] ==  str(
+                            self.months_obs):
+                        # times = _generate_24hr_grid(date_range[0], 0, date_range_in_days,date_range_in_days)
+                        times = _generate_24hr_grid(day, 0, 1, 1)
+                        self.priority.add_row(
+                            ((self.target_table_spc['prio_spc'][i]) ** factor_priospe_spc * (2 ** (10 * (self.reverse_df1[self.target_table_spc['Name'][i]][self.months_obs])))
+                             * max(self.observatory.altaz(times, target, grid_times_targets=True).alt.value) * factor_on_going,
+                             self.target_table_spc['Name'][i], 'None',
+                             self.observatory.altaz(self.observatory.twilight_evening_nautical(day, which='nearest'),
+                                               target).alt.value,
+                             self.observatory.altaz(self.observatory.twilight_morning_nautical(day, which='next'),
+                                               target).alt.value,
+                             self.observatory.altaz(self.observatory.twilight_evening_nautical(day + nb_days * dt_1day, which='nearest'),
+                                               target).alt.value,
+                             self.observatory.altaz(self.observatory.twilight_morning_nautical(day + nb_days * dt_1day, which='next'),
+                                               target).alt.value))
+
+                    else:
+                        self.priority.add_row((-0.5, self.target_table_spc['Name'][i], 'None',
+                                          self.observatory.altaz(self.observatory.twilight_evening_nautical(day, which='nearest'),
+                                                            target).alt.value,
+                                          self.observatory.altaz(self.observatory.twilight_morning_nautical(day, which='next'),
+                                                            target).alt.value,
+                                          self.observatory.altaz(self.observatory.twilight_evening_nautical(day + nb_days * dt_1day, which='nearest'),
+                                                            target).alt.value,
+                                          self.observatory.altaz(self.observatory.twilight_morning_nautical(day + nb_days * dt_1day, which='next'),
+                                                            target).alt.value))
+
+            dataframe_priority = self.priority.to_pandas()
+            dataframe_priority.to_csv('Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) + '_' + str(len(self.targets)) + '.csv', sep= ',',index=False)
 
     def run_all(a,idx_set_targets_sorted,idx_rise_targets_sorted,index_prio):
 
@@ -1423,8 +1568,6 @@ class make_schedule:
             rise_time_begin = datetime.strptime(self.observatory.target_rise_time(self.date_range[0],self.targets[idx_target],which='next',horizon=24*u.deg).iso, date_format)
             rise_time_end = datetime.strptime(self.observatory.target_rise_time(self.date_range[1],self.targets[idx_target],which='next',horizon=24*u.deg).iso, date_format)
             shift_hours_observation = (rise_time_end - rise_time_begin).hours
-
-
 
     def schedule_blocks(self,t):
         """
@@ -1514,14 +1657,14 @@ class make_schedule:
 
         """
         nb_hours_observed = self.target_table_spc['nb_hours_surved']
-        nb_hours_threshold = [50] * len(self.target_table_spc)
+        #self.nb_hours_threshold = [50] * len(self.target_table_spc)
         is_hours_constraint_met_target = True
-        a=(1-nb_hours_observed[idx_target]/(nb_hours_threshold[idx_target]+20))
+        a=(1-nb_hours_observed[idx_target]/(self.nb_hours_threshold[idx_target]+20))
         if a < 1E-5:
             is_hours_constraint_met_target = False
         return is_hours_constraint_met_target
 
-    def is_moon_and_visibility_contraint(self,t,idx_target):
+    def __is_moon_and_visibility_contraint(self,t,idx_target):
         """
             Check if number of moon not too close and target is visible
 
@@ -1554,8 +1697,8 @@ class make_schedule:
         :return:
         '''
         dt_1day=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')
-        return ((Time(self.observatory.twilight_morning_nautical(Time(day) + dt_1day ,which='nearest')))\
-            -(Time(self.observatory.twilight_evening_nautical(Time(day) ,which='next'))))
+        return ((Time(self.observatory.twilight_morning_nautical(day + dt_1day ,which='nearest')))\
+            -(Time(self.observatory.twilight_evening_nautical(day ,which='next'))))
 
     def info_obs_possible(self,day):
         '''
@@ -1599,7 +1742,7 @@ class make_schedule:
 
 
 
-    def _is_moon_and_visibility_contraint(self,day):
+    def is_moon_and_visibility_contraint(self,day):
         """
             Check if number of moon not too close and target is visible
 
@@ -1655,7 +1798,7 @@ class make_schedule:
 
 
         #see if moon constraint is met
-        is_moon_constraint_met_first_target = self.is_moon_and_visibility_contraint(t,self.idx_first_target)
+        is_moon_constraint_met_first_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_first_target]
         hours_constraint_first = self.is_constraint_hours(self.idx_first_target)
 
         idx_safe=1
@@ -1675,13 +1818,13 @@ class make_schedule:
                     idx_safe_1rst_set+=1
                     self.idx_first_target=self.index_prio[-idx_safe_1rst_set]
                     self.first_target=self.priority[self.idx_first_target]
-                    is_moon_constraint_met_first_target = self.is_moon_and_visibility_contraint(t,self.idx_first_target)
+                    is_moon_constraint_met_first_target = self.moon_and_visibility_contraint_table ['ever observable'][self.idx_first_target]
                     hours_constraint_first=self.is_constraint_hours(self.idx_first_target)
                 else:
                     self.idx_first_target=self.idx_set_targets_sorted[-moon_idx_set_target]
                     self.first_target=self.priority[self.idx_first_target]
                     if self.priority['priority'][self.idx_first_target]!=float('-inf'):
-                        is_moon_constraint_met_first_target = self.is_moon_and_visibility_contraint(t,self.idx_first_target)
+                        is_moon_constraint_met_first_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_first_target]
                         hours_constraint_first=self.is_constraint_hours(self.idx_first_target)
                     else:
                         is_moon_constraint_met_first_target = False
@@ -1693,13 +1836,13 @@ class make_schedule:
                     idx_safe_1rst_rise+=1
                     self.idx_first_target=self.index_prio[-idx_safe_1rst_rise]
                     self.first_target=self.priority[self.idx_first_target]
-                    is_moon_constraint_met_first_target = self.is_moon_and_visibility_contraint(t,self.idx_first_target)
+                    is_moon_constraint_met_first_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_first_target]
                     hours_constraint_first=self.is_constraint_hours(self.idx_first_target)
                 else:
                     self.idx_first_target=self.idx_rise_targets_sorted[-(moon_idx_rise_target)]
                     self.first_target=self.priority[self.idx_first_target]
                     if self.priority['priority'][self.idx_first_target]!=float('-inf'):
-                        is_moon_constraint_met_first_target = self.is_moon_and_visibility_contraint(t,self.idx_first_target)
+                        is_moon_constraint_met_first_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_first_target]
                         hours_constraint_first=self.is_constraint_hours(self.idx_first_target)
                     else:
                         is_moon_constraint_met_first_target=False
@@ -1710,7 +1853,7 @@ class make_schedule:
                 idx_safe+=1
                 self.idx_first_target=self.index_prio[-idx_safe]
                 self.first_target=self.priority[self.idx_first_target]
-                is_moon_constraint_met_first_target = self.is_moon_and_visibility_contraint(t,self.idx_first_target)
+                is_moon_constraint_met_first_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_first_target]
                 hours_constraint_first=self.is_constraint_hours(self.idx_first_target)
 
         # variable=self.update_hours_observed_first(t)
@@ -1757,7 +1900,7 @@ class make_schedule:
         # self.constraints.append(TimeConstraint((Time(self.observatory.twilight_evening_nautical(self.date_range[0]+dt_1day*t,which='next'))), \
         #     (Time(self.observatory.twilight_morning_nautical(self.date_range[0]+dt_1day*(t+1),which='nearest') ))) )
 
-        is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+        is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
         hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
 
         idx_safe=1
@@ -1782,13 +1925,13 @@ class make_schedule:
                         idx_safe_2nd_set += 1
                         self.idx_second_target = self.index_prio[-idx_safe_2nd_set]
                         self.second_target = self.priority[self.idx_second_target]
-                        is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+                        is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
                         hours_constraint_second = self.is_constraint_hours(self.idx_second_target)
                     else:
                         self.idx_second_target=self.idx_set_targets_sorted[-(moon_idx_set_target)]
                         self.second_target=self.priority[self.idx_second_target]
                         if self.priority['priority'][self.idx_second_target]!=float('-inf'):
-                            is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+                            is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
                             hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
                         else:
                             is_moon_constraint_met_second_target=False
@@ -1800,13 +1943,13 @@ class make_schedule:
                         idx_safe_2nd_rise+=1
                         self.idx_second_target = self.index_prio[-idx_safe_2nd_rise]
                         self.second_target = self.priority[self.idx_second_target]
-                        is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+                        is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
                         hours_constraint_second = self.is_constraint_hours(self.idx_second_target)
                     else:
                         self.idx_second_target=idx_rise_targets_sorted[-(moon_idx_rise_target)]
                         self.second_target=self.priority[self.idx_second_target]
                         if self.priority['priority'][self.idx_second_target]!=float('-inf'):
-                            is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+                            is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
                             hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
                         else:
                             is_moon_constraint_met_second_target=False
@@ -1819,13 +1962,13 @@ class make_schedule:
                             idx_safe_2nd_set += 1
                             self.idx_second_target = self.index_prio[-idx_safe_2nd_set]
                             self.second_target = self.priority[self.idx_second_target]
-                            is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+                            is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
                             hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
                         else:
                             self.idx_second_target=idx_set_targets_sorted[-(moon_idx_set_target)]
                             self.second_target=self.priority[self.idx_second_target]
                             if self.priority['priority'][self.idx_second_target]!=float('-inf'):
-                                is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+                                is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
                                 hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
                             else:
                                 is_moon_constraint_met_second_target=False
@@ -1837,14 +1980,14 @@ class make_schedule:
                             idx_safe_2nd_rise += 1
                             self.idx_second_target = self.index_prio[-idx_safe_2nd_rise]
                             self.second_target=self.priority[self.idx_second_target]
-                            is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+                            is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
                             hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
 
                         else:
                             self.idx_second_target=idx_rise_targets_sorted[-(moon_idx_rise_target)]
                             self.second_target=self.priority[self.idx_second_target]
                             if self.priority['priority'][self.idx_second_target]!=float('-inf'):
-                                is_moon_constraint_met_second_target = self.is_moon_and_visibility_contraint(t,self.idx_second_target)
+                                is_moon_constraint_met_second_target = self.moon_and_visibility_contraint_table['ever observable'][self.idx_second_target]
                                 hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
                             else:
                                 is_moon_constraint_met_second_target=False
@@ -1865,3 +2008,35 @@ class make_schedule:
         else:
             is_constraints_met_second_target=False
         return is_constraints_met_second_target
+
+    def reference_table(self):
+
+        a = np.zeros((len(self.date_ranges_day_by_day), len(self.target_table_spc['Name']))).astype("object")
+        b = np.zeros((len(self.date_ranges_day_by_day), len(self.target_table_spc['Name']))).astype("object")
+        c = np.zeros((len(self.date_ranges_day_by_day), len(self.target_table_spc['Name']))).astype("object")
+        d = np.zeros((len(self.date_ranges_day_by_day), len(self.target_table_spc['Name']))).astype("object")
+        idx_true = [0] * len(self.date_ranges_day_by_day)
+        is_julien_criterion = [False] * len(self.date_ranges_day_by_day)
+
+        for i, day in enumerate(self.date_ranges_day_by_day):
+            a[i] = self._is_moon_and_visibility_contraint(day)['ever observable']
+            b[i] = self._is_moon_and_visibility_contraint(day)['fraction of time observable']
+            idx_true = len(np.where(a[i])[0])
+            is_julien_criterion[i] = np.sum(self.idx_is_julien_criterion(day))
+            c[i] = self.rise_time_targets(day)
+            d[i] = self.set_time_targets(day)
+
+        E = np.zeros((len(self.date_ranges_day_by_day), len(self.target_table_spc['Name']), 5)).astype("object")
+        E[:, :, 0] = self.target_table_spc['Name']
+        E[:, :, 1] = a
+        E[:, :, 2] = b
+        E[:, :, 3] = c
+        E[:, :, 4] = d
+
+        np.save('array' + str(self.observatory.name) + '.npy', E, allow_pickle=True)
+
+        df = pd.DataFrame({'day': Time(self.date_ranges_day_by_day), 'nb_observable_target': idx_true,
+                           'julien_criterion': is_julien_criterion})
+
+        df.to_csv('nb_observable_target_prio_50_' + str(self.observatory.name) + '.csv', sep=',', index=False)
+
