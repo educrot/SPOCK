@@ -1,3 +1,5 @@
+{::options parse_block_html="true" /}
+
 # SPOCK
 
 
@@ -7,3 +9,18 @@
 *  Visibility of the target
 *  Priority (metric from JWST)
 *  number of hours already performed
+
+## How it works
+
+
+## Quickstart
+
+<div class="panel panel-danger">
+**Danger**
+{: .panel-heading}
+<div class="panel-body">
+
+DANGER DESCRIPTION
+
+</div>
+</div>
