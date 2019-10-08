@@ -1,5 +1,3 @@
-{::options parse_block_html="true" /}
-
 
 
 ![Test Image 1](logo_SPOCK_2.png)
@@ -57,9 +55,10 @@ To plot the schedule you  have generated, execute the following command:
 fig = SPOCKplots.gantt_chart('plan.txt',schedule.observatory)
 ```
 
-![Test Image 1](Schedule.html)
-
 Example of output image you will obtain:
+
+
+![Test Image 1](schedule_example.png)
 
 
 ## Contributing
