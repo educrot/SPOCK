@@ -1,11 +1,10 @@
 
-
 ![Test Image 1](logo_SPOCK_2.png)
 
 
 # SPOCK
 
-`SPOCK` is a Python library for dealing with the planification of SPECULOOS targets observations
+**`SPOCK`** is a Python library for dealing with the planification of SPECULOOS targets observations
 
 *Schedule targets on several criteria:*
 *  Visibility of the target
