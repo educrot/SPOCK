@@ -7,7 +7,7 @@
 
 # SPOCK
 
-SPOCK is a Python library for dealing with the planification of SPECULOOS targets observations
+`SPOCK` is a Python library for dealing with the planification of SPECULOOS targets observations
 
 *Schedule targets on several criteria:*
 *  Visibility of the target
@@ -49,9 +49,18 @@ schedule = SPOCKLS.schedule()
 schedule.load_parameters('input_file.csv')
 schedule.make_schedule()
 schedule.make_plan_file('input_file.csv')
-fig = SPOCKplots.gantt_chart('plan.txt',schedule.observatory)
+```
+
+To plot the schedule you  have generated, execute the following command:
 
 ```
+fig = SPOCKplots.gantt_chart('plan.txt',schedule.observatory)
+```
+
+![Test Image 1](Schedule.html)
+
+Example of output image you will obtain:
+
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
