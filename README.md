@@ -1,7 +1,5 @@
+<img align="right" src="logo_SPOCK_2.png" width="350" height="100">
 
-<img src="logo_SPOCK_2.png" width="400" height="100">
-
-# SPOCK
 
 **`SPOCK`** is a Python library for dealing with the planification of SPECULOOS targets observations
 
