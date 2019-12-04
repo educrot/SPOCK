@@ -1,11 +1,11 @@
 <img align="right" src="logo_SPOCK_2.png" width="350" height="100">
 
 
-**`SPOCK`** is a Python library for dealing with the planification of SPECULOOS targets observations
+**`SPOCK`** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
 
 *Schedule targets on several criteria:*
 *  Visibility of the target
-*  Priority (metric from JWST)
+*  Priority (from different metric)
 *  number of hours already performed
 
 ## Installation
@@ -13,7 +13,9 @@
 Use the package manager [pip]() to install SPOCK.
 
 ```bash
-pip install SPOCK
+git clone http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock.git
+
+cd spock
 ```
 
 ## Usage
@@ -51,6 +53,7 @@ Then, open a python script or the [SPOCK jupyter notebook]() and run:
 
 ```python
 import SPOCK.long_term_scheduler as SPOCKLT
+
 schedule = SPOCKLT.schedules()
 obs = 1 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
 schedule.load_parameters('./input.csv',obs)
@@ -59,9 +62,10 @@ schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
 
 To plot the schedule you  have generated, execute the following command:
 
-```
+```python
 import SPOCK.plots_scheduler as SPOCKplot
 from astropy.time import Time
+
 day = Time('2019-11-01 15:00:00.000')
 SPOCKplot.airmass_plot_saved('SSO','Ganymede',day)
 SPOCKplot.airmass_plot_proposition('SSO','Ganymede',day)
