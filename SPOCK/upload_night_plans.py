@@ -2,8 +2,6 @@
 
 import subprocess
 import os
-import time
-import shutil
 from astropy.time import Time
 
 def upload_np_euro(t_now,nb_jours):

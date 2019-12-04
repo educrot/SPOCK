@@ -1,8 +1,6 @@
 import os
 import numpy as np
-import time
 import pandas as pd
-from datetime import datetime
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
@@ -10,9 +8,6 @@ startup_time=[]
 hour=[]
 minute=[]
 
-
-
-# class txt_files(object):
 def Path_txt_files(telescope):
     Path=os.path.join('./DATABASE',telescope,'Plans_by_date')
     return Path

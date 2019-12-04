@@ -1,20 +1,15 @@
 import SPOCK.long_term_scheduler as SPOCKLT
 import SPOCK.short_term_scheduler as SPOCKST
 import SPOCK.plots_scheduler as SPOCKplot
-from astropy import units as u
-from astroplan import AltitudeConstraint, MoonSeparationConstraint
-import os.path, time
 from astropy.time import Time
-from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
-import SPOCK.ETC as ETC
 
 
 schedule = SPOCKLT.schedules()
 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
 schedule.load_parameters('/Users/elsaducrot/code/spock/input.csv',3)
 
-SPOCKplot.airmass_plot('SSO','Io',schedule.date_range[0])
-SPOCKplot.airmass_altitude_plot('SSO','Io',schedule.date_range[0])
+SPOCKplot.airmass_plot_saved('SSO','Io',schedule.date_range[0])
+SPOCKplot.airmass_altitude_plot_saved('SSO','Io',schedule.date_range[0])
 #SPOCKplot.gantt_chart(schedule.date_range[0],schedule.date_range[1],['Io','Europa','Artemis'])
 
 print()

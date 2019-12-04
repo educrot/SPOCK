@@ -1,9 +1,5 @@
 #!/usr/bin/python
 import os
-import numpy as np
-import time
-import sys
-import math
 import shutil
 from astropy.table import Table
 from astroplan import Observer
@@ -12,10 +8,7 @@ from SPOCK.test_txtfiles import startup, startup_no_flats, Path_txt_files, flate
 from SPOCK.test_txtfiles import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy import units as u
-from astropy.coordinates import SkyCoord, AltAz, ICRS
-from astropy import coordinates as coord
-from astropy.coordinates import Angle
-import pandas as pd
+
 #initialisation
 filt={}
 texp={}
@@ -234,5 +227,3 @@ def make_np(t_now,nb_jours,tel):
 		p2=os.path.join('./DATABASE',str(telescope),str(t_now))
 		shutil.make_archive(p2, 'zip', p)
 
-	#Zip Folder of the date containing Plans of the night
-	#shutil.make_archive(str(t_now), 'zip', p)
