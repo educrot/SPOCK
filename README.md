@@ -1,6 +1,5 @@
 
-![Test Image 1](logo_SPOCK_2.png)
-
+<img src="logo_SPOCK_2.png" width="400" height="100">
 
 # SPOCK
 
@@ -21,37 +20,58 @@ pip install SPOCK
 
 ## Usage
 
-Create your `'input_file.csv'` file in the following format:
+For `long_term_scheduler` reate your *'input_file.csv'* file in the following format:
 
 --- 
+--- 
     date_range: 
-      - "2019-09-23 15:00:00"
-      - "2019-09-26 15:00:00"
+      - "2019-12-05 15:00:00"
+      - "2020-01-08 15:00:00"
+    observatories:
+      1:
+        name: SSO
+        telescopes: [Callisto,Europa,Io]
+      2:
+        name: SNO
+        telescopes: [Artemis]
+      3: 
+        name: Saint-Ex
+        telescopes: [Saint-Ex]
+      4: 
+        name: TS_La_Silla
+        telescopes: [TS_La_Silla]
+      5: 
+        name: TN_Oukaimeden
+        telescopes: [TN_Oukaimeden]
+    strategy: "continuous"
     duration_segments: 20
     nb_segments: 3
-    observatories: 
-      - Saint-Ex
-      - SNO
-    strategy: "continuous"
-    target_list: target_prio_50.txt
+    target_list: speculoos_target_list_v2.txt
 ---
 
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
 
 ```python
-import SPOCK.long_term_scheduler as SPOCKLS
-import SPOCK.plots_scheduler as SPOCKplots
-
-schedule = SPOCKLS.schedule()
-schedule.load_parameters('input_file.csv')
-schedule.make_schedule()
-schedule.make_plan_file('input_file.csv')
+import SPOCK.long_term_scheduler as SPOCKLT
+schedule = SPOCKLT.schedules()
+obs = 1 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
+schedule.load_parameters('./input.csv',obs)
+schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
 ```
 
 To plot the schedule you  have generated, execute the following command:
 
 ```
-fig = SPOCKplots.gantt_chart('plan.txt',schedule.observatory)
+import SPOCK.plots_scheduler as SPOCKplot
+from astropy.time import Time
+day = Time('2019-11-01 15:00:00.000')
+SPOCKplot.airmass_plot_saved('SSO','Ganymede',day)
+SPOCKplot.airmass_plot_proposition('SSO','Ganymede',day)
+SPOCKplot.airmass_altitude_plot_saved('SSO','Io',day)
+SPOCKplot.airmass_altitude_plot_proposition('SSO','Io',day)
+SPOCKplot.gantt_chart(day,day+10,['Artemis'])
+SPOCKplot.gantt_chart_all(schedule.target_list)
+
 ```
 
 Example of output image you will obtain:
