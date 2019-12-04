@@ -1,4 +1,4 @@
-<img align="right" src="logo_SPOCK_2.png" width="350" height="100">
+<img align="right" src="./SPOCK_Figures/logo_SPOCK_2.png" width="350" height="100">
 
 
 **`SPOCK`** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
@@ -134,7 +134,7 @@ SPOCKplot.gantt_chart_all(schedule.target_list)
 Example of output image you will obtain:
 
 
-![Test Image 1](visibiblity_plot_example.png)
+![Test Image 1](./SPOCK_Figures/visibiblity_plot_example.png)
 
 
 ## Contributing
