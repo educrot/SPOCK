@@ -134,7 +134,7 @@ SPOCKplot.gantt_chart_all(schedule.target_list)
 Example of output image you will obtain:
 
 
-![Test Image 1](schedule_example.png)
+![Test Image 1](visibiblity_plot_example.png)
 
 
 ## Contributing
