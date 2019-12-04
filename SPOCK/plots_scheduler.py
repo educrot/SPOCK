@@ -1,9 +1,7 @@
-#import chart_studio.plotly as plotly
 import chart_studio
 chart_studio.tools.set_credentials_file(username='ed510', api_key='lN1JDlEfs0FPrLHqPScL')
 chart_studio.tools.set_config_file(world_readable=True,sharing='public')
 from plotly import graph_objs as go
-from astropy.table import Table
 import pandas as pd
 from plotly import offline
 from astroplan import Observer
@@ -47,7 +45,7 @@ def charge_observatories(Name):
     return observatories
 
 def airmass_plot(name_observatory,telescope,day):
-    night_block = pd.read_csv(os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', telescope,
+    night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
@@ -76,7 +74,7 @@ def airmass_plot(name_observatory,telescope,day):
 
 
 def airmass_altitude_plot(name_observatory,telescope,day):
-    night_block = pd.read_csv(os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', telescope,
+    night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
@@ -117,10 +115,10 @@ def gantt_chart_all(target_list):
                                            2635.0000000009704 * u.m)
     telescopes = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex']
     for tel in telescopes:
-        for i in os.listdir(os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', tel,
+        for i in os.listdir(os.path.join('./DATABASE/', tel,
                                          'Archive_night_blocks')):
             if i.endswith('.txt'):
-                df = pd.read_csv(os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', tel,
+                df = pd.read_csv(os.path.join('./DATABASE/', tel,
                                               'Archive_night_blocks', i), sep=' ', skipinitialspace=True)
                 start.append(list(df["start time (UTC)"]))
                 finish.append(list(df["end time (UTC)"]))
@@ -175,11 +173,11 @@ def gantt_chart(date_start,date_end,telescope):
         for i in range(0, date_range_in_days):
             day = date_start + i
             list_night_blocks.append('night_blocks_' + tel + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt')
-        for i in os.listdir(os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', tel,
+        for i in os.listdir(os.path.join('./DATABASE/', tel,
                                          'Archive_night_blocks')):
             if i.endswith('.txt'):
                 if any(i in s for s in list_night_blocks):
-                    df = pd.read_csv(os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', tel,
+                    df = pd.read_csv(os.path.join('./DATABASE/', tel,
                                                   'Archive_night_blocks', i), sep=' ', skipinitialspace=True)
                     start.append(list(df["start time (UTC)"]))
                     finish.append(list(df["end time (UTC)"]))

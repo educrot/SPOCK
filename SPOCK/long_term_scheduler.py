@@ -128,9 +128,8 @@ def compare_target_lists(path_target_list):
 def SSO_planned_targets(date):
     telescopes = ['Io', 'Europa', 'Ganymede', 'Callisto']
     targets_on_SSO_telescopes = []
-    path = './night_blocks_propositions'
     for i in range(len(telescopes)):
-        night_block_str = path + 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         url = "http://www.mrao.cam.ac.uk/SPECULOOS/" + telescopes[
             i] + '/schedule/Archive_night_blocks/' + night_block_str
         user, password = 'educrot', '58JMSGgdmzTB'
@@ -185,9 +184,12 @@ def update_hours_target_list(path_target_list):
     index_df2_SNO = np.where([df_SNO['Target'] == target_df2 for target_df2 in df_user['SP_ID']])
     index_df = np.where([df_user['Name']==target_df for target_df in df_cambridge['Target']])
     index_df_SNO = np.where([df_user['Name'] == target_df for target_df in df_SNO['Target']])
+    index_SNO_cam, index_cam_SNO = index_list1_list2(df_SNO['Target'], df_cambridge['Target'])
+
     t = Table.from_pandas(df_cambridge)
     t_SNO = Table.from_pandas(df_SNO)
     t2 = Table.from_pandas(df_user)
+
     for i in range(0,len(t['Hours'][index_df[0]])):
         t2['nb_hours_surved'][index_df2[0][i]]=max(float(t['Hours'][index_df[0][i]]),float(t2['nb_hours_surved'][index_df2[0][i]]))
     for i in range(0,len(t['Hours'][index_df_SNO[0]])):
