@@ -44,7 +44,7 @@ def charge_observatories(Name):
 
     return observatories
 
-def airmass_plot(name_observatory,telescope,day):
+def airmass_plot_saved(name_observatory,telescope,day):
     night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
@@ -71,11 +71,64 @@ def airmass_plot(name_observatory,telescope,day):
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
         plt.legend(loc=2)
 
+def airmass_plot_proposition(name_observatory,telescope,day):
+    night_block = pd.read_csv(os.path.join('./night_blocks_propositions/','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
+                              sep=' ', skipinitialspace=True)
+    observatory = charge_observatories(name_observatory)[0]
+    day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
+    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.05,\
+                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.05, 100),format='jd')
+    colors_start_new_target = ['black', 'darkgray', 'lightgray']
+    sun_set =observatory.twilight_evening_nautical(day,which='next').iso
+    sun_rise = observatory.twilight_morning_nautical(day+1,which='nearest').iso
+    for i in range(len(night_block)):
+
+        dec = str(int(float(night_block['dec (d)'][i]))) + ' ' + str(
+            int(abs(float(night_block['dec (m)'][i])))) + ' ' + str(int(abs(float(night_block['dec (s)'][i]))))
+        ra = str(int(float(night_block['ra (h)'][i]))) + ' ' + str(
+            int(abs(float(night_block['ra (m)'][i])))) + ' ' + str(int(abs(float(night_block['ra (s)'][i]))))
+        plot_airmass(FixedTarget(coord=SkyCoord(ra=ra,dec=dec,unit=(u.hourangle, u.deg)),\
+                                 name=night_block['target'][i]), observatory, delta_midnight)
+        t = Time(night_block['start time (UTC)'][i])
+        plt.vlines(t.iso, 3, 1,linestyle='--',color=colors_start_new_target[i],alpha = 0.8,label='start ' + str(night_block['target'][i]))
+        plt.vlines(sun_set, 3, 1, linestyle=':', color='yellow', alpha=0.9)
+        plt.vlines(sun_rise, 3, 1, linestyle=':', color='yellow', alpha=0.9)
+        plt.grid(color='gainsboro', linestyle='-', linewidth=1,alpha=0.3)
+        plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
+        plt.legend(loc=2)
 
 
-def airmass_altitude_plot(name_observatory,telescope,day):
+
+def airmass_altitude_plot_saved(name_observatory,telescope,day):
     night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
+                              sep=' ', skipinitialspace=True)
+    observatory = charge_observatories(name_observatory)[0]
+    day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
+    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.05,\
+                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.05, 100),format='jd')
+    sun_set =observatory.twilight_evening_nautical(day,which='next').iso
+    sun_rise = observatory.twilight_morning_nautical(day+1,which='nearest').iso
+    fig, axs = plt.subplots(1)
+    colors_start_new_target = ['black', 'darkgray', 'lightgray']
+    for i in range(len(night_block)):
+        dec = str(int(float(night_block['dec (d)'][i]))) + ' ' + str(
+            int(abs(float(night_block['dec (m)'][i])))) + ' ' + str(int(abs(float(night_block['dec (s)'][i]))))
+        ra = str(int(float(night_block['ra (h)'][i]))) + ' ' + str(
+            int(abs(float(night_block['ra (m)'][i])))) + ' ' + str(int(abs(float(night_block['ra (s)'][i]))))
+        plot_airmass(FixedTarget(coord=SkyCoord(ra=ra,dec=dec,unit=(u.hourangle, u.deg)),\
+                                 name=night_block['target'][i]), observatory, delta_midnight, altitude_yaxis=True)
+        plt.ylabel('Altitude (degrees)')
+        t = Time(night_block['start time (UTC)'][i])
+        axs.vlines(t.iso, 3, 1,linestyle='--',color=colors_start_new_target[i],alpha = 0.7,label='start ' + str(night_block['target'][i]))
+        axs.vlines(sun_set, 3, 1, linestyle=':', color='yellow', alpha=0.9)
+        axs.vlines(sun_rise, 3, 1, linestyle=':', color='yellow', alpha=0.9)
+        plt.legend(loc=2)
+        plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
+        plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
+
+def airmass_altitude_plot_proposition(name_observatory,telescope,day):
+    night_block = pd.read_csv(os.path.join('./night_blocks_propositions/','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
     day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
