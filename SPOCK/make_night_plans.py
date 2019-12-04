@@ -38,10 +38,8 @@ def make_np(t_now,nb_jours,tel):
 	for nb_day in range(0,nb_jours):
 		print(telescope)
 		t_now=Time(t0+ nb_day*dt, scale='utc', out_subfmt='date').iso
-		Path='/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/'
-		# Path_dropbox='/Users/elsaducrot/Dropbox/SSO/Callisto/Plans/'
-		p=os.path.join(Path,telescope,'Plans_by_date',str(t_now))
-		#p=os.path.join(,str(telescope),'/Plans_by_date/',str(t_now))
+		Path='./DATABASE'
+		p=os.path.join(Path,str(telescope),'Plans_by_date',str(t_now))
 		print(p)
 		if not os.path.exists(p):
 			os.makedirs(p)
@@ -49,7 +47,7 @@ def make_np(t_now,nb_jours,tel):
 		#     os.makedirs(p2)
 
 		#Read night_blocks file
-		scheduler_table=Table.read('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/' + str(telescope) +'/night_blocks_'+ str(telescope) +'_' + str(t_now)+'.txt', format='ascii')
+		scheduler_table=Table.read('./DATABASE/' + str(telescope) +'/night_blocks_'+ str(telescope) +'_' + str(t_now)+'.txt', format='ascii')
 		name=scheduler_table['target']
 		date_start=scheduler_table['start time (UTC)']
 		date_end=scheduler_table['end time (UTC)']
@@ -233,7 +231,7 @@ def make_np(t_now,nb_jours,tel):
 		else:
 			biasdark(t_now,Path)
 
-		p2=os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/',str(telescope),str(t_now))
+		p2=os.path.join('./DATABASE',str(telescope),str(t_now))
 		shutil.make_archive(p2, 'zip', p)
 
 	#Zip Folder of the date containing Plans of the night

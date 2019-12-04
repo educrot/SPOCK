@@ -3,8 +3,8 @@
 import os
 import pandas as pd
 import numpy as np
-from upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
-from make_night_plans import make_np
+from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
+from SPOCK.make_night_plans import make_np
 import subprocess
 import sys
 from astropy import units as u
@@ -806,4 +806,3 @@ def upload_plans(day, nb_days, telescope):
     path_night_blocks = os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', telescope,'Archive_night_blocks/')
     print(path_night_blocks)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_night_blocks, path_database])
-

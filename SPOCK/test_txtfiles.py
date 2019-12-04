@@ -14,7 +14,7 @@ minute=[]
 
 # class txt_files(object):
 def Path_txt_files(telescope):
-    Path=os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/',telescope,'Plans_by_date')
+    Path=os.path.join('./DATABASE',telescope,'Plans_by_date')
     return Path
 
 def startup_no_flats(t_now,name,sun_set,date_start,Path):

@@ -1,12 +1,12 @@
-import long_term_scheduler as SPOCKLT
-import short_term_scheduler as SPOCKST
-import plots_scheduler as SPOCKplot
+import SPOCK.long_term_scheduler as SPOCKLT
+import SPOCK.short_term_scheduler as SPOCKST
+import SPOCK.plots_scheduler as SPOCKplot
 from astropy import units as u
 from astroplan import AltitudeConstraint, MoonSeparationConstraint
 import os.path, time
 from astropy.time import Time
-from upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
-import ETC
+from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
+import SPOCK.ETC as ETC
 
 
 schedule = SPOCKLT.schedules()
@@ -65,16 +65,3 @@ SPOCKST.make_np(schedule.day_of_night,1,schedule.telescope)
 
 print()
 
-
-
-
-last_mod = time.ctime(os.path.getmtime(schedule.target_list))
-created = time.ctime(os.path.getctime(schedule.target_list))
-print("last modified: %s" % time.ctime(os.path.getmtime(schedule.target_list)))
-print("created: %s" % time.ctime(os.path.getctime(schedule.target_list)))
-from datetime import datetime
-now = datetime.now()
-current_time = now.strftime("%H:%M:%S")
-print("Current Time =", current_time)
-#wxif (now - last_mod)>0:
-#    print()

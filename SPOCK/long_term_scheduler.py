@@ -7,10 +7,10 @@ from io import StringIO
 import subprocess
 from astropy.utils.data import clear_download_cache
 clear_download_cache()
-from make_night_plans import make_np
+from SPOCK.make_night_plans import make_np
 import matplotlib.pyplot as plt
 from astroplan.plots import dark_style_sheet, plot_airmass
-from upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
+from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
 import shutil
 #from astropy.utils import iers
 #iers.IERS_A_URL  ='ftp://cddis.gsfc.nasa.gov/pub/products/iers/finals2000A.all'
@@ -31,7 +31,7 @@ import yaml
 import sys
 import os.path, time
 from datetime import datetime
-import ETC
+import SPOCK.ETC as ETC
 import paramiko
 
 def get_hours_files_SNO():
@@ -50,7 +50,7 @@ def get_hours_files_SNO():
     stdin,stdout,stderr = s.exec_command('ls')
     print(stdout.read())
     ftp_client=s.open_sftp()
-    ftp_client.get('/home/speculoos/SNO/ObservationHours/ObservationHours.txt','/Users/elsaducrot/code/spock/ObservationHours.txt')
+    ftp_client.get('/home/speculoos/SNO/ObservationHours/ObservationHours.txt','./ObservationHours.txt')
     ftp_client.close()
 
     s.close()
@@ -128,8 +128,9 @@ def compare_target_lists(path_target_list):
 def SSO_planned_targets(date):
     telescopes = ['Io', 'Europa', 'Ganymede', 'Callisto']
     targets_on_SSO_telescopes = []
+    path = './night_blocks_propositions'
     for i in range(len(telescopes)):
-        night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = path + 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         url = "http://www.mrao.cam.ac.uk/SPECULOOS/" + telescopes[
             i] + '/schedule/Archive_night_blocks/' + night_block_str
         user, password = 'educrot', '58JMSGgdmzTB'
@@ -148,7 +149,7 @@ def SNO_planned_targets(date):
     targets_on_SNO_telescopes = []
     for i in range(len(telescopes)):
         night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
-        path = '/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
+        path = './DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
             for tar in c['target']:
@@ -172,7 +173,7 @@ def update_hours_target_list(path_target_list):
 
     """
     get_hours_files_SNO()
-    df_SNO = pd.read_csv('/Users/elsaducrot/code/spock/ObservationHours.txt',delimiter=',')
+    df_SNO = pd.read_csv('ObservationHours.txt',delimiter=',')
     TargetURL="http://www.mrao.cam.ac.uk/SPECULOOS/reports/SurveyTotal"
     user, password = 'educrot', '58JMSGgdmzTB'
     resp = requests.get(TargetURL, auth=(user, password))
@@ -1048,7 +1049,7 @@ class schedules:
             print('no transition block')
 
         panda_table = self.night_block.to_pandas()
-        panda_table.to_csv(os.path.join('night_blocks_' + self.telescope + '_' +  str(day_fmt) + '.txt'),sep=' ')
+        panda_table.to_csv(os.path.join('night_blocks_propositions/' +'night_blocks_' + self.telescope + '_' +  str(day_fmt) + '.txt'),sep=' ')
 
     def is_constraint_hours(self,idx_target):
         """
@@ -1577,9 +1578,9 @@ def save_schedule(input_file,nb_observatory,save=False,over_write =True):
     for i in range(0,date_range_in_days):
         day = date_range[0] + i
         if save:
-            source = './' + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
-            destination = '/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/' + telescope + '/'
-            destination_2 = '/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/' + telescope + '/' + 'Archive_night_blocks/'
+            source = './' + 'night_blocks_propositions/' +'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
+            destination = './DATABASE/' + telescope + '/'
+            destination_2 = './DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
             if over_write:
                 dest = shutil.copy(source, destination)
                 dest2 = shutil.copy(source, destination_2)
@@ -1615,13 +1616,13 @@ def upload_plans(day, nb_days, telescope):
 
     path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', telescope,'schedule')
     print(path_database)
-    path_plans = os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', telescope,'Plans_by_date/')
+    path_plans = os.path.join('./DATABASE/', telescope,'Plans_by_date/')
     print(path_plans)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_plans, path_database])
 
     # ------------------- update archive niht blocks ------------------
 
-    path_night_blocks = os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', telescope,'Archive_night_blocks/')
+    path_night_blocks = os.path.join('./DATABASE/', telescope,'Archive_night_blocks/')
     print(path_night_blocks)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_night_blocks, path_database])
 
@@ -2492,4 +2493,3 @@ def upload_plans(day, nb_days, telescope):
 
 ########################################################################################################################
 #####################################                  SPOCK               #############################################
-
