@@ -97,8 +97,6 @@ def airmass_plot_proposition(name_observatory,telescope,day):
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
         plt.legend(loc=2)
 
-
-
 def airmass_altitude_plot_saved(name_observatory,telescope,day):
     night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
@@ -209,7 +207,7 @@ def gantt_chart_all(target_list):
     config = {
         'scrollZoom': True
     }
-    offline.plot(fig,auto_open=True,filename='Preview_schedule.html',config=config)
+    offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
 
 def gantt_chart(date_start,date_end,telescope):
     start = []
@@ -269,4 +267,4 @@ def gantt_chart(date_start,date_end,telescope):
     config = {
         'scrollZoom': True
     }
-    offline.plot(fig,auto_open=True,filename='Preview_schedule.html',config=config)
+    offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
