@@ -121,8 +121,9 @@ def compare_target_lists(path_target_list):
     else:
         print('INFO: OK ! User\'s list is similar to the one on the Cambridge server')
 
-def SSO_planned_targets(date):
+def SSO_planned_targets(date,telescope):
     telescopes = ['Io', 'Europa', 'Ganymede', 'Callisto']
+    telescopes = np.delete(telescopes, telescopes.index(telescope))
     targets_on_SSO_telescopes = []
     for i in range(len(telescopes)):
         night_block_str = '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
@@ -136,7 +137,10 @@ def SSO_planned_targets(date):
                 targets_on_SSO_telescopes.append(tar)
         else:
             print('WARNING: No plans on ' + telescopes[i] + ' on the ' + str(date))
-    print('INFO: Targets on SSO: ',targets_on_SSO_telescopes)
+    if (telescope=='Artemis') or (telescope=='Saint-Ex'):
+        print('INFO: Targets on SSO: ', targets_on_SSO_telescopes)
+    else:
+        print('INFO: Targets on other SSO: ',targets_on_SSO_telescopes)
     return targets_on_SSO_telescopes
 
 def SNO_planned_targets(date):
@@ -879,7 +883,7 @@ class schedules:
         priority_non_observable_idx = (self.priority['set or rise']=='None')
         self.priority['priority'][priority_non_observable_idx] = 0.5
         day_fmt = Time(day.iso, out_subfmt='date').iso
-        idx_planned_SSO = index_list1_list2(SSO_planned_targets(day_fmt), self.target_table_spc['Sp_ID'])
+        idx_planned_SSO = index_list1_list2(SSO_planned_targets(day_fmt,self.telescope), self.target_table_spc['Sp_ID'])
         for i in range(len(idx_planned_SSO)):
             self.priority['priority'][idx_planned_SSO[i]] = 0
         idx_planned_SNO = index_list1_list2(SNO_planned_targets(day_fmt), self.target_table_spc['Sp_ID'])
@@ -1350,7 +1354,7 @@ class schedules:
                     if self.first_target['set or rise'] == 'both':
                         self.idx_second_target = self.idx_first_target
                         self.second_target = self.first_target
-                        is_moon_constraint_met_second_target = self.is_moon_and_visibility_constraint(t, self.idx_second_target)
+                        is_moon_constraint_met_second_target = self.is_moon_and_visibility_constraint(t)
 
         if is_moon_constraint_met_second_target and hours_constraint_second:
             is_constraints_met_second_target = True

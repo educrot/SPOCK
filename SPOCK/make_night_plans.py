@@ -30,7 +30,7 @@ def make_np(t_now,nb_jours,tel):
 
 	for nb_day in range(0,nb_jours):
 		print(telescope)
-		t_now=Time(t0+ nb_day*dt, scale='utc', out_subfmt='date').iso
+		t_now=Time(t0+ nb_day*dt, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
 		Path='./DATABASE'
 		p=os.path.join(Path,str(telescope),'Plans_by_date',str(t_now))
 		print(p)

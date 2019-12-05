@@ -276,7 +276,7 @@ class etc:
             #print(5/0)
 
         #available spectra are in folder Spectra
-        path='files_ETC/Spectra/'
+        path='./files_ETC/Spectra/'
         spec_file = os.path.join(path,self.spectra['file'][self.i])
         self.spec=ascii.read(spec_file, data_start=0)
         #plt.grid(True)
@@ -287,7 +287,7 @@ class etc:
         #plt.show()
 
         #available filters are in folder Filters, check available files
-        path='files_ETC/Filters/'
+        path='./files_ETC/Filters/'
         files = []
         # r=root, d=directories, f = files
         for r, d, f in os.walk(path):

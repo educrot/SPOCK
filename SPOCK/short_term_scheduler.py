@@ -14,6 +14,7 @@ from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astroplan import Observer
 import yaml
 import shutil
+import SPOCK.ETC as ETC
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint,observability_table, is_observable, months_observable,time_grid_from_range,LocalTimeConstraint, is_always_observable
 from astroplan import TimeConstraint
 import matplotlib.pyplot as plt
@@ -127,6 +128,8 @@ class schedules:
                                          AirmassConstraint(max = airmass_max,boolean_constraint=True), \
                                          TimeConstraint((Time(self.observatory.twilight_evening_nautical(self.day_of_night, which='next'))), \
                                                         (Time(self.observatory.twilight_morning_nautical(self.day_of_night+1, which='nearest'))))]
+        if self.target_table_spc['texp_spc'][idx_first_target] == 0:
+            self.target_table_spc['texp_spc'][idx_first_target]= self.exposure_time(self.target_table_spc['Sp_ID'][idx_first_target])
         blocks = []
         a = ObservingBlock(self.targets[idx_first_target], dur_mon_target, -1, constraints=constraints_monitoring_target,\
                            configuration={'filt=' + str(self.target_table_spc['Filter'][idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][idx_first_target])})
@@ -149,12 +152,13 @@ class schedules:
         constraints_special_target = [AltitudeConstraint(min=24 * u.deg), MoonSeparationConstraint(min=30 * u.deg), \
                                       TimeConstraint(start, end)]
         idx_to_insert_target = int(np.where((self.target_table_spc['Sp_ID'] == input_name))[0])
+        if self.target_table_spc['texp_spc'][idx_to_insert_target] == 0:
+            self.target_table_spc['texp_spc'][idx_to_insert_target]= self.exposure_time(self.target_table_spc['Sp_ID'][idx_to_insert_target])
         blocks = []
         a = ObservingBlock(self.targets[idx_to_insert_target], dur_obs_both_target, -1,constraints=constraints_special_target,
                            configuration={'filt=' + str(self.target_table_spc['Filter'][idx_to_insert_target]),
                                           'texp=' + str(self.target_table_spc['texp_spc'][idx_to_insert_target])})
         blocks.append(a)
-        print(a)
         transitioner = Transitioner(slew_rate=11 * u.deg / u.second)
         seq_schedule_SS1 = Schedule(self.day_of_night, self.day_of_night + 1)
         sequen_scheduler_SS1 = SPECULOOSScheduler(constraints=constraints_special_target, observer=self.observatory,
@@ -169,17 +173,19 @@ class schedules:
         TimeConstraint((Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next'))), \
                        (Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest'))))]
         idx_first_target = int(np.where((self.target_table_spc['Sp_ID']==input_name))[0])
+        if int(self.target_table_spc['texp_spc'][idx_first_target]) == 0:
+            self.target_table_spc['texp_spc'][idx_first_target]= self.exposure_time(self.target_table_spc['Sp_ID'][idx_first_target])
         blocks=[]
         a = ObservingBlock(self.targets[idx_first_target],dur_obs_both_target,-1,constraints= constraints_special_target,\
                          configuration={'filt=' + str(self.target_table_spc['Filter'][idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][idx_first_target])})
         blocks.append(a)
         transitioner = Transitioner(slew_rate= 11*u.deg/u.second)
-        seq_schedule_SS1=Schedule(self.day_of_night,self.day_of_night+1)
-        sequen_scheduler_SS1=SPECULOOSScheduler(constraints=constraints_special_target, observer = self.observatory,transitioner=transitioner)
+        seq_schedule_SS1 = Schedule(self.day_of_night,self.day_of_night+1)
+        sequen_scheduler_SS1 = SPECULOOSScheduler(constraints=constraints_special_target, observer = self.observatory,transitioner=transitioner)
         sequen_scheduler_SS1(blocks,seq_schedule_SS1)
         self.SS1_night_blocks=seq_schedule_SS1.to_table()
         if len(self.SS1_night_blocks) == 0:
-            print('WARNING = Impossible to schedule target ' + input_name + ' at this time range and/or with those constraints')
+            print('WARNING : Impossible to schedule target ' + input_name + ' at this time range and/or with those constraints')
         return self.SS1_night_blocks
 
     def transit_follow_up(self,follow_up_list):
@@ -197,7 +203,7 @@ class schedules:
             P_err_transit = df['P_err'][i]
             W_err_transit = df['W_err'][i]
             target_transit = EclipsingSystem(primary_eclipse_time = epoch, orbital_period=period, duration=duration, name=df['Sp_ID'][i])
-            print('target_transit', target_transit.next_primary_eclipse_time(self.day_of_night, n_eclipses=1))
+            print('INFO: target_transit', target_transit.next_primary_eclipse_time(self.day_of_night, n_eclipses=1))
             timing_to_obs_jd = Time(target_transit.next_primary_eclipse_time(self.day_of_night, n_eclipses=1)).jd
 
             target = target_list_good_coord_format(follow_up_list)
@@ -212,14 +218,16 @@ class schedules:
                 err_T0_neg = timing_to_obs_jd[0] - (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value,1) * (period.value - P_err_transit) + (epoch.jd - T0_err_transit ))
                 err_T0_pos = (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value,1) * (period.value + P_err_transit) + (epoch.jd + T0_err_transit )) - timing_to_obs_jd[0]
                 start_transit = Time(ing_egr[0][0].value - err_T0_neg - oot_time.value - W_err_transit,format='jd') #- T0_err_transit - W_err_transit  - oot_time.value/24 - (timing_to_obs_jd[0] - epoch.jd) / period.value * P_err_transit,format='jd')
-                print('start_transit', start_transit.iso)
+                #print('INFO: start_transit', start_transit.iso)
                 end_transit = Time(ing_egr[0][1].value + err_T0_pos + oot_time.value + W_err_transit,format='jd') #+ T0_err_transit + W_err_transit + oot_time.value/24 + (timing_to_obs_jd[0] - epoch.jd) / period.value * P_err_transit ,format='jd')
-                print('end_transit', end_transit.iso)
+                #print('INFO: end_transit', end_transit.iso)
                 dur_obs_transit_target = (end_transit - start_transit).value * 1. * u.day
                 constraints_transit_target = [AltitudeConstraint(min=24 * u.deg),
                                               MoonSeparationConstraint(min=30 * u.deg), \
                                               TimeConstraint(start_transit, end_transit)]
                 idx_first_target = int(np.where((df['Sp_ID'] == df['Sp_ID'][i]))[0])
+                if df['texp_spc'][idx_first_target] == 0:
+                    df['texp_spc'][idx_first_target] = self.exposure_time(df['Sp_ID'][idx_first_target])
                 a = ObservingBlock(target[idx_first_target], dur_obs_transit_target, -1,
                                    constraints=constraints_transit_target,
                                    configuration={'filt=' + str(df['Filter'][idx_first_target]),
@@ -230,12 +238,12 @@ class schedules:
                 sequen_scheduler_SS1 = SPECULOOSScheduler(constraints=constraints_transit_target, observer=self.observatory,
                                                           transitioner=transitioner)
                 sequen_scheduler_SS1(blocks, seq_schedule_SS1)
-                print(start_transit.iso, end_transit.iso)
+                print('INFO: start_transit of ',str(df['Sp_ID'][i]), ' : ',start_transit.iso, 'INFO: end_transit of ',str(df['Sp_ID'][i]), ' : ',end_transit.iso)
                 if len(seq_schedule_SS1.to_table()['target']) != 0:
                     self.SS1_night_blocks = seq_schedule_SS1.to_table()  # Table.read(os.path.join(Path,tel,'special_target_test.txt'), format='ascii')#
                     return self.SS1_night_blocks
             else:
-                print('pas de transit ce jour')
+                print('INFO: no transit of ', df['Sp_ID'][i],'  this day')
 
     def planification(self):
         for i in range(len(self.scheduled_table['target'])):
@@ -345,7 +353,7 @@ class schedules:
         return self.scheduled_table_sorted
 
     def make_scheduled_table(self):
-        Path='/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python'
+        Path='./DATABASE'
         try:
             os.path.exists(os.path.join(Path,self.telescope,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d")+ '.txt'))
             print(os.path.join(Path,self.telescope,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d") + '.txt'))
@@ -362,7 +370,7 @@ class schedules:
 
     def make_night_block(self):
 
-        Path='/Users/elsaducrot/code/spock'
+        Path=  'night_blocks_propositions/'
         if not (self.scheduled_table_sorted is None):
             try:
                 self.scheduled_table_sorted.add_index('target')
@@ -375,20 +383,21 @@ class schedules:
 
     def exposure_time(self, input_name):
         i = np.where((self.target_table_spc['Sp_ID'] == input_name))[0]
-        if int(self.target_table_spc['SpT'][i]) <= 9:
-            spt_type = 'M' + str(int(self.target_table_spc['SpT'][i]))
-        elif (int(self.target_table_spc['SpT'][i]) == 12) or (int(self.target_table_spc['SpT'][i]) == 15) or (
-                int(self.target_table_spc['SpT'][i]) == 18):
-            spt_type = 'M' + str(int(self.target_table_spc['SpT'][i]) - 10)
-        elif int(self.target_table_spc['SpT'][i]) == 10:
+        if round(float(self.target_table_spc['SpT'][i])) <= 9:
+            spt_type = 'M' + str(round(float(self.target_table_spc['SpT'][i])))
+        elif (round(float(self.target_table_spc['SpT'][i])) == 12) or (round(float(self.target_table_spc['SpT'][i]))== 15) or (
+                round(float(self.target_table_spc['SpT'][i])) == 18):
+            spt_type = 'M' + str(round(float(self.target_table_spc['SpT'][i])) - 10)
+        elif round(self.target_table_spc['SpT'][i]) == 10:
             spt_type = 'M9'
-        elif int(self.target_table_spc['SpT'][i]) == 11:
+        elif round(self.target_table_spc['SpT'][i]) == 11:
             spt_type = 'L2'
-        elif int(self.target_table_spc['SpT'][i]) == 13:
+        elif round(self.target_table_spc['SpT'][i]) == 13:
             spt_type = 'L2'
-        elif int(self.target_table_spc['SpT'][i]) == 14:
+        elif round(self.target_table_spc['SpT'][i]) == 14:
             spt_type = 'L5'
-        filt_ = str(self.target_table_spc['Filter'][i])
+        # elif self.target_table_spc['SpT'][i]
+        filt_ = self.target_table_spc['Filter'][i[0]]
         if (filt_ == 'z\'') or (filt_ == 'r\'') or (filt_ == 'i\'') or (filt_ == 'g\''):
             filt_ = filt_.replace('\'', '')
         a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,
@@ -422,26 +431,24 @@ def save_schedule(input_file,nb_observatory,save=False,over_write =True):
         Inputs = yaml.load(f, Loader=yaml.FullLoader)
         df = pd.DataFrame.from_dict(Inputs['observatories'])
         observatory = charge_observatories(df[nb_observatory]['name'])[0]
-        date_range = Time(Inputs['date_range'])
-        date_range_in_days = int((date_range[1]- date_range[0]).value)
+        date_range = Time(Inputs['day_of_night'])
         telescope = df[nb_observatory]['telescopes'][0]
-    for i in range(0,date_range_in_days):
-        day = date_range[0] + i
+        day = date_range[0]
         if save:
-            source = './' + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
-            destination = '/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/' + telescope + '/'
-            destination_2 = '/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/' + telescope + '/' + 'Archive_night_blocks/'
+            source = './night_blocks_propositions/' + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
+            destination = './DATABASE/' + telescope + '/'
+            destination_2 = './DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
             if over_write:
                 dest = shutil.copy(source, destination)
                 dest2 = shutil.copy(source, destination_2)
                 print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
-                print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination2 + '\"')
+                print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' + destination_2 + '\"')
             if not over_write:
                 try:
                     dest = shutil.move(source, destination)
                     dest2 = shutil.move(source, destination_2)
                     print('INFO : ' + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
-                    print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination2 + '\"')
+                    print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
                 except shutil.Error:
                     print('INFO : ' + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
         if not save:
@@ -466,13 +473,13 @@ def upload_plans(day, nb_days, telescope):
     # ------------------- update archive date by date plans folder  ------------------
 
     path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', telescope,'schedule')
-    print(path_database)
-    path_plans = os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', telescope,'Plans_by_date/')
-    print(path_plans)
+    print('INFO: Path database = ',path_database)
+    path_plans = os.path.join('./DATABASE/', telescope,'Plans_by_date/')
+    print('INFO: Path local plans by day = ',path_plans)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_plans, path_database])
 
     # ------------------- update archive niht blocks ------------------
 
-    path_night_blocks = os.path.join('/Users/elsaducrot/Documents/GitHub/Scheduler_global/Python/', telescope,'Archive_night_blocks/')
-    print(path_night_blocks)
+    path_night_blocks = os.path.join('./DATABASE/', telescope,'Archive_night_blocks/')
+    print('INFO: Path local night blocks = ',path_night_blocks)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_night_blocks, path_database])

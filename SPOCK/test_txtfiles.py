@@ -188,25 +188,18 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
     df = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ' ',index_col = False)
     print(name)
     idx_target = None
-    if 'NOI-105435' in name:
-        idx_target = 0
-        gaia_id_target = 6915818294923863040
-    if 'TIC_' in name:
-        idx_target = 0
-        gaia_id_target = 201789285
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
-    if 'Sp' in name:
+    elif 'Sp' in name:
         df2 = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter=' ',index_col=None)
         #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
-        gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
-    print(idx_target)
+        gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
-        df2 = pd.read_csv('all_special.csv',delimiter = ',',index_col = False)
-        idx_target = np.where((df2['spc'] == name.replace('_2','')))[0]
-        gaia_id_target = int(df['gaia'][idx_target].values)
+        df2 = pd.read_csv('target_list_special.txt',delimiter=' ',index_col=None)
+        idx_target = np.where((df2['Sp_ID'] == name))[0]
+        gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
     binning=1
@@ -283,18 +276,20 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
 
 def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     df = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ' ',index_col = False)
+    idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
-    if 'NOI-105435' in name:
-        gaia_id_target = 6915818294923863040
-    else:
-        idx_target = np.where((df['Sp_ID'] == name.replace('_2','')))[0]
-        gaia_id_target = int(df['Gaia_ID'][idx_target].values)
-    if not idx_target:
-        df2 = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ',',index_col = False)
+    elif 'Sp' in name:
+        df2 = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter=' ',index_col=None)
+        #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
-        gaia_id_target = int(df['Gaia_ID'][idx_target].values)
+        gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
+    if idx_target is None:
+        df2 = pd.read_csv('target_list_special.txt',delimiter=' ',index_col=None)
+        idx_target = np.where((df2['Sp_ID'] == name))[0]
+        gaia_id_target = df2['Gaia_ID'][int(idx_target)]
+
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
     binning=1
@@ -371,6 +366,7 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
 
 def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     df = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ' ',index_col = False)
+    idx_target = None
     if 'NOI-105435' in name:
         gaia_id_target = 6915818294923863040
     if 'Trappist' in name:
@@ -381,7 +377,7 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     if not idx_target:
         df2 = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ',',index_col = False)
-        idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
+        idx_target = np.where((df2['Sp_ID'] == name))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
@@ -470,19 +466,20 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
 def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     df = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ' ',index_col = False)
     print(name)
-    if 'NOI-105435' in name:
-        gaia_id_target = 6915818294923863040
+    idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
-    else:
-        idx_target = np.where((df['Sp_ID'] == name.replace('_2','')))[0]
-        print('idx_taret',idx_target)
-        gaia_id_target = int(df['Gaia_ID'][idx_target].values)
-    if not idx_target:
-        df2 = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ',',index_col = False)
+    elif 'Sp' in name:
+        df2 = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter=' ',index_col=None)
+        #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
-        gaia_id_target = int(df['Gaia_ID'][idx_target].values)
+        gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
+    if idx_target is None:
+        df2 = pd.read_csv('target_list_special.txt',delimiter=' ',index_col=None)
+        idx_target = np.where((df2['Sp_ID'] == name))[0]
+        gaia_id_target = df2['Gaia_ID'][int(idx_target)]
+
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
     binning=1

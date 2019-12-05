@@ -1,14 +1,14 @@
 --- 
 day_of_night: 
-  - "2019-11-20 15:00:00"
+  - "2019-12-05 15:00:00"
 start_end_range: 
   - "2019-11-21 04:00:00"
   - "2019-11-21 10:30:00"
-use: "follow_up"
+use: "special"
 observatories:
   1:
     name: SSO
-    telescopes: [Io,Ganymede,Callisto,Io,Europa]
+    telescopes: [Europa,Io,Ganymede,Callisto]
   2:
     name: SNO
     telescopes: [Artemis]
@@ -21,4 +21,4 @@ observatories:
   5: 
     name: TN_Oukaimeden
     telescopes: [TN_Oukaimeden]
-target_list: speculoos_target_list_v2.txt
+target_list: target_list_special.txt
