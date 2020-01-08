@@ -1,20 +1,26 @@
 import SPOCK.long_term_scheduler as SPOCKLT
 import SPOCK.short_term_scheduler as SPOCKST
 import SPOCK.plots_scheduler as SPOCKplot
-from astropy.time import Time
+import SPOCK.ETC as ETC
 
-obs = 1
 
-schedule = SPOCKST.schedules()
-schedule.load_parameters('./input_short_term.csv',obs)
+obs = 3
+schedule = SPOCKLT.Schedules()
+schedule.load_parameters('./input.csv',obs)
+schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
+
+
+print()
+
+# ---------------------- SHORT TERM SCHEDULER ---------------------
 
 if schedule.use == 'follow_up':
-    schedule.transit_follow_up('traget_list_special.txt')
+    schedule.transit_follow_up('target_transit_follow_up.txt')
 if schedule.use == 'special_start_end':
     input_name = 'Sp0755-2404'
     schedule.special_target_with_start_end(input_name)
 if schedule.use == 'special':
-    input_name = 'TI206544316'
+    input_name = 'TI425933644'
     schedule.special_target(input_name)
 if schedule.use == 'monitoring':
     input_name = 'Sp0755-2404'
@@ -23,21 +29,13 @@ if schedule.use == 'monitoring':
 schedule.make_scheduled_table()
 schedule.planification()
 schedule.make_night_block()
-schedule.scheduled_table_sorted
-
-print()
-day = Time('2019-12-05 15:00:00.000')
-SPOCKST.save_schedule('./input_short_term.csv',obs,save=True,over_write =True)
-
-SPOCKST.make_np(day,1,schedule.telescope)
-SPOCKST.upload_plans(day, nb_days=1,telescope = schedule.telescope)
-
+SPOCKST.make_plans(day=schedule.day_of_night[0],nb_days=1,telescope=schedule.telescope)
 
 # ---------------------- LONG TERM SCHEDULER ---------------------
 
-schedule = SPOCKLT.schedules()
+schedule = SPOCKLT.Schedules()
 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
-schedule.load_parameters('/Users/elsaducrot/code/spock/input.csv',2)
+schedule.load_parameters('./input.csv',obs)
 
 schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
 
@@ -50,40 +48,24 @@ schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
 print()
 
 
-# ---------------------- SHORT TERM SCHEDULER ---------------------
-obs = 1
-
-schedule = SPOCKST.schedules()
+schedule = SPOCKST.Schedules()
 schedule.load_parameters('./input_short_term.csv',obs)
-
-if schedule.use == 'follow_up':
-    schedule.transit_follow_up('traget_list_special.txt')
-if schedule.use == 'special_start_end':
-    input_name = 'Sp0755-2404'
-    schedule.special_target_with_start_end(input_name)
-if schedule.use == 'special':
-    input_name = 'TIC_206544316'
-    schedule.special_target(input_name)
-if schedule.use == 'monitoring':
-    input_name = 'Sp0755-2404'
-    schedule.monitoring(input_name,5,61)
-
+input_name = 'TI206544316'
+#schedule.special_target(input_name)
+schedule.special_target_with_start_end(input_name)
 schedule.make_scheduled_table()
 schedule.planification()
 schedule.make_night_block()
-schedule.scheduled_table_sorted
-
-#SPOCKST.make_plans(day=schedule.day_of_night[0],nb_days=1,telescope=schedule.telescope)
-
-
-# schedule.save_schedule('input_short_term.csv',1,save=True,over_write=False)
-
 
 print()
+SPOCKST.make_np(schedule.day_of_night[0],1,schedule.telescope)
 
 
 
-schedule = SPOCKLT.schedules()
+
+
+
+schedule = SPOCKLT.Schedules()
 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
 schedule.load_parameters('/Users/elsaducrot/code/spock/input.csv',3)
 

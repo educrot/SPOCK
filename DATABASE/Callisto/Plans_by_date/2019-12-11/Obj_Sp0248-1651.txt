@@ -1,0 +1,22 @@
+;
+; Sp0248-1651
+;
+; 5156623295621846016
+;
+#waituntil 1, 2019/12/12 00:20:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 70
+#TAG Donuts=on
+Sp0248-1651	02 48 41.00	-16 51 22.11
+;
+#quitat 03:56
+#chain Obj_Sp0721-3105.txt
+;

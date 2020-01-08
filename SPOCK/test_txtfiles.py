@@ -817,9 +817,9 @@ def biasdark(t_now,Path):
         out.write(str00 + '\n')
         out.write(str00 + str3 + '\n')
         out.write(str00 + '\n')
-        out.write(str4 + '9,9,9,9' + '\n')
-        out.write(str5 + '1,1,1,1' + '\n')
-        out.write(str6 + '0,15,30,60' + '\n')
+        out.write(str4 + '9,9,9,9,9' + '\n')
+        out.write(str5 + '1,1,1,1,1' + '\n')
+        out.write(str6 + '0,15,30,60,120' + '\n')
         out.write(str7)
         out.write(str8)
         out.write(str00 + '\n')
@@ -983,7 +983,6 @@ def flatexo_calli(Path,t_now,filt,nbu=None,nbB=None,nbz=None,nbV=None,nbr=None,n
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
-
 
 def flatexo_euro(Path,t_now,filt,nbRc=None,nbB=None,nbz=None,nbV=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):#u=None,nbu=None,nbr=None,nbz=None,nbg=None,nbi=None,nbIz=None,nbExo=None):
     str00=';'

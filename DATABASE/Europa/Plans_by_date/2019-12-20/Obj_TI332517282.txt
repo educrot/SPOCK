@@ -1,0 +1,22 @@
+;
+; TI332517282
+;
+; 6557029577557216000
+;
+#waituntil 1, 00:26
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter z'
+#interval 12
+#TAG Donuts=on
+TI332517282	23 23 30.86	-28 07 16.11
+;
+#quitat 03:07
+#chain Obj_Sp0253+1652.txt
+;

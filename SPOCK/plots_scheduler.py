@@ -152,7 +152,6 @@ def airmass_altitude_plot_proposition(name_observatory,telescope,day):
         plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
 
-
 def gantt_chart_all(target_list):
     target_table_spc = pd.read_csv(target_list,delimiter=' ')
     all_targets = target_table_spc['Sp_ID']

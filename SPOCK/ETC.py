@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 from astropy.time import Time
 from astropy.io import ascii
 from astropy.table import Table,Column, MaskedColumn
@@ -9,7 +10,7 @@ from scipy.interpolate import interp1d
 
 class etc:
     def __init__(self,mag_val = None,mag_band = None,spt = None,filt = None,airmass = None,moonphase = None,irtf = None,\
-                 num_tel = None,seeing = None):
+                 num_tel = None,seeing = None,gain=None):
 
         self.mag_val = mag_val
         self.mag_band = mag_band
@@ -20,6 +21,7 @@ class etc:
         self.irtf = irtf
         self.num_tel =num_tel
         self.seeing = seeing
+        self.gain = gain
         self.airmass = airmass
 
         """
@@ -43,7 +45,7 @@ class etc:
         self.npix        = 2048 #Number of pixels x
         self.npiy        = 2048 #Number of pixels y
         self.mipi        = 13.5 #picelscale
-        self.gain        = 1.1  #Gain [el/ADU]
+        #self.gain        = 1.1  #Gain [el/ADU] # SSO
         self.tqe         = 243
         self.qefac       = 1.0  #coefficient
         self.d0          = 2e4  #dark_293K
@@ -286,30 +288,31 @@ class etc:
         #plt.plot(spec['col1'],spec['col2'])
         #plt.show()
 
-        #available filters are in folder Filters, check available files
-        path='./files_ETC/Filters/'
+        # available filters are in folder Filters, check available files
+        path = 'Filters/'
         files = []
         # r=root, d=directories, f = files
         for r, d, f in os.walk(path):
             for file in f:
                 files.append(file)
-        files=np.sort(files)
-        #convert to lower case
+        files = np.sort(files)
+        # convert to lower case
         files_low = np.array([x.lower() if isinstance(x, str) else x for x in files])
-        #check, if selceted filter is contained
-        in_filter_list=np.where(np.char.find(files_low, self.filt.lower())!=-1)
-        if len(in_filter_list)>0:
-            filter_file=os.path.join(path,files[in_filter_list[0][0]])
-            self.filter=ascii.read(filter_file, data_start=0)
-            #plt.grid(True)
-            #plt.xlabel("Wavelength [nm]")
-            #plt.ylabel("Troughput")
-            #plt.title(filt)
-            #plt.plot(filter['col1'],filter['col2'])
-            #plt.show()
-        else:
-            print("Filter not available")
-            print(5/0.)
+        # check, if selceted filter is contained
+        # in_filter_list=np.where(np.char.find(files_low, filt.lower()+'.dat')!=-1)
+        try:
+            in_filter_list = list(files_low).index(filt.lower() + '.dat')
+            # if (in_filter_list)>0:
+            filter_file = os.path.join(path, files[in_filter_list])
+            filter = ascii.read(filter_file, data_start=0)
+            plt.grid(True)
+            plt.xlabel("Wavelength [nm]")
+            plt.ylabel("Troughput")
+            plt.title(filt)
+            plt.plot(filter['col1'], filter['col2'])
+            plt.show()
+        except ValueError:
+            sys.exit("Filter not available")
 
         #get spectral type information
         try:

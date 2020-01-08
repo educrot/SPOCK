@@ -1,0 +1,22 @@
+;
+; TI425933644
+;
+; 4909009394396454144
+;
+#waituntil 1, 2019/12/14 00:21:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter g'
+#interval 50
+#TAG Donuts=on
+TI425933644	00 14 47.86	-60 03 48.67
+;
+#quitat 05:03
+#chain Obj_Sp0721-3105.txt
+;

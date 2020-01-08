@@ -1,0 +1,22 @@
+;
+; TI425933644
+;
+; 4909009394396454144
+;
+#waituntil 1, 00:21
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter r'
+#interval 15
+#TAG Donuts=on
+TI425933644	00 14 47.86	-60 03 48.67
+;
+#quitat 05:07
+#chain Obj_Sp0523-1403_2.txt
+;

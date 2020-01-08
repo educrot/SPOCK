@@ -1,0 +1,22 @@
+;
+; Sp0705+4742
+;
+; 977817513311105664
+;
+#waituntil 1, 07:37
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 125
+#TAG Donuts=on
+Sp0705+4742	07 05 17.24	+47 42 52.78
+;
+#quitat 08:26
+#chain Obj_TIC36724087.txt
+;
