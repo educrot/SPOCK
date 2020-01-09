@@ -115,7 +115,7 @@ schedule.make_night_block()
 SPOCKST.make_np(day=schedule.day_of_night,nb_jours=1,telescope=schedule.telescope)
 ```
 
-To plot the schedule you  have generated, execute the following command:
+To plot the schedule you have generated, use the `plots_scheduler` module and execute the following command:
 
 ```python
 import SPOCK.plots_scheduler as SPOCKplot
