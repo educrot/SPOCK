@@ -922,13 +922,13 @@ class Schedules:
                     self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(self.idx_first_target)
 
         for i in range(abs(idx_init_first)+len(self.index_prio)):
-            print(i, self.targets[self.index_prio[-i]])
+            print(i, self.targets[self.index_prio[-(i+1)]])
             if self.telescope == 'Saint-Ex':
                 set_day_for_target = self.date_range[0] + t
-                rise_day_for_target = self.date_range[0] + t
+                rise_day_for_target = self.date_range[0] + dt_1day + t
             else:
                 set_day_for_target = self.date_range[0] + t
-                rise_day_for_target = self.date_range[0] + dt_1day + t
+                rise_day_for_target = self.date_range[0] + t
 
             if self.first_target['set or rise'] == 'rise':
                 if self.priority['set or rise'][self.index_prio[-i]]=='set':
@@ -1005,7 +1005,7 @@ class Schedules:
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**6
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]**1
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 3
-            self.priority['priority'][idx_on_going] *= 10 ** (2 + 1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
+            self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] *= -1
         elif (self.telescope == 'Ganymede') or (self.telescope == 'Callisto'):
@@ -1020,7 +1020,7 @@ class Schedules:
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 1
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]** 2
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 4
-            self.priority['priority'][idx_on_going] *= 10 ** (2 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
+            self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] *= -1
         elif (self.telescope == 'TS_La_Silla') or (self.telescope == 'TN_Oukaimeden'):
@@ -1036,7 +1036,7 @@ class Schedules:
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 1
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]** 2
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 4
-            self.priority['priority'][idx_on_going] *= 10 ** (2 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
+            self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_not_bright] = 0
             self.priority['priority'][idx_done] = -1

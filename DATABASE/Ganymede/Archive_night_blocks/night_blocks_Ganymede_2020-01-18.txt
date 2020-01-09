@@ -1,2 +1,0 @@
-target "start time (UTC)" "end time (UTC)" "duration (minutes)" "ra (h)" "ra (m)" "ra (s)" "dec (d)" "dec (m)" "dec (s)" configuration
-Sp0806-2839 "2020-01-19 00:30:40.020" "2020-01-19 09:14:20.020" 523.6666666666667 8.0 6.0 26.508144000006837 -28.0 -39.0 -22.854600000000005 "{'filt=I+z', 'texp=110'}"
