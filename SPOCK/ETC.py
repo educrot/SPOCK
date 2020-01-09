@@ -1,7 +1,7 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 import sys
+import matplotlib.pyplot as plt
 from astropy.time import Time
 from astropy.io import ascii
 from astropy.table import Table,Column, MaskedColumn
@@ -289,7 +289,7 @@ class etc:
         #plt.show()
 
         # available filters are in folder Filters, check available files
-        path = 'Filters/'
+        path = './files_ETC/Filters/'
         files = []
         # r=root, d=directories, f = files
         for r, d, f in os.walk(path):
@@ -302,15 +302,14 @@ class etc:
         # in_filter_list=np.where(np.char.find(files_low, filt.lower()+'.dat')!=-1)
         try:
             in_filter_list = list(files_low).index(filt.lower() + '.dat')
-            # if (in_filter_list)>0:
             filter_file = os.path.join(path, files[in_filter_list])
-            filter = ascii.read(filter_file, data_start=0)
-            plt.grid(True)
-            plt.xlabel("Wavelength [nm]")
-            plt.ylabel("Troughput")
-            plt.title(filt)
-            plt.plot(filter['col1'], filter['col2'])
-            plt.show()
+            self.filter = ascii.read(filter_file, data_start=0)
+            # plt.grid(True)
+            # plt.xlabel("Wavelength [nm]")
+            # plt.ylabel("Troughput")
+            # plt.title(filt)
+            # plt.plot(filter['col1'], filter['col2'])
+            # plt.show()
         except ValueError:
             sys.exit("Filter not available")
 

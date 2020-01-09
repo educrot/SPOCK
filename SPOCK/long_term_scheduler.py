@@ -37,6 +37,7 @@ from datetime import datetime
 import SPOCK.ETC as ETC
 import paramiko
 
+
 def get_hours_files_SNO():
     hostname = '172.16.3.11'
     port = 22
@@ -59,6 +60,9 @@ def get_hours_files_SNO():
     ftp_client.close()
 
     s.close()
+    df = pd.read_csv('ObservationHours.txt', delimiter=',')
+    df = df.sort_values(['Target'])
+    df.to_csv('ObservationHours.txt',sep=',')
 
 # definition of the different fonctions
 def max_unit_list(x):
@@ -138,7 +142,7 @@ def SSO_planned_targets(date,telescope):
         telescopes = np.delete(telescopes, telescopes.index(telescope))
     targets_on_SSO_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         url = "http://www.mrao.cam.ac.uk/SPECULOOS/" + telescopes[
             i] + '/schedule/Archive_night_blocks/' + night_block_str
         user, password = 'educrot', '58JMSGgdmzTB'
@@ -498,6 +502,8 @@ class Schedules:
         self.idx_second_target_by_day = []
         self.index_prio = None
         self.index_prio_by_day = []
+        self.idx_planned_SSO = None
+        self.idx_SSO_in_planned = None
         self.moon_and_visibility_constraint_table = None
         self.nb_segments =  None #nb_segments
         self.night_block = []
@@ -633,10 +639,16 @@ class Schedules:
         resp = requests.get(TargetURL, auth=(user, password))
         content = resp.text.replace("\n", "")
         open('SurveyTotal.txt', 'wb').write(resp.content)
+        df =  pd.read_csv('SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        df = df.sort_values(['Target'])
+        df.to_csv('SurveyTotal.txt',sep=' ',index=False)
         df_camserver = pd.read_csv('SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         df_camserver['Target'][9] = 'Sp0004-2058'
         df_camserver['Target'] = [x.strip().replace('SP', 'Sp') for x in df_camserver['Target']]
         df_artemis = pd.read_csv('ObservationHours.txt', delimiter=',')
+        df = pd.read_csv('ObservationHours_Saint-Ex.txt',delimiter=',')
+        df = df.sort_values(['Target'])
+        df.to_csv('ObservationHours_Saint-Ex.txt',sep=',',index=False)
         df_SaintEx = pd.read_csv('ObservationHours_Saint-Ex.txt', delimiter=',')
         df_TRAPPIST = pd.read_csv('ObservationHours_TRAPPIST.txt', delimiter=',')
         df_camserver_telescope = pd.read_csv('SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
@@ -716,9 +728,6 @@ class Schedules:
                 target_list['nb_hours_surved'][i] = df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
                 target_list['telescope'][i].append('TRAPPIST')
 
-            #target_list['telescope'][i] = target_list['telescope'][i].split(',')
-            print(i, target_list['Sp_ID'][i],target_list['nb_hours_surved'][i],target_list['telescope'][i])
-
         target_list.to_csv(self.target_list, sep=' ', index=False)
 
     def get_hours_files_TRAPPIST(self):
@@ -778,7 +787,11 @@ class Schedules:
         user, password = 'educrot', '58JMSGgdmzTB'
         resp = requests.get(TargetURL, auth=(user, password))
         content = resp.text.replace("\n", "")
-        #open('SurveyByTelescope.txt', 'wb').write(resp.content)
+        open('SurveyByTelescope.txt', 'wb').write(resp.content)
+        df = pd.read_csv('SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        df = df.sort_values(['Target'])
+        df.to_csv('SurveyByTelescope.txt',sep=' ',index=False)
+        #
         #df = pd.read_csv('SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         #df['Target'] = [x.strip().replace('SP', 'Sp') for x in df['Target']]
         #server_in_targetlist, targetlist_in_server = index_list1_list2(df['Target'], target_list['Sp_ID'])
@@ -800,6 +813,19 @@ class Schedules:
         self.nb_hours[0,:]  = self.target_table_spc['nb_hours_surved']
         self.nb_hours[1,:] = self.target_table_spc['nb_hours_surved']
         self.targets = target_list_good_coord_format(self.target_list)
+
+        observed_targets_SSO = []
+        observed_targets_SNO = []
+        for i in range(self.date_range_in_days):
+            date = self.date_range[0] + i
+            day_fmt = Time(date.iso, out_subfmt='date').iso
+            observed_targets_SSO += SSO_planned_targets(day_fmt,self.telescope)
+            observed_targets_SNO += SNO_planned_targets(day_fmt)
+        observed_targets_SSO= list(set(observed_targets_SSO))
+        observed_targets_SNO = list(set(observed_targets_SNO))
+        self.idx_planned_SSO, self.idx_SSO_in_planned = index_list1_list2(observed_targets_SSO,self.target_table_spc['Sp_ID'])
+        self.idx_planned_SNO, self.idx_SSO_in_planned = index_list1_list2(observed_targets_SNO,self.target_table_spc['Sp_ID'])
+
 
         if Altitude_constraint:
             self.constraints.append(AltitudeConstraint(min=float(Altitude_constraint)*u.deg))
@@ -877,7 +903,7 @@ class Schedules:
             self.target_table_spc['texp_spc'][self.idx_first_target]= self.exposure_time(self.idx_first_target)
 
         if (self.telescope  == 'Artemis') or (self.telescope  == 'Saint-Ex'):
-            while (self.target_table_spc['texp_spc'][self.idx_first_target] > 200) or (str(self.target_table_spc['telescope'][self.idx_first_target])=='Io') or (str(self.target_table_spc['telescope'][self.idx_first_target])=='Europa') or \
+            while (self.target_table_spc['texp_spc'][self.idx_first_target] > 200) or ('Io' in self.target_table_spc['telescope'][self.idx_first_target]) or ('Europa' in self.target_table_spc['telescope'][self.idx_first_target]) or \
                     ('Ganymede' in self.target_table_spc['telescope'][self.idx_first_target]) or ('Callisto' in self.target_table_spc['telescope'][self.idx_first_target]) or ('TRAPPIST' in self.target_table_spc['telescope'][self.idx_first_target]):
                 idx_init_first -= 1
                 self.idx_first_target = self.index_prio[idx_init_first]
@@ -902,7 +928,7 @@ class Schedules:
                 rise_day_for_target = self.date_range[0] + t
             else:
                 set_day_for_target = self.date_range[0] + t
-                rise_day_for_target = self.date_range[0] + dt_1day +  t
+                rise_day_for_target = self.date_range[0] + dt_1day + t
 
             if self.first_target['set or rise'] == 'rise':
                 if self.priority['set or rise'][self.index_prio[-i]]=='set':
@@ -979,8 +1005,8 @@ class Schedules:
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**6
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]**1
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 3
-            self.priority['priority'][idx_on_going] *= 10 ** (1 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
-            self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
+            self.priority['priority'][idx_on_going] *= 10 ** (2 + 1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
+            self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] *= -1
         elif (self.telescope == 'Ganymede') or (self.telescope == 'Callisto'):
             idx_on_going = np.where(((self.target_table_spc['nb_hours_surved'] > 0) & (self.target_table_spc['nb_hours_surved'] < 100)))
@@ -994,7 +1020,7 @@ class Schedules:
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 1
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]** 2
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 4
-            self.priority['priority'][idx_on_going] *= 10 ** (1 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
+            self.priority['priority'][idx_on_going] *= 10 ** (2 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] *= -1
         elif (self.telescope == 'TS_La_Silla') or (self.telescope == 'TN_Oukaimeden'):
@@ -1010,7 +1036,7 @@ class Schedules:
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 1
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]** 2
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 4
-            self.priority['priority'][idx_on_going] *= 10 ** (1 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
+            self.priority['priority'][idx_on_going] *= 10 ** (2 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_not_bright] = 0
             self.priority['priority'][idx_done] = -1
@@ -1024,15 +1050,15 @@ class Schedules:
         self.priority['priority'][both_targets_index] = self.priority['priority'][both_targets_index]*10
         priority_non_observable_idx = (self.priority['set or rise']=='None')
         self.priority['priority'][priority_non_observable_idx] = 0.5
-        day_fmt = Time(day.iso, out_subfmt='date').iso
-        if self.observatory == 'SSO':
-            idx_planned_SSO = index_list1_list2(SSO_planned_targets(day_fmt,self.telescope), self.target_table_spc['Sp_ID'])
-            for i in range(len(idx_planned_SSO)):
-                self.priority['priority'][idx_planned_SSO[i]] = 0
-        idx_planned_SNO = index_list1_list2(SNO_planned_targets(day_fmt), self.target_table_spc['Sp_ID'])
+        #day_fmt = Time(day.iso, out_subfmt='date').iso
+        if self.observatory.name == 'SSO':
+            #idx_planned_SSO,idx_SSO_in_planned = index_list1_list2(SSO_planned_targets(day_fmt,self.telescope), self.target_table_spc['Sp_ID'])
+            for i in self.idx_planned_SSO:
+                self.priority['priority'][i] = 0
+        #idx_planned_SNO = index_list1_list2(SNO_planned_targets(day_fmt), self.target_table_spc['Sp_ID'])
         if (self.telescope != 'Artemis') and (self.telescope != 'Saint-Ex'):
-            for i in range(len(idx_planned_SNO)):
-                self.priority['priority'][idx_planned_SNO[i]] = 0
+            for i in self.idx_planned_SNO:
+                self.priority['priority'][i] = 0
         self.no_obs_with_different_tel()
         self.index_prio = np.argsort(self.priority['priority'])
         self.priority_ranked = self.priority[self.index_prio]

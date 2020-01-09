@@ -50,8 +50,8 @@ def airmass_plot_saved(name_observatory,telescope,day):
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
     day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
-    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.05,\
-                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.05, 100),format='jd')
+    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.07, \
+                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.07, 100),format='jd')
     colors_start_new_target = ['black', 'darkgray', 'lightgray']
     sun_set =observatory.twilight_evening_nautical(day,which='next').iso
     sun_rise = observatory.twilight_morning_nautical(day+1,which='nearest').iso
@@ -76,8 +76,8 @@ def airmass_plot_proposition(name_observatory,telescope,day):
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
     day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
-    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.05,\
-                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.05, 100),format='jd')
+    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.07,\
+                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.07, 100),format='jd')
     colors_start_new_target = ['black', 'darkgray', 'lightgray']
     sun_set =observatory.twilight_evening_nautical(day,which='next').iso
     sun_rise = observatory.twilight_morning_nautical(day+1,which='nearest').iso
@@ -103,8 +103,8 @@ def airmass_altitude_plot_saved(name_observatory,telescope,day):
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
     day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
-    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.05,\
-                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.05, 100),format='jd')
+    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.07,\
+                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.07, 100),format='jd')
     sun_set =observatory.twilight_evening_nautical(day,which='next').iso
     sun_rise = observatory.twilight_morning_nautical(day+1,which='nearest').iso
     fig, axs = plt.subplots(1)
@@ -121,7 +121,7 @@ def airmass_altitude_plot_saved(name_observatory,telescope,day):
         axs.vlines(t.iso, 3, 1,linestyle='--',color=colors_start_new_target[i],alpha = 0.7,label='start ' + str(night_block['target'][i]))
         axs.vlines(sun_set, 3, 1, linestyle=':', color='yellow', alpha=0.9)
         axs.vlines(sun_rise, 3, 1, linestyle=':', color='yellow', alpha=0.9)
-        plt.legend(loc=2)
+        #plt.legend(loc=2)
         plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
 
@@ -130,8 +130,8 @@ def airmass_altitude_plot_proposition(name_observatory,telescope,day):
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
     day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
-    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.05,\
-                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.05, 100),format='jd')
+    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day,which='next').jd - 0.07,\
+                                      observatory.twilight_morning_nautical(day+1,which='nearest').jd + 0.07, 100),format='jd')
     sun_set =observatory.twilight_evening_nautical(day,which='next').iso
     sun_rise = observatory.twilight_morning_nautical(day+1,which='nearest').iso
     fig, axs = plt.subplots(1)
@@ -148,7 +148,7 @@ def airmass_altitude_plot_proposition(name_observatory,telescope,day):
         axs.vlines(t.iso, 3, 1,linestyle='--',color=colors_start_new_target[i],alpha = 0.7,label='start ' + str(night_block['target'][i]))
         axs.vlines(sun_set, 3, 1, linestyle=':', color='yellow', alpha=0.9)
         axs.vlines(sun_rise, 3, 1, linestyle=':', color='yellow', alpha=0.9)
-        plt.legend(loc=2)
+        #plt.legend(loc=2)
         plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
 
@@ -189,7 +189,7 @@ def gantt_chart_all(target_list):
               'Callisto': 'rgba(0, 255, 255,0.75)',
               'Ganymede': 'rgba(255, 128, 0,0.75)',
               'Artemis':'rgba(107,142,35,0.75)',
-              'Saint-Ex':'rgba(255,255,0,0.75)',
+              'Saint-Ex':'rgba(255,215,0,0.9)',
               'Io_s': 'rgba(255, 182, 193, .9)',
               'Europa_s': 'rgba(28,134,238,0.9)',
               'Ganymede_s': 'rgba(255,160,122,0.9)',
@@ -267,3 +267,31 @@ def gantt_chart(date_start,date_end,telescope):
         'scrollZoom': True
     }
     offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
+
+def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_list):
+    if path_target_list is None:
+        path_target_list = 'SPECULOOS_target_list_v2.txt'
+    observatory = charge_observatories(name_observatory)[0]
+    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day, which='next').jd - 0.07, \
+                                      observatory.twilight_morning_nautical(day + 1, which='nearest').jd + 0.07, 100),
+                          format='jd')
+    sun_set = observatory.twilight_evening_nautical(day, which='next').iso
+    sun_rise = observatory.twilight_morning_nautical(day + 1, which='nearest').iso
+    target_list = pd.read_csv(path_target_list, delimiter=' ')
+    idx_target_list = list(target_list['Sp_ID']).index(target)
+
+    fig, axs = plt.subplots(1)
+    colors_start_new_target = ['black', 'darkgray', 'lightgray']
+
+    dec = target_list['DEC'][idx_target_list]
+    ra = target_list['RA'][idx_target_list]
+    plot_styles = {'linestyle': '--', 'color': 'teal'}
+    plot_airmass(FixedTarget(coord=SkyCoord(ra=ra, dec=dec, unit=(u.deg, u.deg)), \
+                             name=target), observatory, delta_midnight, brightness_shading=True, altitude_yaxis=True,
+                 style_kwargs=plot_styles)
+    axs.vlines(sun_set, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
+    axs.vlines(sun_rise, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
+    plt.ylabel('Altitude (degrees)')
+    plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
+    plt.title('Visibility plot for target ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")))
+    plt.show()

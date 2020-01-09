@@ -43,7 +43,7 @@ def charge_observatories(Name):
 
     if 'Saint-Ex' in str(Name):
         location_saintex = EarthLocation.from_geodetic(-115.48694444444445*u.deg, 31.029166666666665*u.deg, 2829.9999999997976*u.m)
-        observatories.append(Observer(location=location_saintex, name="saintex", timezone="UTC"))
+        observatories.append(Observer(location=location_saintex, name="Saint-Ex", timezone="UTC"))
 
     if 'TS_La_Silla' in str(Name):
         location_TSlasilla = EarthLocation.from_geodetic(-70.73000000000002*u.deg, -29.25666666666666*u.deg, 2346.9999999988418*u.m)
