@@ -143,20 +143,27 @@ def SSO_planned_targets(date,telescope):
     targets_on_SSO_telescopes = []
     for i in range(len(telescopes)):
         night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
-        url = "http://www.mrao.cam.ac.uk/SPECULOOS/" + telescopes[
-            i] + '/schedule/Archive_night_blocks/' + night_block_str
-        user, password = 'educrot', '58JMSGgdmzTB'
-        resp = requests.get(url, auth=(user, password)).text
-        c = pd.read_csv(StringIO(resp), delimiter=' ', index_col=False,error_bad_lines=False)
-        if 'target' in c.columns:
+        #url = "http://www.mrao.cam.ac.uk/SPECULOOS/" + telescopes[
+        #    i] + '/schedule/Archive_night_blocks/' + night_block_str
+        #user, password = 'educrot', '58JMSGgdmzTB'
+        #resp = requests.get(url, auth=(user, password)).text
+        #c = pd.read_csv(StringIO(resp), delimiter=' ', index_col=False,error_bad_lines=False)
+        #if 'target' in c.columns:
+        #    for tar in c['target']:
+        #        targets_on_SSO_telescopes.append(tar)
+        #else:
+        #    print('WARNING: No plans on ' + telescopes[i] + ' on the ' + str(date))
+        path = './DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
+        try:
+            c = pd.read_csv(path, delimiter=' ', index_col=False)
             for tar in c['target']:
                 targets_on_SSO_telescopes.append(tar)
-        else:
+        except FileNotFoundError:
             print('WARNING: No plans on ' + telescopes[i] + ' on the ' + str(date))
-    if (telescope=='Artemis') or (telescope=='Saint-Ex'):
-        print('INFO: Targets on SSO: ', targets_on_SSO_telescopes)
-    else:
-        print('INFO: Targets on other SSO: ',targets_on_SSO_telescopes)
+   #if (telescope=='Artemis') or (telescope=='Saint-Ex'):
+   #     print('INFO: Targets on SSO: ', targets_on_SSO_telescopes)
+   #else:
+   #     print('INFO: Targets on other SSO: ',targets_on_SSO_telescopes)
     return targets_on_SSO_telescopes
 
 def SNO_planned_targets(date):
@@ -171,7 +178,7 @@ def SNO_planned_targets(date):
                 targets_on_SNO_telescopes.append(tar)
         except FileNotFoundError:
             print('WARNING: No plans on ' + telescopes[i] + ' on the ' + str(date))
-    print('INFO: Targets on SNO: ',targets_on_SNO_telescopes)
+    #print('INFO: Targets on SNO: ',targets_on_SNO_telescopes)
     return targets_on_SNO_telescopes
 
 def update_hours_target_list(path_target_list):
@@ -466,6 +473,65 @@ def month_option(target_name,reverse_df1):
         months_4th_option = 0
         months_5th_option = 0
     return [months, months_2nd_option , months_3rd_option,months_4th_option, months_5th_option]
+
+def save_schedule(input_file,nb_observatory,save=False,over_write =True):
+    with open(input_file, "r") as f:
+        Inputs = yaml.load(f, Loader=yaml.FullLoader)
+        df = pd.DataFrame.from_dict(Inputs['observatories'])
+        observatory = charge_observatories(df[nb_observatory]['name'])[0]
+        date_range = Time(Inputs['date_range'])
+        date_range_in_days = int((date_range[1]- date_range[0]).value)
+        telescope = df[nb_observatory]['telescopes'][0]
+    for i in range(0,date_range_in_days):
+        day = date_range[0] + i
+        if save:
+            source = './' + 'night_blocks_propositions/' +'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
+            destination = './DATABASE/' + telescope + '/'
+            destination_2 = './DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
+            if over_write:
+                dest = shutil.copy(source, destination)
+                dest2 = shutil.copy(source, destination_2)
+                print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
+                print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+            if not over_write:
+                try:
+                    dest = shutil.move(source, destination)
+                    #dest2 = shutil.move(source, destination_2)
+                    print('INFO : ' + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
+                    #print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+                except shutil.Error:
+                    print('INFO : ' + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
+        if not save:
+            print('INFO : Those plans have not been saved')
+
+def make_plans(day, nb_days, telescope):
+    make_np(day, nb_days, telescope)
+
+def upload_plans(day, nb_days, telescope):
+    if telescope.find('Callisto') is not -1:
+        upload_np_calli(day, nb_days)
+    if telescope.find('Ganymede') is not -1:
+        upload_np_gany(day, nb_days)
+    if telescope.find('Io') is not -1:
+        upload_np_io(day, nb_days)
+    if telescope.find('Europa') is not -1:
+        upload_np_euro(day, nb_days)
+    if telescope.find('Artemis') is not -1:
+        upload_np_artemis(day, nb_days)
+
+    # ------------------- update archive date by date plans folder  ------------------
+
+    path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', telescope,'schedule')
+    print('INFO: Path database = ',path_database)
+    path_plans = os.path.join('./DATABASE/', telescope,'Plans_by_date/')
+    print('INFO: Path local \'Plans_by_day\' = ',path_plans)
+    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_plans, path_database])
+
+    # ------------------- update archive niht blocks ------------------
+
+    path_night_blocks = os.path.join('./DATABASE/', telescope,'Archive_night_blocks/')
+    print('INFO: Path local \'Archive_night_blocks\' = ',path_night_blocks)
+    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_night_blocks, path_database])
 
 
 class Schedules:
@@ -821,7 +887,7 @@ class Schedules:
             day_fmt = Time(date.iso, out_subfmt='date').iso
             observed_targets_SSO += SSO_planned_targets(day_fmt,self.telescope)
             observed_targets_SNO += SNO_planned_targets(day_fmt)
-        observed_targets_SSO= list(set(observed_targets_SSO))
+        observed_targets_SSO = list(set(observed_targets_SSO))
         observed_targets_SNO = list(set(observed_targets_SNO))
         self.idx_planned_SSO, self.idx_SSO_in_planned = index_list1_list2(observed_targets_SSO,self.target_table_spc['Sp_ID'])
         self.idx_planned_SNO, self.idx_SSO_in_planned = index_list1_list2(observed_targets_SNO,self.target_table_spc['Sp_ID'])
@@ -911,18 +977,24 @@ class Schedules:
                 if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
                     self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(self.idx_first_target)
 
-        else:
+        if (self.telescope  == 'Io') or (self.telescope  == 'Europa') or (self.telescope  == 'Ganymede') or (self.telescope  == 'Callisto'):
             other_SSO = np.delete(self.telescopes, self.telescopes.index(self.telescope))
-            while (self.target_table_spc['texp_spc'][self.idx_first_target] > 200) and (np.any(str(self.target_table_spc['telescope'][self.idx_first_target]) == other_SSO)) and\
-                    (np.any(self.target_table_spc['telescope'][self.idx_first_target] != 'None')) and (np.any(self.target_table_spc['telescope'][self.idx_first_target] != '0')):
+            while (self.target_table_spc['texp_spc'][self.idx_first_target] > 200) or np.any([other_SSO[j] in self.target_table_spc['telescope'][self.idx_first_target] for j in range(len(list(other_SSO)))]) or\
+                    ('Artemis' in self.target_table_spc['telescope'][self.idx_first_target])  or ('Saint-Ex' in self.target_table_spc['telescope'][self.idx_first_target]) \
+                    or ('TRAPPIST' in self.target_table_spc['telescope'][self.idx_first_target]):
                 idx_init_first -= 1
                 self.idx_first_target = self.index_prio[idx_init_first]
                 self.first_target = self.priority[self.idx_first_target]
                 if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
                     self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(self.idx_first_target)
 
-        for i in range(abs(idx_init_first)+len(self.index_prio)):
-            print(i, self.targets[self.index_prio[-(i+1)]])
+        if (self.telescope == 'TS_La_Silla') or (self.telescope == 'TN_Oukaimeden'):
+            while (self.target_table_spc['texp_spc'][self.idx_first_target] > 200) or \
+                    ('Artemis' in self.target_table_spc['telescope'][self.idx_first_target]) or ('Saint-Ex' in self.target_table_spc['telescope'][self.idx_first_target]) \
+                    or ('TRAPPIST' in self.target_table_spc['telescope'][self.idx_first_target]):
+                print()
+        for i in range(1,abs(idx_init_first)+len(self.index_prio)):
+            print(i, self.targets[self.index_prio[-(i)]])
             if self.telescope == 'Saint-Ex':
                 set_day_for_target = self.date_range[0] + t
                 rise_day_for_target = self.date_range[0] + dt_1day + t
@@ -1002,9 +1074,9 @@ class Schedules:
             idx_prog2 = np.where((self.target_table_spc['prog']==2))
             idx_prog3 = np.where((self.target_table_spc['prog'] == 3))
             self.priority['priority'][idx_prog0] *= 0.1
-            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**6
-            self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]**1
-            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 3
+            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**10
+            self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]**2
+            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 6
             self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] *= -1
@@ -1017,9 +1089,9 @@ class Schedules:
             idx_prog2 = np.where((self.target_table_spc['prog']==2))
             idx_prog3 = np.where((self.target_table_spc['prog'] == 3))
             self.priority['priority'][idx_prog0] *= 0.1
-            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 1
+            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 6
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]** 2
-            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 4
+            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 10
             self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] *= -1
@@ -1033,9 +1105,9 @@ class Schedules:
             idx_prog3 = np.where((self.target_table_spc['prog'] == 3))
             idx_not_bright = np.where((self.target_table_spc['J'] >= 11))
             self.priority['priority'][idx_prog0] *= 0.1
-            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 1
+            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 6
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]** 2
-            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 4
+            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 10
             self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_not_bright] = 0
@@ -1047,7 +1119,7 @@ class Schedules:
         self.priority['set or rise'][rise_targets_index]='rise'
         both_targets_index=(self.priority['alt rise start']>20) & (self.priority['alt set start']>20) #& (self.priority['alt rise end']>20) & (self.priority['alt set end']>20)
         self.priority['set or rise'][both_targets_index] = 'both'
-        self.priority['priority'][both_targets_index] = self.priority['priority'][both_targets_index]*10
+        self.priority['priority'][both_targets_index] = self.priority['priority'][both_targets_index]*5
         priority_non_observable_idx = (self.priority['set or rise']=='None')
         self.priority['priority'][priority_non_observable_idx] = 0.5
         #day_fmt = Time(day.iso, out_subfmt='date').iso
@@ -1059,7 +1131,8 @@ class Schedules:
         if (self.telescope != 'Artemis') and (self.telescope != 'Saint-Ex'):
             for i in self.idx_planned_SNO:
                 self.priority['priority'][i] = 0
-        self.no_obs_with_different_tel()
+        if (self.telescope == 'Artemis') or (self.telescope == 'Saint-Ex'):
+            self.no_obs_with_different_tel()
         self.index_prio = np.argsort(self.priority['priority'])
         self.priority_ranked = self.priority[self.index_prio]
 
@@ -1508,7 +1581,7 @@ class Schedules:
                             hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
 
                         else:
-                            self.idx_second_target = idx_rise_targets_sorted[-(moon_idx_rise_target)]
+                            self.idx_second_target = self.idx_rise_targets_sorted[-(moon_idx_rise_target)]
                             self.second_target = self.priority[self.idx_second_target]
                             if self.priority['priority'][self.idx_second_target] != float('-inf'):
                                 is_moon_constraint_met_second_target = self.moon_and_visibility_constraint_table['ever observable'][self.idx_second_target]
@@ -1712,62 +1785,3 @@ class Schedules:
             for i in idx_observed_other_SSO[0]:
                 self.priority['priority'][idx_observed_SSO[i]] = 0
 
-
-def save_schedule(input_file,nb_observatory,save=False,over_write =True):
-    with open(input_file, "r") as f:
-        Inputs = yaml.load(f, Loader=yaml.FullLoader)
-        df = pd.DataFrame.from_dict(Inputs['observatories'])
-        observatory = charge_observatories(df[nb_observatory]['name'])[0]
-        date_range = Time(Inputs['date_range'])
-        date_range_in_days = int((date_range[1]- date_range[0]).value)
-        telescope = df[nb_observatory]['telescopes'][0]
-    for i in range(0,date_range_in_days):
-        day = date_range[0] + i
-        if save:
-            source = './' + 'night_blocks_propositions/' +'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
-            destination = './DATABASE/' + telescope + '/'
-            destination_2 = './DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
-            if over_write:
-                dest = shutil.copy(source, destination)
-                dest2 = shutil.copy(source, destination_2)
-                print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
-                print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
-            if not over_write:
-                try:
-                    dest = shutil.move(source, destination)
-                    #dest2 = shutil.move(source, destination_2)
-                    print('INFO : ' + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
-                    #print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
-                except shutil.Error:
-                    print('INFO : ' + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
-        if not save:
-            print('INFO : Those plans have not been saved')
-
-def make_plans(day, nb_days, telescope):
-    make_np(day, nb_days, telescope)
-
-def upload_plans(day, nb_days, telescope):
-    if telescope.find('Callisto') is not -1:
-        upload_np_calli(day, nb_days)
-    if telescope.find('Ganymede') is not -1:
-        upload_np_gany(day, nb_days)
-    if telescope.find('Io') is not -1:
-        upload_np_io(day, nb_days)
-    if telescope.find('Europa') is not -1:
-        upload_np_euro(day, nb_days)
-    if telescope.find('Artemis') is not -1:
-        upload_np_artemis(day, nb_days)
-
-    # ------------------- update archive date by date plans folder  ------------------
-
-    path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', telescope,'schedule')
-    print('INFO: Path database = ',path_database)
-    path_plans = os.path.join('./DATABASE/', telescope,'Plans_by_date/')
-    print('INFO: Path local \'Plans_by_day\' = ',path_plans)
-    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_plans, path_database])
-
-    # ------------------- update archive niht blocks ------------------
-
-    path_night_blocks = os.path.join('./DATABASE/', telescope,'Archive_night_blocks/')
-    print('INFO: Path local \'Archive_night_blocks\' = ',path_night_blocks)
-    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_night_blocks, path_database])

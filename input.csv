@@ -1,11 +1,11 @@
 --- 
 date_range: 
   - "2020-01-09 15:00:00"
-  - "2020-02-01 15:00:00"
+  - "2020-01-18 15:00:00"
 observatories:
   1:
     name: SSO
-    telescopes: [Callisto,Ganymede,Io,Europa]
+    telescopes: [Europa,Io,Ganymede,Callisto]
   2:
     name: SNO
     telescopes: [Artemis]

@@ -1,0 +1,22 @@
+;
+; Sp0949+0806
+;
+; 3853943806185777664
+;
+#waituntil 1, 04:45
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 30
+#TAG Donuts=on
+Sp0949+0806	09 49 22.23	+08 06 45.11
+;
+#quitat 09:06
+#chain Cal_flatdawn.txt
+;
