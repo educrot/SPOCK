@@ -1,0 +1,22 @@
+;
+; Sp0510+2714
+;
+; 3421840993510952192
+;
+#waituntil 1, 2020/01/12 00:32:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 11
+#TAG Donuts=on
+Sp0510+2714	05 10 20.06	+27 14 01.87
+;
+#quitat 04:46
+#chain Obj_Sp1048-3956.txt
+;

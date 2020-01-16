@@ -186,7 +186,7 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
 
 def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     df = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ' ',index_col = False)
-    print(name)
+    #print(name)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
@@ -199,7 +199,10 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
     if idx_target is None:
         df2 = pd.read_csv('target_list_special.txt',delimiter=' ',index_col=None)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
-        gaia_id_target = df2['Gaia_ID'][int(idx_target)]
+        try:
+            gaia_id_target = df2['Gaia_ID'][int(idx_target)]
+        except TypeError:
+            gaia_id_target = 'None'
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
     binning=1
@@ -232,9 +235,9 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
         seq_dec=(str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
         s.join( seq_ra )
         s2.join( seq_dec )
-        print(s.join( seq_ra ),s2.join( seq_dec ))
+        #print(s.join( seq_ra ),s2.join( seq_dec ))
         c = SkyCoord(s.join( seq_ra ),s2.join( seq_dec ),frame='icrs')
-        print(c.dec.degree,c.dec.radian)
+        #print(c.dec.degree,c.dec.radian)
         for i in range(1,2):
             out.write(str00 + '\n')
         out.write(str00 + ' ' + str(name).replace('_2','') + '\n')
@@ -256,14 +259,14 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
         out.write(str8 + str(exptime) +'\n')
         out.write('#TAG Donuts=on'+'\n')
         if int(dec1)==-0:
-            print('ici')
+            #print('ici')
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
-            print('la')
+            #print('la')
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
@@ -322,9 +325,9 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         seq_dec=(str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
         s.join( seq_ra )
         s2.join( seq_dec )
-        print(s.join( seq_ra ),s2.join( seq_dec ))
+        #print(s.join( seq_ra ),s2.join( seq_dec ))
         c = SkyCoord(s.join( seq_ra ),s2.join( seq_dec ),frame='icrs')
-        print(c.dec.degree,c.dec.radian)
+        #print(c.dec.degree,c.dec.radian)
         for i in range(1,2):
             out.write(str00 + '\n')
         out.write(str00 + ' ' + str(name).replace('_2','') + '\n')
@@ -346,14 +349,14 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         out.write(str8 + str(exptime) +'\n')
         out.write(';#TAG Donuts=on'+'\n')
         if int(dec1)==-0:
-            print('ici')
+            #print('ici')
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
-            print('la')
+            #print('la')
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
@@ -410,9 +413,9 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         seq_dec=(str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
         s.join( seq_ra )
         s2.join( seq_dec )
-        print(s.join( seq_ra ),s2.join( seq_dec ))
+        #print(s.join( seq_ra ),s2.join( seq_dec ))
         c = SkyCoord(s.join( seq_ra ),s2.join( seq_dec ),frame='icrs')
-        print(c.dec.degree,c.dec.radian)
+        #print(c.dec.degree,c.dec.radian)
         teldeg = 2
         skyarcmin = (teldeg/60)/(np.cos(c.dec.degree*np.pi/180))*60
         ra_deg = c.ra.degree + skyarcmin/60
@@ -424,7 +427,7 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         dec1 = c.dec.dms.d
         dec2 = c.dec.dms.m
         dec3 = c.dec.dms.s
-        print('ICI TOI' ,c.ra.hms,c.dec.dms,ra1,ra2,ra3,dec1,dec2,dec3)
+        #print('ICI TOI' ,c.ra.hms,c.dec.dms,ra1,ra2,ra3,dec1,dec2,dec3)
         for i in range(1,2):
             out.write(str00 + '\n')
         out.write(str00 + ' ' + str(name.replace('_2','')) + '\n')
@@ -445,14 +448,14 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         out.write(str8 + str(exptime) +'\n')
         out.write('#TAG Donuts=on'+'\n')
         if int(dec1)==-0:
-            print('ici')
+            #print('ici')
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
-            print('la')
+            #print('la')
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
@@ -465,7 +468,7 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
 
 def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     df = pd.read_csv('SPECULOOS_target_list_v2.txt',delimiter = ' ',index_col = False)
-    print(name)
+    #print(name)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
@@ -512,9 +515,9 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
         seq_dec=(str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
         s.join( seq_ra )
         s2.join( seq_dec )
-        print(s.join( seq_ra ),s2.join( seq_dec ))
+        #print(s.join( seq_ra ),s2.join( seq_dec ))
         c = SkyCoord(s.join( seq_ra ),s2.join( seq_dec ),frame='icrs')
-        print(c.dec.degree,c.dec.radian)
+        #print(c.dec.degree,c.dec.radian)
         for i in range(1,2):
             out.write(str00 + '\n')
         out.write(str00 + ' ' + str(name.replace('_2','')) + '\n')
@@ -536,14 +539,14 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
         out.write(str8 + str(exptime) +'\n')
         out.write('#TAG Donuts=on'+'\n')
         if int(dec1)==-0:
-            print('ici')
+            #print('ici')
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
-            print('la')
+            #print('la')
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
@@ -589,9 +592,9 @@ def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,auto
         seq_dec=(str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
         s.join( seq_ra )
         s2.join( seq_dec )
-        print(s.join( seq_ra ),s2.join( seq_dec ))
+        #print(s.join( seq_ra ),s2.join( seq_dec ))
         c = SkyCoord(s.join( seq_ra ),s2.join( seq_dec ),frame='icrs')
-        print(c.dec.degree,c.dec.radian)
+        #print(c.dec.degree,c.dec.radian)
         teldeg = 2
         skyarcmin = (teldeg/60)/(np.cos(c.dec.degree*np.pi/180))*60
         ra_deg = c.ra.degree + skyarcmin/60
@@ -603,7 +606,7 @@ def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,auto
         dec1 = c.dec.dms.d
         dec2 = c.dec.dms.m
         dec3 = c.dec.dms.s
-        print('ICI TOI first target' ,c.ra.hms,c.dec.dms,ra1,ra2,ra3,dec1,dec2,dec3)
+        #print('ICI TOI first target' ,c.ra.hms,c.dec.dms,ra1,ra2,ra3,dec1,dec2,dec3)
         for i in range(1,2):
             out.write(str00 + '\n')
         out.write(str00 + ' ' + str(name) + '\n')
@@ -623,14 +626,14 @@ def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,auto
         out.write(str8 + str(exptime) +'\n')
         out.write('#TAG Donuts=on'+'\n')
         if int(dec1)==-0:
-            print('ici')
+            #print('ici')
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
-            print('la')
+            #print('la')
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
@@ -674,9 +677,9 @@ def first_target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,a
         seq_dec=(str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
         s.join( seq_ra )
         s2.join( seq_dec )
-        print(s.join( seq_ra ),s2.join( seq_dec ))
+        #print(s.join( seq_ra ),s2.join( seq_dec ))
         c = SkyCoord(s.join( seq_ra ),s2.join( seq_dec ),frame='icrs')
-        print(c.dec.degree,c.dec.radian)
+        #print(c.dec.degree,c.dec.radian)
         for i in range(1,2):
             out.write(str00 + '\n')
         out.write(str00 + ' ' + str(name) + '\n')
@@ -696,14 +699,14 @@ def first_target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,a
         out.write(str8 + str(exptime) +'\n')
         out.write(';#TAG Donuts=on'+'\n')
         if int(dec1)==-0:
-            print('ici')
+            #print('ici')
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
-            print('la')
+            #print('la')
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
@@ -1267,3 +1270,4 @@ def flatexo_artemis_evening(Path,t_now,filt,nbu=None,nbHa=None,nbRc=None,nbz=Non
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
+

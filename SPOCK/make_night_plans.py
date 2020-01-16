@@ -24,16 +24,16 @@ dec3={}
 def make_np(t_now,nb_jours,tel):
 
 	telescope=tel
-	print(t_now,nb_jours,telescope)
+	#print(t_now,nb_jours,telescope)
 	t0=Time(t_now)
 	dt=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg') #1 day
 
 	for nb_day in range(0,nb_jours):
-		print(telescope)
+		#print(telescope)
 		t_now=Time(t0+ nb_day*dt, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
 		Path='./DATABASE'
 		p=os.path.join(Path,str(telescope),'Plans_by_date',str(t_now))
-		print(p)
+		#print(p)
 		if not os.path.exists(p):
 			os.makedirs(p)
 		# if not os.path.exists(p2):
@@ -57,7 +57,7 @@ def make_np(t_now,nb_jours,tel):
 			index_to_delete=scheduler_table.loc['TransitionBlock'].index
 			scheduler_table.remove_row(index_to_delete)
 		except KeyError:
-			print(scheduler_table)
+			print()
 
 		config_filled=config_mask#.filled()
 
@@ -87,20 +87,20 @@ def make_np(t_now,nb_jours,tel):
 						item=item.replace('\'','')
 						texp[i]=item.replace('texp=','')
 						texp[i]=texp[i].replace(' ','')
-				print('avant :',filt[i])
+				#print('avant :',filt[i])
 				if filt[i]=='z' or filt[i]=='g' or filt[i]=='g' or filt[i]=='i' or filt[i]=='r':
-					print('ici')
+					#print('ici')
 					a=filt[i]
 					filt[i]=a+'\''
-				print('apres :',filt[i],texp[i])
+				#print('apres :',filt[i],texp[i])
 
 		location = EarthLocation.from_geodetic(-70.40300000000002*u.deg, -24.625199999999996*u.deg,2635.0000000009704*u.m)
 		paranal = Observer(location=location, name="paranal", timezone="UTC")
 		t=Time(t_now)
-		sun_set_jd=paranal.sun_set_time(t,which='next')
-		sun_rise_jd=paranal.sun_rise_time(t+1,which='next')
-		sun_set=Time(sun_set_jd,format='jd',scale='utc')
-		sun_rise=Time(sun_rise_jd+1,format='jd',scale='utc')
+		#sun_set_jd=paranal.sun_set_time(t,which='next')
+		#sun_rise_jd=paranal.sun_rise_time(t+1,which='next')
+		#sun_set=Time(sun_set_jd,format='jd',scale='utc')
+		#sun_rise=Time(sun_rise_jd+1,format='jd',scale='utc')
 
 		#Defaults parameters
 		autofocus=None
@@ -138,7 +138,7 @@ def make_np(t_now,nb_jours,tel):
 
 		#Making plans
 		Path=Path_txt_files(telescope)
-		print(Path)
+		#print(Path)
 		if telescope.find('Europa') is not -1:
 			startup(t_now,name[0],sun_set.iso,date_start[0],Path)
 		if telescope.find('Ganymede') is not -1:
@@ -152,7 +152,7 @@ def make_np(t_now,nb_jours,tel):
 		if telescope.find('Saint-Ex') is not -1:
 			startup(t_now,name[0],sun_set_san_pedro.iso,date_start[0],Path)
 		for i,nam in enumerate(name):
-			print(i,len(name))
+			#print(i,len(name))
 			if nam!='TransitionBlock':
 				if (len(name)==2):
 					if i==0:
@@ -202,9 +202,9 @@ def make_np(t_now,nb_jours,tel):
 					if i<(len(name)-1):
 						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],Path)
 
-		print('str(filt)',str(filt))
+		#print('str(filt)',str(filt))
 		if telescope.find('Callisto') is not -1:
-			print('CALLISTO')
+			#print('CALLISTO')
 			flatexo_calli(Path,t_now,str(filt),nbu=3,nbB=3,nbz=3,nbV=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)
 		if telescope.find('Ganymede') is not -1:
 			flatexo_gany(Path,t_now,str(filt),nbOIII=3,nbHa=3,nbSII=3,nbz=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)

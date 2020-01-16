@@ -9,7 +9,7 @@
 #waituntil 1, 2020/01/15 23:41:42
 #duskflats Cal_flatexo.txt
 ;
-#quitat 2020/01/16 00:31:00
+#quitat 2020/01/16 00:31:20
 ;
-#chain Obj_Sp0806-2839.txt
+#chain Obj_Sp0555-5402.txt
 ;

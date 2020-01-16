@@ -313,7 +313,7 @@ class Schedules:
                                                   self.SS1_night_blocks['start time (UTC)'][0],
                                                   self.SS1_night_blocks['end time (UTC)'][0],
                                                   self.SS1_night_blocks['duration (minutes)'][0],
-                                                  self.SS1_night_blocks['ra (h)'],
+                                                  self.SS1_night_blocks['ra (h)'][0],
                                                   self.SS1_night_blocks['ra (m)'][0],
                                                   self.SS1_night_blocks['ra (s)'][0],
                                                   self.SS1_night_blocks['dec (d)'][0],
@@ -322,7 +322,7 @@ class Schedules:
                                                   self.SS1_night_blocks['configuration'][0]))
 
                 elif (self.SS1_night_blocks['end time (UTC)'][0] >= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso) : #case 4
-                    self.SS1_night_blocks['end time (UTC)'][0] = Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest'))[0].iso
+                    self.SS1_night_blocks['end time (UTC)'][0] = Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso
                     self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
                     self.scheduled_table['duration (minutes)'][i]=(Time(self.scheduled_table['end time (UTC)'][i])-Time(self.scheduled_table['start time (UTC)'][i])).value*24*60
                     self.scheduled_table.add_row((self.SS1_night_blocks['target'][0],
@@ -342,10 +342,10 @@ class Schedules:
                 if (self.SS1_night_blocks['end time (UTC)'][0] <= end_before_cut):
                     if (self.SS1_night_blocks['end time (UTC)'][0] <= start_before_cut): #case5
                         print('INFO: no change made to initial schedule')
-                    elif (self.SS1_night_blocks['start time (UTC)'][0] >= Time(self.observatory.twilight_evening_nautical(self.day_of_night[0],which='next')).iso): #case 6
+                    elif (self.SS1_night_blocks['start time (UTC)'][0] >= Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next')).iso): #case 6
                         self.scheduled_table['start time (UTC)'][i] = self.SS1_night_blocks['end time (UTC)'][0]
                         self.scheduled_table['duration (minutes)'][i] = (Time(self.scheduled_table['end time (UTC)'][i])-Time(self.scheduled_table['start time (UTC)'][i])).value*24*60
-                        self.scheduled_table.add_index('target')
+                        self.scheduled_table.set_index('target')
                         index_to_delete = self.scheduled_table.loc[self.scheduled_table['target'][i]].index
 
                         self.scheduled_table.add_row((str(self.scheduled_table['target'][i]),
@@ -468,6 +468,9 @@ class Schedules:
         try:
             os.path.exists(os.path.join(Path,self.telescope,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d")+ '.txt'))
             print('INFO: Path exists and is: ',os.path.join(Path,self.telescope,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d") + '.txt'))
+        except TypeError:
+            os.path.exists(os.path.join(Path, self.telescope,'night_blocks_' + self.telescope + '_' + self.day_of_night.tt.datetime.strftime("%Y-%m-%d") + '.txt'))
+            print('INFO: Path exists and is: ', os.path.join(Path, self.telescope,'night_blocks_' + self.telescope + '_' +self.day_of_night.tt.datetime.strftime("%Y-%m-%d") + '.txt'))
         except NameError:
             print('INFO: no input night_block for this day')
         except FileNotFoundError:
@@ -476,8 +479,12 @@ class Schedules:
         if not (self.scheduled_table is None):
             return self.scheduled_table
         else:
-            self.scheduled_table = Table.read(os.path.join(Path,self.telescope,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d") + '.txt'), format='ascii')
-            return self.scheduled_table
+            try:
+                self.scheduled_table = Table.read(os.path.join(Path,self.telescope,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d") + '.txt'), format='ascii')
+                return self.scheduled_table
+            except TypeError:
+                self.scheduled_table = Table.read(os.path.join(Path,self.telescope,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime.strftime("%Y-%m-%d") + '.txt'), format='ascii')
+                return self.scheduled_table
 
     def make_night_block(self):
 
@@ -500,7 +507,7 @@ class Schedules:
                 except KeyError:
                     print('INFO: no transition block')
                 panda_table = self.scheduled_table_sorted.to_pandas()
-                panda_table.to_csv(os.path.join(Path,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d") + '.txt'),sep=' ')
+                panda_table.to_csv(os.path.join(Path,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime.strftime("%Y-%m-%d") + '.txt'),sep=' ')
 
     def exposure_time(self, input_name):
         i = np.where((self.target_table_spc['Sp_ID'] == input_name))[0]
@@ -547,7 +554,11 @@ def visibility_plot(day,observatory,night_block):
         plt.vlines(t.iso, 3, 1,linestyle='-', color='r',alpha = 0.7)
         plt.legend(shadow=True, loc=2)
 
-def save_schedule(input_file,nb_observatory,save=False,over_write =True):
+def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope):
+    if input_file is None:
+        telescope = telescope
+        date_range = date_range
+        date_range_in_days = int((date_range[1] - date_range[0]).value)
     with open(input_file, "r") as f:
         Inputs = yaml.load(f, Loader=yaml.FullLoader)
         df = pd.DataFrame.from_dict(Inputs['observatories'])

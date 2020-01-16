@@ -280,12 +280,18 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
     target_list = pd.read_csv(path_target_list, delimiter=' ')
     idx_target_list = list(target_list['Sp_ID']).index(target)
 
-    fig, axs = plt.subplots(1)
+    fig, axs = plt.subplots(1,figsize=(9,7))
     colors_start_new_target = ['black', 'darkgray', 'lightgray']
 
     dec = target_list['DEC'][idx_target_list]
     ra = target_list['RA'][idx_target_list]
-    plot_styles = {'linestyle': '--', 'color': 'teal'}
+    plot_styles = {'linestyle': '-', 'color': 'k'}
+    if name_observatory == 'SSO':
+        plot_styles = {'linestyle': '-', 'color': 'skyblue'}
+    if name_observatory == 'SNO':
+        plot_styles = {'linestyle': '-', 'color': 'teal'}
+    if name_observatory == 'Saint-Ex':
+        plot_styles = {'linestyle': '-', 'color': 'gold'}
     plot_airmass(FixedTarget(coord=SkyCoord(ra=ra, dec=dec, unit=(u.deg, u.deg)), \
                              name=target), observatory, delta_midnight, brightness_shading=True, altitude_yaxis=True,
                  style_kwargs=plot_styles)
@@ -293,5 +299,6 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
     axs.vlines(sun_rise, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
     plt.ylabel('Altitude (degrees)')
     plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
-    plt.title('Visibility plot for target ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")))
+    plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at ' + name_observatory)
+    #plt.title('Visibility plot for target ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")))
     plt.show()
