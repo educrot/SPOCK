@@ -9,8 +9,8 @@ import subprocess
 import sys
 from astropy import units as u
 from astropy.time import Time
-from astroplan.plots import dark_style_sheet, plot_airmass
-from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
+from astroplan.plots import dark_style_sheet
+from astropy.coordinates import SkyCoord, EarthLocation
 from astroplan import Observer
 import yaml
 import shutil
@@ -18,16 +18,14 @@ import SPOCK.ETC as ETC
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint,observability_table, is_observable, months_observable,time_grid_from_range,LocalTimeConstraint, is_always_observable
 from astroplan import TimeConstraint
 import matplotlib.pyplot as plt
-from astropy.table import Table, Column
 from astropy.table import unique
-from astroplan.plots import plot_schedule_airmass,plot_airmass,plot_sky
-from eScheduler.spe_schedule import SPECULOOSScheduler, PriorityScheduler, Schedule, ObservingBlock, Transitioner, DateElsa
-from eScheduler.spe_schedule import SequentialScheduler, Transitioner, PriorityScheduler, SimpleScheduler
+from astroplan.plots import plot_airmass
+from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock
+from eScheduler.spe_schedule import Transitioner
 from astroplan.periodic import EclipsingSystem
 from astroplan.constraints import is_event_observable
 
 dt=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg') #1 day
-
 constraints = [AltitudeConstraint(min=24*u.deg), AtNightConstraint()] #MoonSeparationConstraint(min=30*u.deg)
 
 def charge_observatories(Name):
@@ -50,7 +48,7 @@ def charge_observatories(Name):
         observatories.append(Observer(location=location_TSlasilla, name="TSlasilla", timezone="UTC"))
 
     if 'TN_Oukaimeden' in str(Name):
-        location_TNOuka = EarthLocation.from_geodetic(31.20516*u.deg, -7.862263*u.deg, 2751*u.m)
+        location_TNOuka = EarthLocation.from_geodetic( -7.862263*u.deg, 31.20516*u.deg,2751*u.m)
         observatories.append(Observer(location=location_TNOuka, name="TNOuka", timezone="UTC"))
 
     if 'Munich' in str(Name):
@@ -105,6 +103,10 @@ class Schedules:
             self.telescopes = df[nb_observatory]['telescopes']
             self.telescope = self.telescopes[0]
             self.day_of_night = Time(Inputs['day_of_night'])  # ,Time(Inputs['date_range'][1])]
+            try:
+                self.day_of_night = self.day_of_night[0]
+            except TypeError:
+                self.day_of_night = self.day_of_night
             self.start_end_range = Time(Inputs['start_end_range'])
             if self.start_end_range[1] <= self.start_end_range[0]:
                 sys.exit('ERROR: end date inferior to start date')
@@ -247,10 +249,16 @@ class Schedules:
                 print('INFO: no transit of ', df['Sp_ID'][i],' this day')
 
     def planification(self):
+        end_scheduled_table = pd.DataFrame(columns=['target','start time (UTC)','end time (UTC)','duration (minutes)','ra (h)','ra (m)','ra (s)',\
+                                                    'dec (d)','dec (m)','dec (s)','configuration'])
+        if self.SS1_night_blocks['target'][0] in self.scheduled_table['target']:
+            sys.exit('ERROR: This target is already scheduled this day')
         for i in range(len(self.scheduled_table['target'])):
             try:
                 self.SS1_night_blocks['target'][0]
             except IndexError:
+                sys.exit('ERROR: No block to insert ')
+            except TypeError:
                 sys.exit('ERROR: No block to insert ')
             #if self.SS1_night_blocks['target'][0] == self.scheduled_table['target'][i]:
             #    sys.exit('WARNING: The target ' + str(self.SS1_night_blocks['target'][0]) + 'that you wich to insert is already scheduled for this night !')
@@ -266,201 +274,126 @@ class Schedules:
                     print('INFO: two TRAPPIST-1 planets this night!')
                     self.SS1_night_blocks['start time (UTC)'][0] = min(self.SS1_night_blocks['start time (UTC)'][0],self.scheduled_table_sorted['start time (UTC)'][0])
                     self.SS1_night_blocks['end time (UTC)'][0] = max(self.SS1_night_blocks['end time (UTC)'][0],self.scheduled_table_sorted['end time (UTC)'][0])
-
-            if (self.SS1_night_blocks['start time (UTC)'][0] <= Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next')).iso): #case 1
+                    self.SS1_night_blocks['duration (minutes)'][0] = (Time(self.SS1_night_blocks['end time (UTC)'][0]) - Time(self.SS1_night_blocks['start time (UTC)'][0])).value*24*60
+                    end_scheduled_table.append({'target':self.SS1_night_blocks['target'][0],\
+                                                'start time (UTC)':self.SS1_night_blocks['start time (UTC)'][0],\
+                                                'end time (UTC)':self.SS1_night_blocks['end time (UTC)'][0],\
+                                                'duration (minutes)':self.SS1_night_blocks['duration (minutes)'][0],\
+                                                'ra (h)':self.SS1_night_blocks['ra (h)'][0],\
+                                                'ra (m)':self.SS1_night_blocks['ra (m)'][0],\
+                                                'ra (s)':self.SS1_night_blocks['ra (s)'][0],\
+                                                'dec (d)':self.SS1_night_blocks['dec (d)'][0],\
+                                                'dec (m)':self.SS1_night_blocks['dec (m)'][0],\
+                                                'dec (s)':self.SS1_night_blocks['dec (s)'][0],\
+                                                'configuration':self.SS1_night_blocks['configuration'][0]},ignore_index=True)
+            #situation 1
+            if (self.SS1_night_blocks['start time (UTC)'][0] <= Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next')).iso): #case 1 # if new_block starts before twilight sun set
                 self.SS1_night_blocks['start time (UTC)'][0] = Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next')).iso
 
-            if (self.scheduled_table['start time (UTC)'][i] <= self.SS1_night_blocks['start time (UTC)'][0]) and \
-                    (self.SS1_night_blocks['start time (UTC)'][0] <= self.scheduled_table['end time (UTC)'][i]):
-
-                if (self.SS1_night_blocks['end time (UTC)'][0] <= self.scheduled_table['end time (UTC)'][i]): #case 2
-                    self.scheduled_table = self.scheduled_table.to_pandas()
-                    self.SS1_night_blocks = self.SS1_night_blocks.to_pandas()
-                    self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
+            if (self.SS1_night_blocks['start time (UTC)'][0] < start_before_cut) and \
+                    (self.SS1_night_blocks['start time (UTC)'][0] < end_before_cut): # if new_block starts before exiting_block starts AND before existing_block ends
+                # situation 2
+                if (self.SS1_night_blocks['end time (UTC)'][0] > start_before_cut) and (self.SS1_night_blocks['end time (UTC)'][0] < end_before_cut): #case 2 # if new_block ends before the end of existing block
+                    print('case2')
+                    self.scheduled_table['start time (UTC)'][i] = self.SS1_night_blocks['end time (UTC)'][0]
                     self.scheduled_table['duration (minutes)'][i] = (Time(self.scheduled_table['end time (UTC)'][i])-Time(self.scheduled_table['start time (UTC)'][i])).value*24*60
 
-                    self.scheduled_table = self.scheduled_table.append(pd.DataFrame({'target': self.SS1_night_blocks['target'][0], \
-                                  'start time (UTC)': self.SS1_night_blocks['start time (UTC)'][0], \
-                                  'end time (UTC)': self.SS1_night_blocks['end time (UTC)'][0], \
-                                  'duration (minutes)': self.SS1_night_blocks['duration (minutes)'][0], \
-                                  'ra (h)': self.SS1_night_blocks['ra (h)'][0], \
-                                  'ra (m)': self.SS1_night_blocks['ra (m)'][0], \
-                                  'ra (s)': self.SS1_night_blocks['ra (s)'][0], \
-                                  'dec (d)': self.SS1_night_blocks['dec (d)'][0], \
-                                  'dec (m)': self.SS1_night_blocks['dec (m)'][0], \
-                                  'dec (s)': self.SS1_night_blocks['dec (s)'][0], \
-                                  'configuration': self.SS1_night_blocks['configuration'][0]},columns=self.scheduled_table.columns.values,index = [0]),ignore_index = True)
+                # situation 3
+                if (self.SS1_night_blocks['end time (UTC)'][0] <= start_before_cut):
+                    print('INFO: no change made to initial schedule')
 
-                    self.scheduled_table = self.scheduled_table.append(pd.DataFrame({'target': self.scheduled_table['target'][i] + '_2', \
-                                  'start time (UTC)': self.SS1_night_blocks['end time (UTC)'][0], \
-                                  'end time (UTC)': end_before_cut, \
-                                  'duration (minutes)': (Time(end_before_cut)-Time(self.SS1_night_blocks['end time (UTC)'][0])).value*24*60, \
-                                  'ra (h)': self.scheduled_table['ra (h)'][i], \
-                                  'ra (m)': self.scheduled_table['ra (m)'][i], \
-                                  'ra (s)': self.scheduled_table['ra (s)'][i], \
-                                  'dec (d)': self.scheduled_table['dec (d)'][i], \
-                                  'dec (m)': self.scheduled_table['dec (m)'][i], \
-                                  'dec (s)': self.scheduled_table['dec (s)'][i], \
-                                  'configuration': self.scheduled_table['configuration'][i]},columns=self.scheduled_table.columns.values,index = [0]),ignore_index=True)
-
+                # situation 4
                 elif (self.SS1_night_blocks['end time (UTC)'][0] >= end_before_cut) and \
-                        (self.SS1_night_blocks['end time (UTC)'][0] <= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso) : #case 3
+                        (self.SS1_night_blocks['end time (UTC)'][0] <= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso) :
 
-                    self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
-                    self.scheduled_table['duration (minutes)'][i]=(Time(self.scheduled_table['end time (UTC)'][i])-Time(self.scheduled_table['start time (UTC)'][i])).value*24*60
+                    self.scheduled_table[i] = self.SS1_night_blocks[0] #a way  to erase self.scheduled_table block
 
-                    self.scheduled_table.add_row((self.SS1_night_blocks['target'][0],
-                                                  self.SS1_night_blocks['start time (UTC)'][0],
-                                                  self.SS1_night_blocks['end time (UTC)'][0],
-                                                  self.SS1_night_blocks['duration (minutes)'][0],
-                                                  self.SS1_night_blocks['ra (h)'][0],
-                                                  self.SS1_night_blocks['ra (m)'][0],
-                                                  self.SS1_night_blocks['ra (s)'][0],
-                                                  self.SS1_night_blocks['dec (d)'][0],
-                                                  self.SS1_night_blocks['dec (m)'][0],
-                                                  self.SS1_night_blocks['dec (s)'][0],
-                                                  self.SS1_night_blocks['configuration'][0]))
-
-                elif (self.SS1_night_blocks['end time (UTC)'][0] >= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso) : #case 4
+                # situation 5
+                elif (self.SS1_night_blocks['end time (UTC)'][0] >= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso) :
                     self.SS1_night_blocks['end time (UTC)'][0] = Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso
-                    self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
-                    self.scheduled_table['duration (minutes)'][i]=(Time(self.scheduled_table['end time (UTC)'][i])-Time(self.scheduled_table['start time (UTC)'][i])).value*24*60
-                    self.scheduled_table.add_row((self.SS1_night_blocks['target'][0],
-                                                  self.SS1_night_blocks['start time (UTC)'][0],
-                                                  self.SS1_night_blocks['end time (UTC)'][0],
-                                                  self.SS1_night_blocks['duration (minutes)'][0],
-                                                  self.SS1_night_blocks['ra (h)'],
-                                                  self.SS1_night_blocks['ra (m)'][0],
-                                                  self.SS1_night_blocks['ra (s)'][0],
-                                                  self.SS1_night_blocks['dec (d)'][0],
-                                                  self.SS1_night_blocks['dec (m)'][0],
-                                                  self.SS1_night_blocks['dec (s)'][0],
-                                                  self.SS1_night_blocks['configuration'][0]))
+                    self.scheduled_table[i] = self.SS1_night_blocks[0] #a way  to erase self.scheduled_table block
 
-            if (start_before_cut >= self.SS1_night_blocks['start time (UTC)'][0]):
+            if (self.SS1_night_blocks['start time (UTC)'][0] >= start_before_cut):
 
-                if (self.SS1_night_blocks['end time (UTC)'][0] <= end_before_cut):
-                    if (self.SS1_night_blocks['end time (UTC)'][0] <= start_before_cut): #case5
-                        print('INFO: no change made to initial schedule')
-                    elif (self.SS1_night_blocks['start time (UTC)'][0] >= Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next')).iso): #case 6
-                        self.scheduled_table['start time (UTC)'][i] = self.SS1_night_blocks['end time (UTC)'][0]
-                        self.scheduled_table['duration (minutes)'][i] = (Time(self.scheduled_table['end time (UTC)'][i])-Time(self.scheduled_table['start time (UTC)'][i])).value*24*60
-                        self.scheduled_table.set_index('target')
-                        index_to_delete = self.scheduled_table.loc[self.scheduled_table['target'][i]].index
+                # situation 6
+                if (self.SS1_night_blocks['start time (UTC)'][0] <= end_before_cut) and (self.SS1_night_blocks['end time (UTC)'][0] <= end_before_cut):
 
-                        self.scheduled_table.add_row((str(self.scheduled_table['target'][i]),
-                                                      self.SS1_night_blocks['end time (UTC)'][0],
-                                                      end_before_cut,
-                                                      self.scheduled_table['duration (minutes)'][i],
-                                                      self.scheduled_table['ra (h)'][i],
-                                                      self.scheduled_table['ra (m)'][i],
-                                                      self.scheduled_table['ra (s)'][i],
-                                                      self.scheduled_table['dec (d)'][0],
-                                                      self.scheduled_table['dec (m)'][0],
-                                                      self.scheduled_table['dec (s)'][0],
-                                                      self.scheduled_table['configuration'][i]))
-                        self.scheduled_table.remove_row(index_to_delete)
+                    self.scheduled_table['end time (UTC)'][i] =  self.SS1_night_blocks['start time (UTC)'][0]
+                    self.scheduled_table['duration (minutes)'] = (Time(self.scheduled_table['end time (UTC)'][i]) - Time(self.scheduled_table['start time (UTC)'][i])).value * 24*60
 
-                        self.scheduled_table.add_row((self.SS1_night_blocks['target'][0],
-                                                      self.SS1_night_blocks['start time (UTC)'][0],
-                                                      self.SS1_night_blocks['end time (UTC)'][0],
-                                                      self.SS1_night_blocks['duration (minutes)'][0],
-                                                      self.SS1_night_blocks['ra (h)'][0],
-                                                      self.SS1_night_blocks['ra (m)'][0],
-                                                      self.SS1_night_blocks['ra (s)'][0],
-                                                      self.SS1_night_blocks['dec (d)'][0],
-                                                      self.SS1_night_blocks['dec (m)'][0],
-                                                      self.SS1_night_blocks['dec (s)'][0],
-                                                      self.SS1_night_blocks['configuration'][0]))
+                    end_scheduled_table = end_scheduled_table.append({'target': self.scheduled_table['target'][i] + '_2', \
+                                                                      'start time (UTC)':
+                                                                          self.SS1_night_blocks['end time (UTC)'][0], \
+                                                                      'end time (UTC)': end_before_cut, \
+                                                                      'duration (minutes)': (Time(end_before_cut) - Time(
+                                                                          self.SS1_night_blocks['end time (UTC)'][
+                                                                              0])).value * 24 * 60, \
+                                                                      'ra (h)': self.scheduled_table['ra (h)'][i], \
+                                                                      'ra (m)': self.scheduled_table['ra (m)'][i], \
+                                                                      'ra (s)': self.scheduled_table['ra (s)'][i], \
+                                                                      'dec (d)': self.scheduled_table['dec (d)'][i], \
+                                                                      'dec (m)': self.scheduled_table['dec (m)'][i], \
+                                                                      'dec (s)': self.scheduled_table['dec (s)'][i], \
+                                                                      'configuration':
+                                                                          self.scheduled_table['configuration'][i]},
+                                                                     ignore_index=True)
 
-                    elif (self.SS1_night_blocks['start time (UTC)'][0] <= Time(self.observatory.twilight_evening_nautical(self.day_of_night, which='next'))[0].iso): #case 7
-                        self.SS1_night_blocks['start time (UTC)'][0] = Time(self.observatory.twilight_evening_nautical(self.day_of_night, which='next'))[0].iso
-                        self.SS1_night_blocks['duration (minutes)'][i] = (Time(self.SS1_night_blocks['end time (UTC)'][0])-Time(self.SS1_night_blocks['start time (UTC)'][0])).value*24*60
-                        self.scheduled_table['start time (UTC)'][i] = self.SS1_night_blocks['end time (UTC)'][0]
-                        self.scheduled_table['duration (minutes)'][i] = (Time(self.scheduled_table['end time (UTC)'][i])-Time(self.scheduled_table['start time (UTC)'][i])).value*24*60
-                        self.scheduled_table.add_index('target')
-                        index_to_delete = self.scheduled_table.loc[self.scheduled_table['target'][i]].index
-                        self.scheduled_table.remove_row(index_to_delete)
+                if (self.SS1_night_blocks['end time (UTC)'][0] >= end_before_cut):
 
-                        self.scheduled_table.add_row((str(self.scheduled_table['target'][i]),
-                                                      self.SS1_night_blocks['end time (UTC)'][0],
-                                                      end_before_cut,
-                                                      self.scheduled_table['duration (minutes)'][i],
-                                                      self.scheduled_table['ra (h)'][i],
-                                                      self.scheduled_table['ra (m)'][i],
-                                                      self.scheduled_table['ra (s)'][i],
-                                                      self.scheduled_table['dec (d)'][0],
-                                                      self.scheduled_table['dec (m)'][0],
-                                                      self.scheduled_table['dec (s)'][0],
-                                                      self.scheduled_table['configuration'][i]))
+                    # situation 7
+                    if (self.SS1_night_blocks['end time (UTC)'][0] >= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso):
 
-                        self.scheduled_table.add_row((self.SS1_night_blocks['target'][0],
-                                                      self.SS1_night_blocks['start time (UTC)'][0],
-                                                      self.SS1_night_blocks['end time (UTC)'][0],
-                                                      self.SS1_night_blocks['duration (minutes)'][0],
-                                                      self.SS1_night_blocks['ra (h)'][0],
-                                                      self.SS1_night_blocks['ra (m)'][0],
-                                                      self.SS1_night_blocks['ra (s)'][0],
-                                                      self.SS1_night_blocks['dec (d)'][0],
-                                                      self.SS1_night_blocks['dec (m)'][0],
-                                                      self.SS1_night_blocks['dec (s)'][0],
-                                                      self.SS1_night_blocks['configuration'][0]))
+                        self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
+                        self.scheduled_table['duration (minutes)'] = (Time(self.scheduled_table['end time (UTC)'][i]) - Time(self.scheduled_table['start time (UTC)'][i])).value * 24 * 60
 
-                if (self.SS1_night_blocks['end time (UTC)'][0] >= end_before_cut) and \
-                        (self.SS1_night_blocks['end time (UTC)'][0] <= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso): #case 8
-                    self.scheduled_table.add_index('target')
-                    index_to_delete = self.scheduled_table.loc[self.scheduled_table['target'][i]].index
-                    self.scheduled_table.remove_row(index_to_delete)
+                        self.SS1_night_blocks['end time (UTC)'][0] = Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso
+                        self.SS1_night_blocks['duration (minutes)'][0] = (Time(self.SS1_night_blocks['end time (UTC)'][0])  - Time(self.SS1_night_blocks['start time (UTC)'][0])).value * 24*60
 
-                    self.scheduled_table.add_row((self.SS1_night_blocks['target'][0],
-                                                  self.SS1_night_blocks['start time (UTC)'][0],
-                                                  self.SS1_night_blocks['end time (UTC)'][0],
-                                                  self.SS1_night_blocks['duration (minutes)'][0],
-                                                  self.SS1_night_blocks['ra (h)'][0],
-                                                  self.SS1_night_blocks['ra (m)'][0],
-                                                  self.SS1_night_blocks['ra (s)'][0],
-                                                  self.SS1_night_blocks['dec (d)'][0],
-                                                  self.SS1_night_blocks['dec (m)'][0],
-                                                  self.SS1_night_blocks['dec (s)'][0],
-                                                  self.SS1_night_blocks['configuration'][0]))
+                    # situation 8
+                    elif (self.SS1_night_blocks['end time (UTC)'][0] <= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso):
 
-                elif (self.SS1_night_blocks['end time (UTC)'][0] >= Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')).iso): #case 9
-                    self.SS1_night_blocks['end time (UTC)'][0] = Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest'))[0].iso
-                    self.scheduled_table.add_index('target')
-                    index_to_delete = self.scheduled_table.loc[self.scheduled_table['target'][i]].index
-                    self.scheduled_table.remove_row(index_to_delete)
+                        self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
+                        self.scheduled_table['duration (minutes)'] = (Time(self.scheduled_table['end time (UTC)'][i]) - Time(self.scheduled_table['start time (UTC)'][i])).value * 24 * 60
 
-                    self.scheduled_table.add_row((self.SS1_night_blocks['target'][0],
-                                                  self.SS1_night_blocks['start time (UTC)'][0],
-                                                  self.SS1_night_blocks['end time (UTC)'][0],
-                                                  self.SS1_night_blocks['duration (minutes)'][0],
-                                                  self.SS1_night_blocks['ra (h)'][0],
-                                                  self.SS1_night_blocks['ra (m)'][0],
-                                                  self.SS1_night_blocks['ra (s)'][0],
-                                                  self.SS1_night_blocks['dec (d)'][0],
-                                                  self.SS1_night_blocks['dec (m)'][0],
-                                                  self.SS1_night_blocks['dec (s)'][0],
-                                                  self.SS1_night_blocks['configuration'][0]))
+                # situation 9
+                if (self.SS1_night_blocks['start time (UTC)'][0] >= end_before_cut):
+                    print('INFO: no change made to initial schedule')
 
-        if isinstance(self.scheduled_table,pd.DataFrame):
-            self.scheduled_table_unique = self.scheduled_table.loc[self.scheduled_table.astype(str).drop_duplicates().index]
-            index_prio=np.argsort(self.scheduled_table_unique['start time (UTC)'])
-            self.scheduled_table_sorted = pd.DataFrame({'target':self.scheduled_table_unique['target'][index_prio],\
-                                                        'start time (UTC)':self.scheduled_table_unique['start time (UTC)'][index_prio],\
-                                                        'end time (UTC)':self.scheduled_table_unique['end time (UTC)'][index_prio], \
-                                                        'duration (minutes)':self.scheduled_table_unique['duration (minutes)'][index_prio], \
-                                                        'ra (h)':self.scheduled_table_unique['ra (h)'][index_prio], \
-                                                        'ra (m)': self.scheduled_table_unique['ra (m)'][index_prio], \
-                                                        'ra (s)': self.scheduled_table_unique['ra (s)'][index_prio], \
-                                                        'dec (d)': self.scheduled_table_unique['dec (d)'][index_prio], \
-                                                        'dec (m)': self.scheduled_table_unique['dec (m)'][index_prio], \
-                                                        'dec (s)': self.scheduled_table_unique['dec (s)'][index_prio], \
-                                                        'configuration': self.scheduled_table_unique['configuration'][index_prio]})
-        else:
-            self.scheduled_table_unique=unique(self.scheduled_table, keys='target')
-            index_prio=np.argsort(self.scheduled_table_unique['start time (UTC)'])
-            self.scheduled_table_sorted = self.scheduled_table_unique[index_prio]
+            end_scheduled_table = end_scheduled_table.append({'target': self.SS1_night_blocks['target'][0], \
+                                        'start time (UTC)': self.SS1_night_blocks['start time (UTC)'][0], \
+                                        'end time (UTC)': self.SS1_night_blocks['end time (UTC)'][0], \
+                                        'duration (minutes)': self.SS1_night_blocks['duration (minutes)'][0], \
+                                        'ra (h)': self.SS1_night_blocks['ra (h)'][0], \
+                                        'ra (m)': self.SS1_night_blocks['ra (m)'][0], \
+                                        'ra (s)': self.SS1_night_blocks['ra (s)'][0], \
+                                        'dec (d)': self.SS1_night_blocks['dec (d)'][0], \
+                                        'dec (m)': self.SS1_night_blocks['dec (m)'][0], \
+                                        'dec (s)': self.SS1_night_blocks['dec (s)'][0], \
+                                        'configuration': self.SS1_night_blocks['configuration'][0]},
+                                       ignore_index=True)
+            end_scheduled_table = end_scheduled_table.append({'target': self.scheduled_table['target'][i], \
+                                        'start time (UTC)': self.scheduled_table['start time (UTC)'][i], \
+                                        'end time (UTC)': self.scheduled_table['end time (UTC)'][i], \
+                                        'duration (minutes)': self.scheduled_table['duration (minutes)'][i], \
+                                        'ra (h)': self.scheduled_table['ra (h)'][i], \
+                                        'ra (m)': self.scheduled_table['ra (m)'][i], \
+                                        'ra (s)': self.scheduled_table['ra (s)'][i], \
+                                        'dec (d)': self.scheduled_table['dec (d)'][i], \
+                                        'dec (m)': self.scheduled_table['dec (m)'][i], \
+                                        'dec (s)': self.scheduled_table['dec (s)'][i], \
+                                        'configuration': self.scheduled_table['configuration'][i]},
+                                       ignore_index=True)
 
+        end_scheduled_table = Table.from_pandas(end_scheduled_table)
+        end_scheduled_table = unique(end_scheduled_table, keys='target')
+        end_scheduled_table.sort(keys='start time (UTC)')
+        idx_too_short_block = np.where((end_scheduled_table['duration (minutes)'] < 5))
+
+        if idx_too_short_block is not None:
+            for i in idx_too_short_block:
+                end_scheduled_table.remove_row(i[0])
+
+        self.scheduled_table_sorted = end_scheduled_table
         return self.scheduled_table_sorted
 
     def make_scheduled_table(self):
@@ -497,8 +430,10 @@ class Schedules:
                 except KeyError:
                     print('INFO: no transition block')
                 panda_table = self.scheduled_table_sorted
-                panda_table.to_csv(os.path.join(Path,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d") + '.txt'),sep=' ')
-
+                try:
+                    panda_table.to_csv(os.path.join(Path,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d") + '.txt'),sep=' ')
+                except TypeError:
+                    panda_table.to_csv(os.path.join(Path, 'night_blocks_' + self.telescope + '_' +self.day_of_night.tt.datetime.strftime("%Y-%m-%d") + '.txt'),sep=' ')
             else:
                 try:
                     self.scheduled_table_sorted.add_index('target')
@@ -507,7 +442,10 @@ class Schedules:
                 except KeyError:
                     print('INFO: no transition block')
                 panda_table = self.scheduled_table_sorted.to_pandas()
-                panda_table.to_csv(os.path.join(Path,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime.strftime("%Y-%m-%d") + '.txt'),sep=' ')
+                try:
+                    panda_table.to_csv(os.path.join(Path,'night_blocks_' + self.telescope + '_' +  self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d") + '.txt'),sep=' ')
+                except TypeError:
+                    panda_table.to_csv(os.path.join(Path, 'night_blocks_' + self.telescope + '_' +self.day_of_night.tt.datetime.strftime("%Y-%m-%d") + '.txt'),sep=' ')
 
     def exposure_time(self, input_name):
         i = np.where((self.target_table_spc['Sp_ID'] == input_name))[0]
@@ -516,20 +454,20 @@ class Schedules:
         elif (round(float(self.target_table_spc['SpT'][i])) == 12) or (round(float(self.target_table_spc['SpT'][i]))== 15) or (
                 round(float(self.target_table_spc['SpT'][i])) == 18):
             spt_type = 'M' + str(round(float(self.target_table_spc['SpT'][i])) - 10)
-        elif round(self.target_table_spc['SpT'][i]) == 10:
+        elif round(float(self.target_table_spc['SpT'][i])) == 10:
             spt_type = 'M9'
-        elif round(self.target_table_spc['SpT'][i]) == 11:
+        elif round(float(self.target_table_spc['SpT'][i])) == 11:
             spt_type = 'L2'
-        elif round(self.target_table_spc['SpT'][i]) == 13:
+        elif round(float(self.target_table_spc['SpT'][i])) == 13:
             spt_type = 'L2'
-        elif round(self.target_table_spc['SpT'][i]) == 14:
+        elif round(float(self.target_table_spc['SpT'][i])) == 14:
             spt_type = 'L5'
         # elif self.target_table_spc['SpT'][i]
         filt_ = self.target_table_spc['Filter'][i[0]]
         if (filt_ == 'z\'') or (filt_ == 'r\'') or (filt_ == 'i\'') or (filt_ == 'g\''):
             filt_ = filt_.replace('\'', '')
         a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,
-                     moonphase=0.6, irtf=0.8, num_tel=1, seeing=0.95))
+                     moonphase=0.6, irtf=0.8, num_tel=1, seeing=0.95,gain=1.1))
         texp = a.exp_time_calculator(ADUpeak=30000)[0]
         return texp
 
@@ -558,33 +496,37 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
     if input_file is None:
         telescope = telescope
         date_range = date_range
-        date_range_in_days = int((date_range[1] - date_range[0]).value)
-    with open(input_file, "r") as f:
-        Inputs = yaml.load(f, Loader=yaml.FullLoader)
-        df = pd.DataFrame.from_dict(Inputs['observatories'])
-        observatory = charge_observatories(df[nb_observatory]['name'])[0]
-        date_range = Time(Inputs['day_of_night'])
-        telescope = df[nb_observatory]['telescopes'][0]
-        day = date_range[0]
-        if save:
-            source = './night_blocks_propositions/' + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
-            destination = './DATABASE/' + telescope + '/'
-            destination_2 = './DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
-            if over_write:
-                dest = shutil.copy(source, destination)
-                dest2 = shutil.copy(source, destination_2)
-                print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
-                print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' + destination_2 + '\"')
-            if not over_write:
-                try:
-                    dest = shutil.move(source, destination)
-                    dest2 = shutil.move(source, destination_2)
-                    print('INFO : ' + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
-                    print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
-                except shutil.Error:
-                    print('INFO : ' + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
-        if not save:
-            print('INFO : Those plans have not been saved')
+        try:
+            day = date_range[0]
+        except TypeError:
+            day = date_range
+    else:
+        with open(input_file, "r") as f:
+            Inputs = yaml.load(f, Loader=yaml.FullLoader)
+            df = pd.DataFrame.from_dict(Inputs['observatories'])
+            observatory = charge_observatories(df[nb_observatory]['name'])[0]
+            date_range = Time(Inputs['day_of_night'])
+            telescope = df[nb_observatory]['telescopes'][0]
+            day = date_range[0]
+    if save:
+        source = './night_blocks_propositions/' + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
+        destination = './DATABASE/' + telescope + '/'
+        destination_2 = './DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
+        if over_write:
+            dest = shutil.copy(source, destination)
+            dest2 = shutil.copy(source, destination_2)
+            print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
+            print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' + destination_2 + '\"')
+        if not over_write:
+            try:
+                dest = shutil.move(source, destination)
+                dest2 = shutil.move(source, destination_2)
+                print('INFO : ' + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
+                print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+            except shutil.Error:
+                print('INFO : ' + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
+    if not save:
+        print('INFO : Those plans have not been saved')
 
 
 def make_plans(day, nb_days, telescope):
@@ -615,3 +557,216 @@ def upload_plans(day, nb_days, telescope):
     path_night_blocks = os.path.join('./DATABASE/', telescope,'Archive_night_blocks/')
     print('INFO: Path local night blocks = ',path_night_blocks)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_night_blocks, path_database])
+
+from docx import Document
+from docx.shared import *
+from docx.enum.text import *
+from astropy.table import Table
+
+def read_night_block(telescope, day):
+    day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
+    scheduler_table = Table.read(
+        './DATABASE/' + str(telescope) + '/night_blocks_' + str(telescope) + '_' + str(day_fmt) + '.txt',
+        format='ascii')
+    return scheduler_table
+
+def make_docx_schedule(observatory,telescope, date_range, name_operator,path_target_list):
+    df_pandas = pd.read_csv(path_target_list, delimiter=' ')
+    df = Table.from_pandas(df_pandas)
+    nb_day_date_range = date_range_in_days(date_range)
+    doc = Document()
+    par = doc.add_paragraph()
+    par_format = par.paragraph_format
+    par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    par_format.space_before = Pt(0)
+    par_format.space_after = Pt(6)
+    run = par.add_run(observatory.name)
+    run.bold = True
+    font = run.font
+    font.size = Pt(16)
+    font.color.rgb = RGBColor(0, 0, 0)
+    par = doc.add_paragraph()
+    par_format = par.paragraph_format
+    par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    par_format.space_before = Pt(0)
+    par_format.space_after = Pt(12)
+    run = par.add_run('Schedule from ' + date_range[0].iso + '-' + date_range[1].iso)
+    run.bold = True
+    font = run.font
+    font.size = Pt(16)
+    font.color.rgb = RGBColor(0, 0, 0)
+    par = doc.add_paragraph()
+    par_format = par.paragraph_format
+    par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    par_format.space_before = Pt(0)
+    par_format.space_after = Pt(12)
+    run = par.add_run(
+        '(Total time = 0hr, technical loss = 0hr, weather loss = 0hr, Exotime = 0hr, cometime = 0hr,   chilean time = 0hr)')
+    run.bold = True
+    font = run.font
+    font.size = Pt(12)
+    font.color.rgb = RGBColor(255, 0, 0)
+    par = doc.add_paragraph()
+    par_format = par.paragraph_format
+    par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    par_format.space_before = Pt(0)
+    par_format.space_after = Pt(20)
+    run = par.add_run(name_operator)
+    run.italic = True
+    font = run.font
+    font.size = Pt(12)
+    font.color.rgb = RGBColor(0, 0, 0)
+    par = doc.add_paragraph()
+    par_format = par.paragraph_format
+    par_format.space_before = Pt(16)
+    par_format.space_after = Pt(0)
+
+    for i in range(nb_day_date_range):
+
+        date = date_range[0] + i
+        read_night_block(telescope, date)
+
+        table_schedule = read_night_block(telescope, date)
+        idx_target = [np.where((df['Sp_ID'] == table_schedule['target'][i])) for i in range(len(table_schedule))]
+
+        sun_set = observatory.sun_set_time(date, which='next').iso
+        sun_rise = observatory.sun_rise_time(date, which='next').iso
+        moon_illumination = int(round(astroplan.moon_illumination(date) * 100, 0)) * u.percent
+        civil_twilights = [Time(observatory.twilight_evening_civil(date, which='next')).iso,
+                           Time(observatory.twilight_morning_civil(date + 1, which='nearest')).iso]
+        nautic_twilights = [Time(observatory.twilight_evening_nautical(date, which='next')).iso,
+                            Time(observatory.twilight_morning_nautical(date + 1, which='nearest')).iso]
+        astro_twilights = [Time(observatory.twilight_evening_astronomical(date, which='next')).iso,
+                           Time(observatory.twilight_morning_astronomical(date + 1, which='nearest')).iso]
+        start_night = table_schedule['start time (UTC)'][0]
+        end_night = table_schedule['end time (UTC)'][-1]
+        night_duration = round((Time(end_night) - Time(start_night)).jd * 24, 3) * u.hour
+
+        run = par.add_run('Night starting on the ' + Time(date, out_subfmt='date').value)
+        run.bold = True
+        run.underline = True
+        font = run.font
+        font.size = Pt(12)
+        font.color.rgb = RGBColor(0, 0, 0)
+        par = doc.add_paragraph()
+        par_format = par.paragraph_format
+        par_format.space_before = Pt(0)
+        par_format.space_after = Pt(0)
+        run = par.add_run('Moon illumination: ' + str(moon_illumination))
+        par = doc.add_paragraph()
+        par_format = par.paragraph_format
+        par_format.space_before = Pt(0)
+        par_format.space_after = Pt(0)
+        run = par.add_run(
+            'Sunset /  Sunrise: ' + Time(sun_set, out_subfmt='date_hm').value + '  / ' + Time(sun_rise,
+                                                                                              out_subfmt='date_hm').value)
+        run.italic = True
+        font = run.font
+        font.size = Pt(12)
+        font.color.rgb = RGBColor(0, 0, 0)
+        par = doc.add_paragraph()
+        par_format = par.paragraph_format
+        par_format.space_before = Pt(0)
+        par_format.space_after = Pt(0)
+        run = par.add_run(
+            'Civil/Naut./Astro. twilights: ' + Time(civil_twilights[0], out_subfmt='date_hm').value + '/' + Time(
+                civil_twilights[1], out_subfmt='date_hm').value + \
+            ' , ' + Time(nautic_twilights[0], out_subfmt='date_hm').value + '/' + Time(nautic_twilights[1],
+                                                                                       out_subfmt='date_hm').value + \
+            ' , ' + Time(astro_twilights[0], out_subfmt='date_hm').value + '/' + Time(astro_twilights[1],
+                                                                                      out_subfmt='date_hm').value)
+        run.italic = True
+        font = run.font
+        font.size = Pt(12)
+        font.color.rgb = RGBColor(0, 0, 0)
+        par = doc.add_paragraph()
+        par_format = par.paragraph_format
+        par_format.space_before = Pt(0)
+        par_format.space_after = Pt(0)
+        run = par.add_run('Start-end of night (Naut. twil.): ' + start_night + ' to ' + end_night)
+        run.italic = True
+        font = run.font
+        font.size = Pt(12)
+        font.color.rgb = RGBColor(0, 0, 0)
+        par = doc.add_paragraph()
+        par_format = par.paragraph_format
+        par_format.space_before = Pt(0)
+        par_format.space_after = Pt(3)
+        run = par.add_run('Night duration (Naut. twil.): ' + str(night_duration))
+        run.italic = True
+        font = run.font
+        font.size = Pt(12)
+        font.color.rgb = RGBColor(0, 0, 0)
+
+        for i in range(len(table_schedule)):
+            idx_target = np.where((df['Sp_ID'] == table_schedule['target'][i]))
+            start_time_target = table_schedule['start time (UTC)'][i]
+            end_time_target = table_schedule['end time (UTC)'][i]
+            config = table_schedule['configuration'][i]
+            dist_moon = '34'
+
+            par = doc.add_paragraph()
+            par_format = par.paragraph_format
+            par_format.space_before = Pt(0)
+            par_format.space_after = Pt(0)
+            run = par.add_run(
+                'From ' + Time(start_time_target, out_subfmt='date_hm').value + ' to ' + Time(end_time_target,
+                                                                                              out_subfmt='date_hm').value + ' : ' + str(
+                    df['Sp_ID'][idx_target].data.data[0]))
+            run.bold = True
+            font = run.font
+            font.size = Pt(12)
+            font.color.rgb = RGBColor(0, 0, 0)
+            par = doc.add_paragraph()
+            par_format = par.paragraph_format
+            par_format.space_before = Pt(0)
+            par_format.space_after = Pt(0)
+            run = par.add_run('  Note: Prio_target                                         ')
+            font = run.font
+            font.size = Pt(10)
+            font.color.rgb = RGBColor(0, 0, 0)
+            par = doc.add_paragraph()
+            par_format = par.paragraph_format
+            par_format.space_before = Pt(0)
+            par_format.space_after = Pt(0)
+            run = par.add_run(
+                '  SPECULOOS : ' + str(df['nb_hours_surved'][idx_target].data.data[0]) + 'hr of obs over' + str(
+                    df['nb_hours_threshold'][idx_target].data.data[0]))
+            font = run.font
+            font.size = Pt(10)
+            font.color.rgb = RGBColor(0, 0, 0)
+            par = doc.add_paragraph()
+            par_format = par.paragraph_format
+            par_format.space_before = Pt(0)
+            par_format.space_after = Pt(0)
+            run = par.add_run('Jmag= ' + str(df['J'][idx_target].data.data[0]) + ',  SpT= ' + str(
+                df['SpT'][idx_target].data.data[0]))  # + ', Moon at ' + str(dist_moon))
+            font = run.font
+            font.size = Pt(12)
+            font.color.rgb = RGBColor(0, 0, 0)
+            par = doc.add_paragraph()
+            par_format = par.paragraph_format
+            par_format.space_before = Pt(0)
+            par_format.space_after = Pt(3)
+            run = par.add_run(
+                '  RA=' + str(round(df['RA'][idx_target].data.data[0], 2) * u.degree) + ', DEC= ' + str(
+                    round(df['DEC'][idx_target].data.data[0], 2) * u.degree) + ', Config: ' + str(config))
+            font = run.font
+            font.size = Pt(12)
+            font.color.rgb = RGBColor(0, 0, 0)
+            par = doc.add_paragraph()
+            par_format = par.paragraph_format
+            par_format.space_before = Pt(16)
+            par_format.space_after = Pt(0)
+
+    font = run.font
+    font.size = Pt(12)
+    font.color.rgb = RGBColor(0, 0, 0)
+    doc.save('schedule.docx')
+
+def date_range_in_days(date_range):
+    date_format = "%Y-%m-%d %H:%M:%S.%f"
+    date_start = datetime.datetime.strptime(date_range[0].value, date_format)
+    date_end = datetime.datetime.strptime(date_range[1].value, date_format)
+    date_range_in_days = (date_end - date_start).days
+    return date_range_in_days

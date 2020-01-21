@@ -1,8 +1,8 @@
-import os
-import numpy as np
-import pandas as pd
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+import numpy as np
+import os
+import pandas as pd
 
 startup_time=[]
 hour=[]
@@ -68,7 +68,6 @@ def startup_no_flats(t_now,name,sun_set,date_start,Path):
             out.write(str00)
         out.write(str5 + 'Obj_' + name + '.txt' + '\n')
         out.write(str00)
-
 
 def startup(t_now,name,sun_set,date_start,Path):
     date_start=np.datetime64(date_start)
@@ -480,8 +479,11 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
         gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
     if idx_target is None:
         df2 = pd.read_csv('target_list_special.txt',delimiter=' ',index_col=None)
-        idx_target = np.where((df2['Sp_ID'] == name))[0]
-        gaia_id_target = df2['Gaia_ID'][int(idx_target)]
+        try:
+            idx_target = np.where((df2['Sp_ID'] == name))[0]
+            gaia_id_target = df2['Gaia_ID'][int(idx_target)]
+        except TypeError:
+            gaia_id_target = 'None'
 
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
@@ -556,8 +558,6 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
         else:
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
-
-
 
 def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     date_start=np.datetime64(date_start)
@@ -717,7 +717,6 @@ def first_target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,a
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
 
-
 def flatdawn(t_now,date_end,sun_rise,Path):
     date_end=np.datetime64(date_end)
     hour0=date_end.astype(object).hour
@@ -789,71 +788,6 @@ def flatdawn_no_flats(t_now,date_end,sun_rise,Path):
         out.write(str3 + str4)
         out.write(str44 + str(hour1) + ':' + str(minute1) + '\n')
         out.write(str5 + str6)
-
-
-
-def shutdown(t_now,Path):
-    with open(os.path.join(Path,str(t_now),'Cal_shutdown.txt'),'w') as out:
-        str00=';'
-        str1='#domeclose \n'
-        str2='#shutdown \n'
-        out.write(str00 + '\n')
-        out.write(str1)
-        out.write(str2)
-        out.write(str00 + '\n')
-
-
-def biasdark(t_now,Path):
-    with open(os.path.join(Path,str(t_now),'Cal_biasdark.txt'),'w') as out:
-        str00=';'
-        str1='#domeclose \n'
-        str2='#nopreview \n'
-        str3=' == bias dark exoplanet =='
-        str4='#count '
-        str5='#binning '
-        str6='#interval '
-        str7='#dark \n'
-        str8='#shutdown \n'
-        str9='END'
-        out.write(str1)
-        out.write(str2)
-        out.write(str00 + '\n')
-        out.write(str00 + str3 + '\n')
-        out.write(str00 + '\n')
-        out.write(str4 + '9,9,9,9,9' + '\n')
-        out.write(str5 + '1,1,1,1,1' + '\n')
-        out.write(str6 + '0,15,30,60,120' + '\n')
-        out.write(str7)
-        out.write(str8)
-        out.write(str00 + '\n')
-        out.write(str00 + str9+ '\n')
-        out.write(str00 + '\n')
-
-def biasdark_comete(t_now,Path):
-    with open(os.path.join(Path,str(t_now),'Cal_biasdark.txt'),'w') as out:
-        str00=';'
-        str1='#domeclose \n'
-        str2='#nopreview \n'
-        str3=' == bias dark exoplanet =='
-        str4='#count '
-        str5='#binning '
-        str6='#interval '
-        str7='#dark \n'
-        str8='#shutdown \n'
-        str9='END'
-        out.write(str1)
-        out.write(str2)
-        out.write(str00 + '\n')
-        out.write(str00 + str3 + '\n')
-        out.write(str00 + '\n')
-        out.write(str4 + '9,9,9,9,9,9,9' + '\n')
-        out.write(str5 + '1,1,1,1,2,2,2' + '\n')
-        out.write(str6 + '120,15,30,60,0,120,240' + '\n')
-        out.write(str7)
-        out.write(str8)
-        out.write(str00 + '\n')
-        out.write(str00 + str9+ '\n')
-        out.write(str00 + '\n')
 
 def flatexo_gany(Path,t_now,filt,nbOIII=None,nbHa=None,nbSII=None,nbz=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):
     str00=';'
@@ -1271,3 +1205,64 @@ def flatexo_artemis_evening(Path,t_now,filt,nbu=None,nbHa=None,nbRc=None,nbz=Non
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
+def biasdark(t_now,Path):
+    with open(os.path.join(Path,str(t_now),'Cal_biasdark.txt'),'w') as out:
+        str00=';'
+        str1='#domeclose \n'
+        str2='#nopreview \n'
+        str3=' == bias dark exoplanet =='
+        str4='#count '
+        str5='#binning '
+        str6='#interval '
+        str7='#dark \n'
+        str8='#shutdown \n'
+        str9='END'
+        out.write(str1)
+        out.write(str2)
+        out.write(str00 + '\n')
+        out.write(str00 + str3 + '\n')
+        out.write(str00 + '\n')
+        out.write(str4 + '9,9,9,9,9' + '\n')
+        out.write(str5 + '1,1,1,1,1' + '\n')
+        out.write(str6 + '0,15,30,60,120' + '\n')
+        out.write(str7)
+        out.write(str8)
+        out.write(str00 + '\n')
+        out.write(str00 + str9+ '\n')
+        out.write(str00 + '\n')
+
+def biasdark_comete(t_now,Path):
+    with open(os.path.join(Path,str(t_now),'Cal_biasdark.txt'),'w') as out:
+        str00=';'
+        str1='#domeclose \n'
+        str2='#nopreview \n'
+        str3=' == bias dark exoplanet =='
+        str4='#count '
+        str5='#binning '
+        str6='#interval '
+        str7='#dark \n'
+        str8='#shutdown \n'
+        str9='END'
+        out.write(str1)
+        out.write(str2)
+        out.write(str00 + '\n')
+        out.write(str00 + str3 + '\n')
+        out.write(str00 + '\n')
+        out.write(str4 + '9,9,9,9,9,9,9' + '\n')
+        out.write(str5 + '1,1,1,1,2,2,2' + '\n')
+        out.write(str6 + '120,15,30,60,0,120,240' + '\n')
+        out.write(str7)
+        out.write(str8)
+        out.write(str00 + '\n')
+        out.write(str00 + str9+ '\n')
+        out.write(str00 + '\n')
+
+def shutdown(t_now,Path):
+    with open(os.path.join(Path,str(t_now),'Cal_shutdown.txt'),'w') as out:
+        str00=';'
+        str1='#domeclose \n'
+        str2='#shutdown \n'
+        out.write(str00 + '\n')
+        out.write(str1)
+        out.write(str2)
+        out.write(str00 + '\n')

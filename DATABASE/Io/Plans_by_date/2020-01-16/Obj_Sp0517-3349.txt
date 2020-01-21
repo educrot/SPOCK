@@ -17,6 +17,6 @@
 #TAG Donuts=on
 Sp0517-3349	05 17 37.79	-33 49 03.07
 ;
-#quitat 04:47
-#chain Obj_Sp1048-3956.txt
+#quitat 01:39
+#chain Obj_Sp0938-2748.txt
 ;

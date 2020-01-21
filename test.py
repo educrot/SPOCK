@@ -2,52 +2,19 @@ import SPOCK.long_term_scheduler as SPOCKLT
 import SPOCK.short_term_scheduler as SPOCKST
 import SPOCK.plots_scheduler as SPOCKplot
 import SPOCK.ETC as ETC
-
-
-# ---------------------- SHORT TERM SCHEDULER ---------------------
-obs=1
+#
+obs = 2
 schedule = SPOCKST.Schedules()
-schedule.load_parameters('input_short_term.csv', obs)
-schedule.day_of_night = schedule.day_of_night[0]
-
-if schedule.use == 'follow_up':
-    schedule.transit_follow_up('target_transit_follow_up.txt')
-if schedule.use == 'special_start_end':
-    input_name = 'Sp0755-2404'
-    schedule.special_target_with_start_end(input_name)
-if schedule.use == 'special':
-    input_name = 'Sp0938-2748'
-    schedule.special_target(input_name)
-if schedule.use == 'monitoring':
-    input_name = 'Sp0755-2404'
-    schedule.monitoring(input_name,5,61)
-
-schedule.make_scheduled_table()
-schedule.planification()
-schedule.make_night_block()
-SPOCKST.make_plans(day=schedule.day_of_night,nb_days=1,telescope=schedule.telescope)
-
-
-print()
-
-obs = 1
-schedule = SPOCKLT.Schedules()
-schedule.load_parameters('./input.csv',obs)
-schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
-
-
-
-print()
-
+schedule.load_parameters('input_short_term.csv',obs)
 # ---------------------- SHORT TERM SCHEDULER ---------------------
 
 if schedule.use == 'follow_up':
     schedule.transit_follow_up('target_transit_follow_up.txt')
 if schedule.use == 'special_start_end':
-    input_name = 'Sp0755-2404'
+    input_name = 'Sp0916-1121'
     schedule.special_target_with_start_end(input_name)
 if schedule.use == 'special':
-    input_name = 'TI425933644'
+    input_name = 'Sp0025+5422'
     schedule.special_target(input_name)
 if schedule.use == 'monitoring':
     input_name = 'Sp0755-2404'
@@ -58,7 +25,21 @@ schedule.planification()
 schedule.make_night_block()
 SPOCKST.make_plans(day=schedule.day_of_night[0],nb_days=1,telescope=schedule.telescope)
 
+print()
+
 # ---------------------- LONG TERM SCHEDULER ---------------------
+
+
+
+obs = 5
+schedule = SPOCKLT.Schedules()
+schedule.load_parameters('./input.csv',obs)
+schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
+
+
+
+print()
+
 
 schedule = SPOCKLT.Schedules()
 # 1 for SSO , 2 for SNO and 3 for Saint-Ex

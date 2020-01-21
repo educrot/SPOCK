@@ -35,7 +35,7 @@ def charge_observatories(Name):
         observatories.append(Observer(location=location_TSlasilla, name="TSlasilla", timezone="UTC"))
 
     if 'TN_Oukaimeden' in str(Name):
-        location_TNOuka = EarthLocation.from_geodetic(31.20516*u.deg, -7.862263*u.deg, 2751*u.m)
+        location_TNOuka = EarthLocation.from_geodetic( -7.862263*u.deg,31.20516*u.deg, 2751*u.m)
         observatories.append(Observer(location=location_TNOuka, name="TNOuka", timezone="UTC"))
 
     if 'Munich' in str(Name):
