@@ -12,8 +12,8 @@
 ;#autofocus 
 #count 5000
 #binning 1
-#filter I+z
-#interval 21
+#filter i'
+#interval 20
 #TAG Donuts=on
 Sp1048-3956	10 48 14.20	-39 56 06.84
 ;

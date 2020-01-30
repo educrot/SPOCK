@@ -1,0 +1,22 @@
+;
+; NGTS_BD
+;
+; 3023459583984210304
+;
+#waituntil 1, 2020/01/28 00:10:20
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 50
+#TAG Donuts=on
+NGTS_BD	05 39 55.55	-04 20 08.92
+;
+#quitat 06:17
+#chain Obj_Sp0805-3158.txt
+;

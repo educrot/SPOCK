@@ -13,10 +13,10 @@
 #count 5000
 #binning 1
 #filter I+z
-#interval 30
+#interval 25
 #TAG Donuts=on
-Sp1430+5943	14 30 36.97	+59 43 24.87
+Sp1430+5943	14 30 23.00	+59 41 58.00
 ;
-#quitat 07:02
+#quitat 07:01
 #chain Cal_flatdawn.txt
 ;

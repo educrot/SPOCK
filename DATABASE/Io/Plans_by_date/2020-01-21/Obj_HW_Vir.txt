@@ -1,0 +1,22 @@
+;
+; HW_Vir
+;
+; 3675067076961979264
+;
+#waituntil 1, 04:53
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter r'
+#interval 10
+#TAG Donuts=on
+HW_Vir	12 44 34.27	-08 41 27.27
+;
+#quitat 09:16
+#chain Cal_flatdawn.txt
+;

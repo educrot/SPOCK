@@ -163,7 +163,7 @@ def gantt_chart_all(target_list):
     telescope = []
     location = EarthLocation.from_geodetic(-70.40300000000002 * u.deg, -24.625199999999996 * u.deg,
                                            2635.0000000009704 * u.m)
-    telescopes = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex']
+    telescopes = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex','TS_La_Silla','TN_Oukaimeden']
     for tel in telescopes:
         for i in os.listdir(os.path.join('./DATABASE/', tel,
                                          'Archive_night_blocks')):
@@ -193,7 +193,9 @@ def gantt_chart_all(target_list):
               'Io_s': 'rgba(255, 182, 193, .9)',
               'Europa_s': 'rgba(28,134,238,0.9)',
               'Ganymede_s': 'rgba(255,160,122,0.9)',
-              'Callisto_s': 'rgba(152,245,255,.9)'}
+              'Callisto_s': 'rgba(152,245,255,0.9)',
+              'TS_La_Silla': 'rgba(255,0,255,0.9)',
+              'TN_Oukaimeden':'rgba(0,128,128,0.9)'}
 
     for i in range(0,len(Task)):
         for j in range(0,len(Task[i])):

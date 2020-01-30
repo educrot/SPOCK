@@ -1,5 +1,13 @@
 #!/anaconda3/bin/python3.6
+from astropy import units as u
+from astropy.time import Time
+from astroplan.plots import dark_style_sheet
+from astropy.coordinates import SkyCoord, EarthLocation
+from astroplan import Observer
+from astroplan.periodic import EclipsingSystem
+from astroplan.constraints import is_event_observable
 
+from datetime import datetime
 import os
 import pandas as pd
 import numpy as np
@@ -7,23 +15,18 @@ from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_
 from SPOCK.make_night_plans import make_np
 import subprocess
 import sys
-from astropy import units as u
-from astropy.time import Time
-from astroplan.plots import dark_style_sheet
-from astropy.coordinates import SkyCoord, EarthLocation
-from astroplan import Observer
+
 import yaml
 import shutil
 import SPOCK.ETC as ETC
-from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint,observability_table, is_observable, months_observable,time_grid_from_range,LocalTimeConstraint, is_always_observable
+from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint
 from astroplan import TimeConstraint
+import astroplan
 import matplotlib.pyplot as plt
 from astropy.table import unique
 from astroplan.plots import plot_airmass
 from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock
 from eScheduler.spe_schedule import Transitioner
-from astroplan.periodic import EclipsingSystem
-from astroplan.constraints import is_event_observable
 
 dt=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg') #1 day
 constraints = [AltitudeConstraint(min=24*u.deg), AtNightConstraint()] #MoonSeparationConstraint(min=30*u.deg)
@@ -357,7 +360,7 @@ class Schedules:
 
                 # situation 9
                 if (self.SS1_night_blocks['start time (UTC)'][0] >= end_before_cut):
-                    print('INFO: no change made to initial schedule')
+                    print('INFO: situation 9, no change made to initial schedule')
 
             end_scheduled_table = end_scheduled_table.append({'target': self.SS1_night_blocks['target'][0], \
                                         'start time (UTC)': self.SS1_night_blocks['start time (UTC)'][0], \
@@ -387,11 +390,19 @@ class Schedules:
         end_scheduled_table = Table.from_pandas(end_scheduled_table)
         end_scheduled_table = unique(end_scheduled_table, keys='target')
         end_scheduled_table.sort(keys='start time (UTC)')
-        idx_too_short_block = np.where((end_scheduled_table['duration (minutes)'] < 5))
+        idx_too_short_block = np.where((end_scheduled_table['duration (minutes)'] <= 3))
 
-        if idx_too_short_block is not None:
-            for i in idx_too_short_block:
-                end_scheduled_table.remove_row(i[0])
+        if idx_too_short_block:
+            for i in list(idx_too_short_block[0]):
+                idx_for_target_2 = np.where((end_scheduled_table['target'] == end_scheduled_table['target'][i] + '_2'))[0]
+                if idx_for_target_2.size != 0:
+                    end_scheduled_table['target'][idx_for_target_2[0]] = end_scheduled_table['target'][i]
+
+            list_too_short_reverse = list(idx_too_short_block[0])
+            list_too_short_reverse.reverse() # important to reverse if you want to delete lines correctly
+            for i in list_too_short_reverse:
+                print(i)
+                end_scheduled_table.remove_row(i)
 
         self.scheduled_table_sorted = end_scheduled_table
         return self.scheduled_table_sorted
@@ -590,7 +601,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     par_format.space_before = Pt(0)
     par_format.space_after = Pt(12)
-    run = par.add_run('Schedule from ' + date_range[0].iso + '-' + date_range[1].iso)
+    run = par.add_run('Schedule from ' + Time(date_range[0].iso,out_subfmt='date').iso + ' to ' + Time(date_range[1].iso,out_subfmt='date').iso)
     run.bold = True
     font = run.font
     font.size = Pt(16)
@@ -625,10 +636,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
 
         date = date_range[0] + i
         read_night_block(telescope, date)
-
         table_schedule = read_night_block(telescope, date)
-        idx_target = [np.where((df['Sp_ID'] == table_schedule['target'][i])) for i in range(len(table_schedule))]
-
         sun_set = observatory.sun_set_time(date, which='next').iso
         sun_rise = observatory.sun_rise_time(date, which='next').iso
         moon_illumination = int(round(astroplan.moon_illumination(date) * 100, 0)) * u.percent
@@ -653,13 +661,6 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
         par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run('Moon illumination: ' + str(moon_illumination))
-        par = doc.add_paragraph()
-        par_format = par.paragraph_format
-        par_format.space_before = Pt(0)
-        par_format.space_after = Pt(0)
-        run = par.add_run(
-            'Sunset /  Sunrise: ' + Time(sun_set, out_subfmt='date_hm').value + '  / ' + Time(sun_rise,
-                                                                                              out_subfmt='date_hm').value)
         run.italic = True
         font = run.font
         font.size = Pt(12)
@@ -669,12 +670,8 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
         par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run(
-            'Civil/Naut./Astro. twilights: ' + Time(civil_twilights[0], out_subfmt='date_hm').value + '/' + Time(
-                civil_twilights[1], out_subfmt='date_hm').value + \
-            ' , ' + Time(nautic_twilights[0], out_subfmt='date_hm').value + '/' + Time(nautic_twilights[1],
-                                                                                       out_subfmt='date_hm').value + \
-            ' , ' + Time(astro_twilights[0], out_subfmt='date_hm').value + '/' + Time(astro_twilights[1],
-                                                                                      out_subfmt='date_hm').value)
+            'Sunset - Sunrise: ' + '{:02d}'.format(Time(sun_set, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(sun_set, out_subfmt='date_hm').datetime.minute) +\
+            '  / ' + '{:02d}'.format(Time(sun_rise, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(sun_rise, out_subfmt='date_hm').datetime.minute))
         run.italic = True
         font = run.font
         font.size = Pt(12)
@@ -683,7 +680,24 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
         par_format = par.paragraph_format
         par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
-        run = par.add_run('Start-end of night (Naut. twil.): ' + start_night + ' to ' + end_night)
+        run = par.add_run(
+            'Civil/Naut./Astro. twilights: ' + \
+            '{:02d}'.format(Time(civil_twilights[0], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(civil_twilights[0], out_subfmt='date_hm').datetime.minute)  +\
+            '-' + '{:02d}'.format(Time(civil_twilights[1], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(civil_twilights[1], out_subfmt='date_hm').datetime.minute)  +\
+            ' / ' + '{:02d}'.format(Time(nautic_twilights[0], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(nautic_twilights[0], out_subfmt='date_hm').datetime.minute) +\
+            '-' + '{:02d}'.format(Time(nautic_twilights[1], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(nautic_twilights[1], out_subfmt='date_hm').datetime.minute) +\
+            '  / ' + '{:02d}'.format(Time(astro_twilights[0], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(astro_twilights[0], out_subfmt='date_hm').datetime.minute) +\
+            '-' + '{:02d}'.format(Time(astro_twilights[0], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(astro_twilights[0], out_subfmt='date_hm').datetime.minute))
+        run.italic = True
+        font = run.font
+        font.size = Pt(12)
+        font.color.rgb = RGBColor(0, 0, 0)
+        par = doc.add_paragraph()
+        par_format = par.paragraph_format
+        par_format.space_before = Pt(0)
+        par_format.space_after = Pt(0)
+        run = par.add_run('Start-end of night (Naut. twil.): ' + '{:02d}'.format(Time(start_night).datetime.hour) + 'h' + '{:02d}'.format(Time(start_night).datetime.minute) +\
+                          ' to ' + '{:02d}'.format(Time(end_night).datetime.hour) + 'h' + '{:02d}'.format(Time(end_night).datetime.minute))
         run.italic = True
         font = run.font
         font.size = Pt(12)
@@ -703,6 +717,10 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
             start_time_target = table_schedule['start time (UTC)'][i]
             end_time_target = table_schedule['end time (UTC)'][i]
             config = table_schedule['configuration'][i]
+            try:
+                coords = SkyCoord(ra=df['RA'][idx_target].data.data[0] * u.deg, dec=df['DEC'][idx_target].data.data[0] * u.deg)
+            except IndexError:
+                break
             dist_moon = '34'
 
             par = doc.add_paragraph()
@@ -710,9 +728,9 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
             par_format.space_before = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run(
-                'From ' + Time(start_time_target, out_subfmt='date_hm').value + ' to ' + Time(end_time_target,
-                                                                                              out_subfmt='date_hm').value + ' : ' + str(
-                    df['Sp_ID'][idx_target].data.data[0]))
+                'From ' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.minute) +\
+                ' to ' + '{:02d}'.format(Time(end_time_target, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(end_time_target, out_subfmt='date_hm').datetime.minute) +\
+                ' : ' + str(df['Sp_ID'][idx_target].data.data[0]))
             run.bold = True
             font = run.font
             font.size = Pt(12)
@@ -730,8 +748,8 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
             par_format.space_before = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run(
-                '  SPECULOOS : ' + str(df['nb_hours_surved'][idx_target].data.data[0]) + 'hr of obs over' + str(
-                    df['nb_hours_threshold'][idx_target].data.data[0]))
+                '  SPECULOOS : ' + str(df['nb_hours_surved'][idx_target].data.data[0]*u.hour) + ' of obs over ' + str(
+                    df['nb_hours_threshold'][idx_target].data.data[0]*u.hour))
             font = run.font
             font.size = Pt(10)
             font.color.rgb = RGBColor(0, 0, 0)
@@ -748,9 +766,8 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
             par_format = par.paragraph_format
             par_format.space_before = Pt(0)
             par_format.space_after = Pt(3)
-            run = par.add_run(
-                '  RA=' + str(round(df['RA'][idx_target].data.data[0], 2) * u.degree) + ', DEC= ' + str(
-                    round(df['DEC'][idx_target].data.data[0], 2) * u.degree) + ', Config: ' + str(config))
+            run = par.add_run(' RA = ' + str('{:02d}'.format(int(coords.ra.hms[0]))) + " " + str('{:02d}'.format(int(coords.ra.hms[1]))) + " " + str('{:05.3f}'.format(round(coords.ra.hms[2], 3))) + \
+                ', DEC = ' + str('{:02d}'.format(int(coords.dec.dms[0]))) + " " + str('{:02d}'.format(int(abs(coords.dec.dms[1])))) + " " + str('{:05.3f}'.format(round(abs(coords.dec.dms[2]), 3))) + ', ' + str(config[2:-2]).replace('\'',' '))
             font = run.font
             font.size = Pt(12)
             font.color.rgb = RGBColor(0, 0, 0)
@@ -762,11 +779,16 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
     font = run.font
     font.size = Pt(12)
     font.color.rgb = RGBColor(0, 0, 0)
-    doc.save('schedule.docx')
+    if telescope == 'TS_La_Silla':
+        doc.save('./TRAPPIST_schedules_docx/TS_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
+                 Time(date_range[1],out_subfmt='date').value .replace('-','')  +'.docx')
+    if telescope == 'TN_Oukaimeden':
+        doc.save('./TRAPPIST_schedules_docx/TN_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
+                 Time(date_range[1],out_subfmt='date').value .replace('-','')  +'.docx')
 
 def date_range_in_days(date_range):
     date_format = "%Y-%m-%d %H:%M:%S.%f"
-    date_start = datetime.datetime.strptime(date_range[0].value, date_format)
-    date_end = datetime.datetime.strptime(date_range[1].value, date_format)
+    date_start = datetime.strptime(date_range[0].value, date_format)
+    date_end = datetime.strptime(date_range[1].value, date_format)
     date_range_in_days = (date_end - date_start).days
     return date_range_in_days

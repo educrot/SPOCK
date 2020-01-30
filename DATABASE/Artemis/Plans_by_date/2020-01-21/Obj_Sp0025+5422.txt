@@ -13,7 +13,7 @@
 #count 5000
 #binning 1
 #filter I+z
-#interval 25
+#interval 40
 #TAG Donuts=on
 Sp0025+5422	00 25 15.78	+54 22 54.91
 ;
