@@ -1,0 +1,22 @@
+;
+; HW_Vir
+;
+; 3675067076961979264
+;
+#waituntil 1, 07:50
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter r'
+#interval 10
+#TAG Donuts=on
+HW_Vir	12 44 19.99	-08 40 15.96
+;
+#quitat 09:40
+#chain Obj_Sp1253+4034.txt
+;

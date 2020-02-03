@@ -8,7 +8,7 @@ use: "special_start_end"
 observatories:
   1:
     name: SSO
-    telescopes: [Callisto,Io,Ganymede,Europa]
+    telescopes: [Ganymede,Io,Callisto,Europa]
   2:
     name: SNO
     telescopes: [Artemis]

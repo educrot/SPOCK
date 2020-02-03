@@ -1,0 +1,22 @@
+;
+; Sp0841+3611
+;
+; 717602487277224320
+;
+#waituntil 1, 2020/02/06 02:15:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 101
+#TAG Donuts=on
+Sp0841+3611	08 41 07.82	+36 11 31.36
+;
+#quitat 07:51
+#chain Obj_Sp1153+0659.txt
+;

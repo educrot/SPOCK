@@ -1074,19 +1074,29 @@ class Schedules:
 
         for i in range(1,abs(idx_init_first)+len(self.index_prio)):
             #print(i, self.targets[self.index_prio[-(i)]])
+            rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
+            set_first_target = self.observatory.target_set_time(self.date_range[0]+t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
+            if self.observatory.target_set_time(self.date_range[0] + t, self.targets[self.idx_first_target], which='next',
+                                             horizon=24 * u.deg) < self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='nearest',horizon=24*u.deg):
+                #rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
+                set_first_target = self.observatory.target_set_time(self.date_range[0]+t+1,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
+
             if self.telescope == 'Saint-Ex':
-                set_day_for_target = self.date_range[0] + t
-                rise_day_for_target = self.date_range[0] + dt_1day + t
+                set_target = self.observatory.target_set_time(self.date_range[0] + t,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg)
+                rise_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg)
+                if set_target > (self.date_range[0] + t +1):
+                    set_target = self.observatory.target_set_time(self.date_range[0]+ t,self.targets[self.index_prio[-i]], which='nearest',horizon=24 * u.deg)
+                if rise_target < (self.date_range[0] + t ):
+                    rise_target = self.observatory.target_set_time(self.date_range[0]+t+1,self.targets[self.index_prio[-i]], which='nearest',horizon=24 * u.deg)
             else:
-                set_day_for_target = self.date_range[0] + t
-                rise_day_for_target = self.date_range[0] + t
+                set_target = self.observatory.target_set_time(self.date_range[0] + t,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg)
+                rise_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg)
 
             if self.first_target['set or rise'] == 'rise':
+
                 if self.priority['set or rise'][self.index_prio[-i]]=='set':
-                    if (self.observatory.target_rise_time(rise_day_for_target,self.targets[self.index_prio[-i]],which='nearest',horizon=24*u.deg) \
-                        < self.observatory.twilight_evening_nautical(self.date_range[0]+t,which='nearest')) and \
-                            (self.observatory.target_set_time(set_day_for_target,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg) \
-                                > self.observatory.target_rise_time(rise_day_for_target,self.targets[self.idx_first_target],which='nearest',horizon=24*u.deg)):
+                    if (rise_target < self.observatory.twilight_evening_nautical(self.date_range[0]+t,which='nearest')) and \
+                            (set_target > rise_first_target):
                         self.idx_second_target=self.index_prio[-i]
                         self.second_target = self.priority[self.idx_second_target]
                         if self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
@@ -1108,10 +1118,8 @@ class Schedules:
 
             if self.first_target['set or rise'] == 'set':
                 if self.priority['set or rise'][self.index_prio[-i]]=='rise':
-                    if (self.observatory.target_set_time(set_day_for_target,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg) \
-                        > self.observatory.twilight_morning_nautical(self.date_range[0]+t+dt_1day,which='nearest')) and \
-                            (self.observatory.target_rise_time(rise_day_for_target,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg) \
-                                < self.observatory.target_set_time(set_day_for_target,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)):
+                    if (set_target > self.observatory.twilight_morning_nautical(self.date_range[0]+t,which='next')) and \
+                            (rise_target < set_first_target):
                         self.idx_second_target = self.index_prio[-i]
                         self.second_target = self.priority[self.idx_second_target]
                         if self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
@@ -1124,11 +1132,11 @@ class Schedules:
                     else:
                         self.second_target = None
                         self.idx_second_target = None
-
-                if self.priority['set or rise'][self.index_prio[-i]]=='both':
-                    self.second_target = None
-                    self.idx_second_target = None
-                    print('INFO: still searching for the second target that is no both')
+                #
+                # if self.priority['set or rise'][self.index_prio[-i]]=='both':
+                #     self.second_target = None
+                #     self.idx_second_target = None
+                #     print('INFO: still searching for the second target that is no both')
 
             if self.first_target['set or rise'] == 'both':
                 self.idx_second_target = self.idx_first_target
@@ -1153,12 +1161,12 @@ class Schedules:
             idx_prog2 = np.where((self.target_table_spc['prog']==2))
             idx_prog3 = np.where((self.target_table_spc['prog'] == 3))
             self.priority['priority'][idx_prog0] *= 0.1
-            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**10
+            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**15
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]**1
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 3
             self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
-            self.priority['priority'][idx_done] *= -1
+            self.priority['priority'][idx_done] = -1
         elif (self.telescope == 'Ganymede') or (self.telescope == 'Callisto'):
             idx_on_going = np.where(((self.target_table_spc['nb_hours_surved'] > 0) & (self.target_table_spc['nb_hours_surved'] < 100)))
             idx_to_be_done = np.where((self.target_table_spc['nb_hours_surved'] == 0))
@@ -1173,7 +1181,7 @@ class Schedules:
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 10
             self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
-            self.priority['priority'][idx_done] *= -1
+            self.priority['priority'][idx_done] = -1
         elif (self.telescope == 'TS_La_Silla') or (self.telescope == 'TN_Oukaimeden'):
             idx_on_going = np.where(((self.target_table_spc['nb_hours_surved'] > 0) & (self.target_table_spc['nb_hours_surved'] < 100)))
             idx_to_be_done = np.where((self.target_table_spc['nb_hours_surved'] == 0))
@@ -1206,65 +1214,53 @@ class Schedules:
         priority_non_observable_idx = (self.priority['set or rise']=='None')
         self.priority['priority'][priority_non_observable_idx] = 0.5
         if self.observatory.name == 'SSO':
-            for i in self.idx_planned_SSO:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_SNO:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_TS:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_TN:
-                self.priority['priority'][i] = 0
+            self.priority['priority'][self.idx_planned_SSO] = -1000
+            self.priority['priority'][self.idx_planned_SNO] = -1000
+            self.priority['priority'][self.idx_planned_TS] = -1000
+            self.priority['priority'][self.idx_planned_TN] = -1000
 
-        if (self.telescope == 'Artemis') and (self.telescope == 'Saint-Ex'):
-            for i in self.idx_planned_SSO:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_TS:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_TN:
-                self.priority['priority'][i] = 0
+        if (self.telescope == 'Artemis') or (self.telescope == 'Saint-Ex'):
+            self.priority['priority'][self.idx_planned_SSO] = -1000
+            self.priority['priority'][self.idx_planned_TS] = -1000
+            self.priority['priority'][self.idx_planned_TN] = -1000
 
         if  (self.telescope == 'TN_Oukaimeden'):
-            for i in self.idx_planned_SSO:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_SNO:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_TS:
-                self.priority['priority'][i] = 0
+            self.priority['priority'][self.idx_planned_SSO] = -1000
+            self.priority['priority'][self.idx_planned_SNO] = -1000
+            self.priority['priority'][self.idx_planned_TS] = -1000
 
         if  (self.telescope == 'TS_La_Silla'):
-            for i in self.idx_planned_SSO:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_SNO:
-                self.priority['priority'][i] = 0
-            for i in self.idx_planned_TN:
-                self.priority['priority'][i] = 0
+            self.priority['priority'][self.idx_planned_SSO] = -1000
+            self.priority['priority'][self.idx_planned_SNO] = -1000
+            self.priority['priority'][self.idx_planned_TN] = -1000
 
         self.no_obs_with_different_tel()
         exposure_time_table = pd.read_csv('exposure_time_table.csv',sep=',')
         if self.observatory.name == 'SSO':
             texp = exposure_time_table['SSO_texp']
             idx_texp_too_long = np.where((texp > 150))
-            self.priority['priority'][idx_texp_too_long] = 0
+            self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'SNO':
             texp = exposure_time_table['SNO_texp']
             idx_texp_too_long =  np.where((texp > 150))
-            self.priority['priority'][idx_texp_too_long] = 0
-        if self.observatory.name == 'Saint-Ex':
+            self.priority['priority'][idx_texp_too_long] = -1000
+        if self.observatory.name == 'saintex':
             texp = exposure_time_table['Saintex_texp']
             idx_texp_too_long =  np.where((texp > 150))
-            self.priority['priority'][idx_texp_too_long] = 0
-        if self.observatory.name == 'TS':
+            self.priority['priority'][idx_texp_too_long] = -1000
+        if self.observatory.name == 'TS_La_Silla':
             texp = exposure_time_table['TS_texp']
             idx_texp_too_long =  np.where((texp > 150))
-            self.priority['priority'][idx_texp_too_long] = 0
-        if self.observatory.name == 'TN':
+            self.priority['priority'][idx_texp_too_long] = -1000
+        if self.observatory.name == 'TN_Oukaimeden':
             texp = exposure_time_table['TN_texp']
             idx_texp_too_long =  np.where((texp > 150))
-            self.priority['priority'][idx_texp_too_long] = 0
+            self.priority['priority'][idx_texp_too_long] = -1000
 
 
         self.index_prio = np.argsort(self.priority['priority'])
         self.priority_ranked = self.priority[self.index_prio]
+        print(self.priority_ranked)
 
         return self.index_prio, self.priority, self.priority_ranked
 
@@ -2010,7 +2006,9 @@ class Schedules:
             self.priority['priority'][idx_observed_SNO] = 0
             self.priority['priority'][idx_observed_SaintEx] = 0
         elif (self.telescope == 'Artemis') or (self.telescope == 'Saint-Ex'):
-            self.priority['priority'][idx_observed_SSO] = 0
+            #self.priority['priority'][idx_observed_SSO] = 0
+            self.priority['priority'][idx_observed_SaintEx] *= 2
+            self.priority['priority'][idx_observed_SNO] *= 2
             self.priority['priority'][idx_observed_trappist] = 0
         elif (self.telescope == 'Io') or (self.telescope == 'Europa') or \
                 (self.telescope == 'Ganymede') or (self.telescope == 'Callisto'):

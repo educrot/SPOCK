@@ -1,0 +1,22 @@
+;
+; Sp0900+2150
+;
+; 685103912857072640
+;
+#waituntil 1, 2020/02/29 00:02:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 12
+#TAG Donuts=on
+Sp0900+2150	09 00 23.51	+21 50 04.90
+;
+#quitat 04:50
+#chain Obj_Sp1159-5247.txt
+;
