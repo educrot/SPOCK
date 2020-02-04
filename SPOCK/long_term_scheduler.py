@@ -37,6 +37,7 @@ import SPOCK.ETC as ETC
 import paramiko
 from docx import Document
 from docx.shared import *
+from docx.enum.text import *
 from astropy.table import Table
 
 
@@ -1078,8 +1079,12 @@ class Schedules:
             set_first_target = self.observatory.target_set_time(self.date_range[0]+t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
             if self.observatory.target_set_time(self.date_range[0] + t, self.targets[self.idx_first_target], which='next',
                                              horizon=24 * u.deg) < self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='nearest',horizon=24*u.deg):
-                #rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
                 set_first_target = self.observatory.target_set_time(self.date_range[0]+t+1,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
+                if self.observatory.target_rise_time(self.date_range[0] + t, self.targets[self.idx_first_target],
+                        which='next',horizon=24 * u.deg) < self.observatory.target_rise_time(self.date_range[0] + t,
+                                            self.targets[self.idx_first_target], which='nearest', horizon=24 * u.deg):
+                    rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t + 1,self.targets[self.idx_first_target], which='next',
+                                                                          horizon=24 * u.deg)
 
             if self.telescope == 'Saint-Ex':
                 set_target = self.observatory.target_set_time(self.date_range[0] + t,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg)
@@ -1150,7 +1155,10 @@ class Schedules:
     def table_priority_prio(self,day):
 
         self.priority=Table(names=('priority','target name','set or rise','alt set start','alt rise start','alt set end','alt rise end'),dtype=('f4','S11','S4','f4','f4','f4','f4'))
-        self.observability_seclection(day) #observability selection
+        try:
+            self.observability_seclection(day) #observability selection
+        except ValueError:
+            sys.exit('ERROR: This is a known error, please re-run')
 
         if (self.telescope == 'Io') or (self.telescope == 'Europa') or (self.telescope == 'Saint-Ex') or (self.telescope == 'Artemis'):
             idx_on_going = np.where(((self.target_table_spc['nb_hours_surved'] > 0) & (self.target_table_spc['nb_hours_surved'] < 200)))
@@ -1248,13 +1256,13 @@ class Schedules:
             texp = exposure_time_table['Saintex_texp']
             idx_texp_too_long =  np.where((texp > 150))
             self.priority['priority'][idx_texp_too_long] = -1000
-        if self.observatory.name == 'TS_La_Silla':
+        if self.observatory.name == 'TSlasilla':
             texp = exposure_time_table['TS_texp']
-            idx_texp_too_long =  np.where((texp > 150))
+            idx_texp_too_long =  np.where((texp > 100))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'TN_Oukaimeden':
             texp = exposure_time_table['TN_texp']
-            idx_texp_too_long =  np.where((texp > 150))
+            idx_texp_too_long =  np.where((texp > 100))
             self.priority['priority'][idx_texp_too_long] = -1000
 
 
@@ -1891,7 +1899,9 @@ class Schedules:
                      moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=3.5))
             texp = a.exp_time_calculator(ADUpeak=20000)[0]
         elif obs == 'TS' or obs =='TN':
-            texp = 10
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,\
+                moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+            texp = a.exp_time_calculator(ADUpeak=50000)[0]
             print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif obs =='SNO':
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,\
@@ -1916,7 +1926,9 @@ class Schedules:
                              moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=30000)[0]
             elif obs == 'TS' or obs =='TN':
-                texp = 10
+                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
+                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+                texp = a.exp_time_calculator(ADUpeak=50000)[0]
                 print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
             elif obs == 'SSO':
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
@@ -1955,7 +1967,9 @@ class Schedules:
                          moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=3.5))
             texp = a.exp_time_calculator(ADUpeak=20000)[0]
         elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
-            texp = 10
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,\
+                moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+            texp = a.exp_time_calculator(ADUpeak=50000)[0]
             print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif self.telescope == 'Artemis':
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
@@ -1982,7 +1996,9 @@ class Schedules:
                              moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=30000)[0]
             elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
-                texp = 10
+                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
+                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+                texp = a.exp_time_calculator(ADUpeak=50000)[0]
                 print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
             elif self.telescope == 'Io' or self.telescope == 'Europa' or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_,
@@ -1998,7 +2014,7 @@ class Schedules:
         idx_observed_SaintEx = self.idx_SaintEx_observed_targets()
         idx_observed_trappist = self.idx_trappist_observed_targets()
         if (self.telescope == 'TS_La_Silla') :
-            self.priority['priority'][idx_observed_SSO] = 0
+            #self.priority['priority'][idx_observed_SSO] = 0
             self.priority['priority'][idx_observed_SNO] = 0
             self.priority['priority'][idx_observed_SaintEx] = 0
         elif (self.telescope == 'TN_Oukaimeden') :

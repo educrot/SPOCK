@@ -6,7 +6,10 @@ from astropy.coordinates import SkyCoord, EarthLocation
 from astroplan import Observer
 from astroplan.periodic import EclipsingSystem
 from astroplan.constraints import is_event_observable
-
+from docx import Document
+from docx.shared import *
+from docx.enum.text import *
+from astropy.table import Table
 from datetime import datetime
 import os
 import pandas as pd
@@ -568,11 +571,6 @@ def upload_plans(day, nb_days, telescope):
     path_night_blocks = os.path.join('./DATABASE/', telescope,'Archive_night_blocks/')
     print('INFO: Path local night blocks = ',path_night_blocks)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_night_blocks, path_database])
-
-from docx import Document
-from docx.shared import *
-from docx.enum.text import *
-from astropy.table import Table
 
 def read_night_block(telescope, day):
     day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")

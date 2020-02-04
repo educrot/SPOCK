@@ -4,11 +4,10 @@ import SPOCK.plots_scheduler as SPOCKplot
 from astropy.time import Time
 import SPOCK.ETC as ETC
 
-obs = 2
+obs = 4
 schedule = SPOCKLT.Schedules()
 schedule.load_parameters('./input.csv',obs)
 schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
-
 print()
 # ---------------------- SHORT TERM SCHEDULER ---------------------
 
