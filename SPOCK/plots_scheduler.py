@@ -272,7 +272,7 @@ def gantt_chart(date_start,date_end,telescope):
 
 def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_list):
     if path_target_list is None:
-        path_target_list = 'SPECULOOS_target_list_v2.txt'
+        path_target_list = 'SPECULOOS_target_list_v3.txt'
     observatory = charge_observatories(name_observatory)[0]
     delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day, which='next').jd - 0.07, \
                                       observatory.twilight_morning_nautical(day + 1, which='nearest').jd + 0.07, 100),

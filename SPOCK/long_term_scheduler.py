@@ -559,6 +559,11 @@ def upload_plans(day, nb_days, telescope):
     path_plans = os.path.join('./DATABASE/', telescope,'Plans_by_date/')
     print('INFO: Path local \'Plans_by_day\' = ',path_plans)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_plans, path_database])
+    path_gant_chart = os.path.join('./SPOCK_Figures/Preview_schedule.html')
+    path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/')
+    print('INFO: Path local \'Gant chart\' = ', path_gant_chart)
+    print('INFO: Path database = \'Gant chart\' = ',  path_database_home)
+    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_gant_chart, path_database_home])
 
     # ------------------- update archive niht blocks ------------------
 
@@ -696,7 +701,7 @@ class Schedules:
             print(i)
             sso_texp[i] = self.exposure_time_('SSO', day, i)
             sno_texp[i] = self.exposure_time_( 'SNO', day, i)
-            saintex_texp[i] = self.exposure_time_( 'Saint-Ex', day, i)
+            saintex_texp[i] = self.exposure_time_( 'saintex', day, i)
             ts_texp[i] = self.exposure_time_( 'TS', day, i)
             tn_texp[i] = self.exposure_time_( 'TN', day, i)
 
@@ -755,13 +760,9 @@ class Schedules:
             time_since_las_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
                                      Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
             #self.update_nb_hours_all()
-            if abs(time_since_las_update) > 10: # in hours
+            if abs(time_since_las_update) > 1: # in hours
                 print('INFO: Updating the number of hours observed')
                 self.update_nb_hours_all()
-                #self.update_nb_hours_SNO()
-                #self.update_telescope_SNO()
-                #self.update_nb_hours_from_server()
-                #self.update_telescope_from_server()
 
     def update_nb_hours_all(self):
         get_hours_files_SNO() # get hours SNO
@@ -1042,8 +1043,8 @@ class Schedules:
         self.first_target=self.priority[self.idx_first_target]
         dt_1day=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg') #1 day
 
-        if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
-            self.target_table_spc['texp_spc'][self.idx_first_target]= self.exposure_time(self.date_ranges_day_by_day[t],self.idx_first_target)
+        # if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
+        #     self.target_table_spc['texp_spc'][self.idx_first_target]= self.exposure_time(self.date_ranges_day_by_day[t],self.idx_first_target)
 
         if (self.telescope  == 'Artemis') or (self.telescope  == 'Saint-Ex'):
             while (self.target_table_spc['texp_spc'][self.idx_first_target] > 150) or ('Io' in self.target_table_spc['telescope'][self.idx_first_target]) or ('Europa' in self.target_table_spc['telescope'][self.idx_first_target]) or \
@@ -1051,8 +1052,7 @@ class Schedules:
                 idx_init_first -= 1
                 self.idx_first_target = self.index_prio[idx_init_first]
                 self.first_target = self.priority[self.idx_first_target]
-                if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
-                    self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(self.date_ranges_day_by_day[t],self.idx_first_target)
+                self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(self.date_ranges_day_by_day[t],self.idx_first_target)
 
         if (self.telescope == 'Io') or (self.telescope == 'Europa') or (self.telescope == 'Ganymede') or (self.telescope == 'Callisto'):
             other_SSO = np.delete(self.telescopes, self.telescopes.index(self.telescope))
@@ -1062,8 +1062,8 @@ class Schedules:
                 idx_init_first -= 1
                 self.idx_first_target = self.index_prio[idx_init_first]
                 self.first_target = self.priority[self.idx_first_target]
-                if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
-                    self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(self.date_ranges_day_by_day[t],self.idx_first_target)
+                # if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
+                #     self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(self.date_ranges_day_by_day[t],self.idx_first_target)
 
         if (self.telescope == 'TS_La_Silla') or (self.telescope == 'TN_Oukaimeden'):
             while (self.target_table_spc['texp_spc'][self.idx_first_target] > 150) or np.any([self.telescopes[j] in self.target_table_spc['telescope'][self.idx_first_target] for j in range(len(list(self.telescopes)))])  \
@@ -1074,7 +1074,7 @@ class Schedules:
                 self.first_target = self.priority[self.idx_first_target]
 
         for i in range(1,abs(idx_init_first)+len(self.index_prio)):
-            #print(i, self.targets[self.index_prio[-(i)]])
+            print(i, self.targets[self.index_prio[-(i)]])
             rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
             set_first_target = self.observatory.target_set_time(self.date_range[0]+t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
             if self.observatory.target_set_time(self.date_range[0] + t, self.targets[self.idx_first_target], which='next',
@@ -1098,28 +1098,36 @@ class Schedules:
                 rise_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg)
 
             if self.first_target['set or rise'] == 'rise':
-
                 if self.priority['set or rise'][self.index_prio[-i]]=='set':
                     if (rise_target < self.observatory.twilight_evening_nautical(self.date_range[0]+t,which='nearest')) and \
                             (set_target > rise_first_target):
                         self.idx_second_target=self.index_prio[-i]
                         self.second_target = self.priority[self.idx_second_target]
-                        if self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
-                           self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(self.date_ranges_day_by_day[t],self.idx_second_target)
-
-                        if self.target_table_spc['texp_spc'][self.idx_second_target]<150:
-                            break
-                        elif self.target_table_spc['texp_spc'][self.idx_second_target]>150:
-                            self.second_target = None
-                            self.idx_second_target = None
+                        break
+                        # if self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
+                        #     self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(self.date_ranges_day_by_day[t],self.idx_second_target)
+                        # if self.telescope == 'Saint-Ex' or self.telescope == 'Artemis': #different default so bbetter to recalculate
+                        #     self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(self.date_ranges_day_by_day[t], self.idx_second_target)
+                        # if self.target_table_spc['texp_spc'][self.idx_second_target]<150:
+                        #     break
+                        # elif self.target_table_spc['texp_spc'][self.idx_second_target]>150:
+                        #     self.second_target = None
+                        #     self.idx_second_target = None
                     else:
                         self.second_target = None
                         self.idx_second_target = None
 
                 if self.priority['set or rise'][self.index_prio[-i]]=='both':
-                    self.second_target = None
-                    self.idx_second_target = None
-                    print('INFO: still searching for the second target that is no both')
+                    if (rise_target < self.observatory.twilight_evening_nautical(self.date_range[0]+t,which='nearest')) and \
+                            (set_target > rise_first_target):
+                        self.idx_second_target=self.index_prio[-i]
+                        self.second_target = self.priority[self.idx_second_target]
+                        break
+                        # if self.telescope == 'Saint-Ex' or self.telescope == 'Artemis': #different default so bbetter to recalculate
+                        #     self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(self.date_ranges_day_by_day[t], self.idx_second_target)
+                        # self.second_target = None
+                        # self.idx_second_target = None
+                        # print('INFO: still searching for the second target that is no both')
 
             if self.first_target['set or rise'] == 'set':
                 if self.priority['set or rise'][self.index_prio[-i]]=='rise':
@@ -1127,16 +1135,26 @@ class Schedules:
                             (rise_target < set_first_target):
                         self.idx_second_target = self.index_prio[-i]
                         self.second_target = self.priority[self.idx_second_target]
-                        if self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
-                            self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(self.date_ranges_day_by_day[t],self.idx_second_target)
-                        if self.target_table_spc['texp_spc'][self.idx_second_target] < 150:
-                            break
-                        elif self.target_table_spc['texp_spc'][self.idx_second_target] > 150:
-                            self.second_target = None
-                            self.idx_second_target = None
+                        break
+                        # if self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
+                        #     self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(self.date_ranges_day_by_day[t],self.idx_second_target)
+                        # if self.telescope == 'Saint-Ex' or self.telescope == 'Artemis': #different default so bbetter to recalculate
+                        #     self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(self.date_ranges_day_by_day[t], self.idx_second_target)
+                        # if self.target_table_spc['texp_spc'][self.idx_second_target] < 150:
+                        #     break
+                        # elif self.target_table_spc['texp_spc'][self.idx_second_target] > 150:
+                        #     self.second_target = None
+                        #     self.idx_second_target = None
                     else:
                         self.second_target = None
                         self.idx_second_target = None
+
+                if self.priority['set or rise'][self.index_prio[-i]]=='both':
+                    if (set_target > self.observatory.twilight_morning_nautical(self.date_range[0]+t,which='next')) and \
+                            (rise_target < set_first_target):
+                        self.idx_second_target=self.index_prio[-i]
+                        self.second_target = self.priority[self.idx_second_target]
+                        break
                 #
                 # if self.priority['set or rise'][self.index_prio[-i]]=='both':
                 #     self.second_target = None
@@ -1147,7 +1165,6 @@ class Schedules:
                 self.idx_second_target = self.idx_first_target
                 self.second_target = self.first_target
                 break
-
 
         if self.idx_second_target is None:
             print('INFO: no second target available')
@@ -1161,17 +1178,17 @@ class Schedules:
             sys.exit('ERROR: This is a known error, please re-run')
 
         if (self.telescope == 'Io') or (self.telescope == 'Europa') or (self.telescope == 'Saint-Ex') or (self.telescope == 'Artemis'):
-            idx_on_going = np.where(((self.target_table_spc['nb_hours_surved'] > 0) & (self.target_table_spc['nb_hours_surved'] < 200)))
+            idx_on_going = np.where(((self.target_table_spc['nb_hours_surved'] > 0) & (self.target_table_spc['nb_hours_surved'] < 190)))
             idx_to_be_done = np.where((self.target_table_spc['nb_hours_surved'] == 0))
             idx_done = np.where((self.target_table_spc['nb_hours_surved'] > 200))
-            idx_prog0 = np.where((self.target_table_spc['prog']==0))
-            idx_prog1 = np.where((self.target_table_spc['prog']==1))
-            idx_prog2 = np.where((self.target_table_spc['prog']==2))
-            idx_prog3 = np.where((self.target_table_spc['prog'] == 3))
+            idx_prog0 = np.where((self.target_table_spc['Program']==0))
+            idx_prog1 = np.where((self.target_table_spc['Program']==1))
+            idx_prog2 = np.where((self.target_table_spc['Program']==2))
+            idx_prog3 = np.where((self.target_table_spc['Program'] == 3))
             self.priority['priority'][idx_prog0] *= 0.1
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**15
-            self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]**1
-            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 3
+            self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_TESS_temp'][idx_prog2]**1
+            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_Spec_temp'][idx_prog3] ** 3
             self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] = -1
@@ -1179,14 +1196,14 @@ class Schedules:
             idx_on_going = np.where(((self.target_table_spc['nb_hours_surved'] > 0) & (self.target_table_spc['nb_hours_surved'] < 100)))
             idx_to_be_done = np.where((self.target_table_spc['nb_hours_surved'] == 0))
             idx_done = np.where((self.target_table_spc['nb_hours_surved'] > 100))
-            idx_prog0 = np.where((self.target_table_spc['prog'] == 0))
-            idx_prog1 = np.where((self.target_table_spc['prog'] == 1))
-            idx_prog2 = np.where((self.target_table_spc['prog']==2))
-            idx_prog3 = np.where((self.target_table_spc['prog'] == 3))
+            idx_prog0 = np.where((self.target_table_spc['Program'] == 0))
+            idx_prog1 = np.where((self.target_table_spc['Program'] == 1))
+            idx_prog2 = np.where((self.target_table_spc['Program']==2))
+            idx_prog3 = np.where((self.target_table_spc['Program'] == 3))
             self.priority['priority'][idx_prog0] *= 0.1
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 3
-            self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]** 1
-            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 10
+            self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_TESS_temp'][idx_prog2]** 1
+            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_Spec_temp'][idx_prog3] ** 10
             self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] = -1
@@ -1194,17 +1211,17 @@ class Schedules:
             idx_on_going = np.where(((self.target_table_spc['nb_hours_surved'] > 0) & (self.target_table_spc['nb_hours_surved'] < 100)))
             idx_to_be_done = np.where((self.target_table_spc['nb_hours_surved'] == 0))
             idx_done = np.where((self.target_table_spc['nb_hours_surved'] > 100))
-            idx_prog0 = np.where((self.target_table_spc['prog'] == 0))
-            idx_prog1 = np.where((self.target_table_spc['prog'] == 1))
-            idx_prog2 = np.where((self.target_table_spc['prog'] == 2))
-            idx_prog3 = np.where((self.target_table_spc['prog'] == 3))
+            idx_prog0 = np.where((self.target_table_spc['Program'] == 0))
+            idx_prog1 = np.where((self.target_table_spc['Program'] == 1))
+            idx_prog2 = np.where((self.target_table_spc['Program'] == 2))
+            idx_prog3 = np.where((self.target_table_spc['Program'] == 3))
             idx_bright = np.where((self.target_table_spc['J'] <= 11.)) #limit Jmag<11
             #idx_not_bright = np.where((self.target_table_spc['J'] >= 11.5))  # limit Jmag<11
             idx_too_faint = np.where((self.target_table_spc['J'] >= 12))  # limit Jmag>12.5
             self.priority['priority'][idx_prog0] *= 0.1
             self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1] ** 3
-            self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog2]** 1
-            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_T1b'][idx_prog3] ** 10
+            self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_TESS_temp'][idx_prog2]** 1
+            self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_Spec_temp'][idx_prog3] ** 10
             self.priority['priority'][idx_on_going] *= 10 ** (4 + 1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_on_going]))
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 100 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             #self.priority['priority'][idx_not_bright] = 0
@@ -1250,7 +1267,7 @@ class Schedules:
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'SNO':
             texp = exposure_time_table['SNO_texp']
-            idx_texp_too_long =  np.where((texp > 150))
+            idx_texp_too_long =  np.where((texp > 100))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'saintex':
             texp = exposure_time_table['Saintex_texp']
@@ -1372,8 +1389,12 @@ class Schedules:
         blocks=[]
         if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
             self.target_table_spc['texp_spc'][self.idx_first_target]= self.exposure_time(day=None,i=self.idx_first_target)
+        if self.telescope == 'Saint-Ex' or self.telescope == 'Artemis':  # different default so bbetter to recalculate
+            self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(day=None, i=self.idx_first_target)
         if (self.idx_second_target != None) and self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
             self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(day=None,i=self.idx_second_target)
+        if self.telescope == 'Saint-Ex' or self.telescope == 'Artemis':  # different default so bbetter to recalculate
+            self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(day=None, i=self.idx_second_target)
 
         if self.first_target['set or rise'] == 'set':
             print('INFO: First target is \'set\'')
@@ -1798,13 +1819,14 @@ class Schedules:
         dur_obs_set_target = (self.night_duration(day).value/2  - shift/self.date_range_in_days)  * u.day #(self.night_duration(day)/(2*u.day))*u.day+1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
         dur_obs_rise_target = (self.night_duration(day).value/2  + shift/self.date_range_in_days) * u.day #(self.night_duration(day)/(2*u.day))*u.day-1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
 
+
         if self.second_target['set or rise'] == 'rise':
             nb_hours__2nd_old = self.nb_hours[1,self.idx_second_target] #hours
             b = dur_obs_rise_target.value #in days
         if self.second_target['set or rise'] == 'set':
             nb_hours__2nd_old = self.nb_hours[1,self.idx_second_target] #hours
             b =  dur_obs_set_target.value #in days
-        if self.first_target['set or rise'] == 'both':
+        if self.second_target['set or rise'] == 'both':
             nb_hours__2nd_old = self.nb_hours[1,self.idx_second_target] #hours
             b = dur_obs_both_target.value #in days
 
@@ -1869,7 +1891,7 @@ class Schedules:
 
         df.to_csv('nb_observable_target_prio_50_' + str(self.observatory.name) + '_6hr' + 'prio_50_no_M6' + '.csv', sep=',', index=False)
 
-    def exposure_time_(self, obs,day,i):
+    def exposure_time_(self, obs,day,i): #juste for exposure time table
         if day is None:
             print('INFO: Not using moon phase in ETC')
         #moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
@@ -1891,50 +1913,51 @@ class Schedules:
         filt_ = str(self.target_table_spc['Filter'][i])
         if (filt_ == 'z\'') or (filt_ == 'r\'') or (filt_ == 'i\'') or (filt_ == 'g\''):
             filt_ = filt_.replace('\'', '')
-        filters = ['I+z', 'z', 'i', 'r']
+        filters = ['I+z']
         filt_idx = 0
         filt_ = filters[filt_idx]
-        if obs =='Saint-Ex':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,
-                     moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=3.5))
-            texp = a.exp_time_calculator(ADUpeak=20000)[0]
+        if obs =='saintex':
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
+                     moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.5))
+            texp = a.exp_time_calculator(ADUpeak=34000)[0]
         elif obs == 'TS' or obs =='TN':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,\
-                moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
+                moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=50000)[0]
             print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif obs =='SNO':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,\
-                moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
-            texp = a.exp_time_calculator(ADUpeak=30000)[0]
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
+                moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+            texp = a.exp_time_calculator(ADUpeak=45000)[0]
         elif obs == 'SSO':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
-                         moonphase=0.6, irtf=0.8, num_tel=1, seeing=0.95, gain=1.1))
-            texp = a.exp_time_calculator(ADUpeak=30000)[0]
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
+            texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
-        while texp < 10:
-            filt_idx +=1
-            if (filt_idx > 3):
-                sys.exit('ERROR: You have to defocus in we want to observe this target')
-            filt_ = filters[filt_idx]
-            if obs == 'Saint-Ex':
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,
-                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=3.5))
-                texp = a.exp_time_calculator(ADUpeak=20000)[0]
-            elif obs == 'SNO':
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,
-                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
-                texp = a.exp_time_calculator(ADUpeak=30000)[0]
-            elif obs == 'TS' or obs =='TN':
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
-                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
-                texp = a.exp_time_calculator(ADUpeak=50000)[0]
-                print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
-            elif obs == 'SSO':
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
-                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=0.95, gain=1.1))
-                texp = a.exp_time_calculator(ADUpeak=30000)[0]
-
+        # while texp < 10:
+        #     filt_idx +=1
+        #     if (filt_idx >= 3):
+        #         print('ERROR: You have to defocus in we want to observe this target')
+        #         texp = 10.0001
+        #     filt_ = filters[filt_idx]
+        #     if obs == 'Saint-Ex':
+        #         a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
+        #                      moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.5))
+        #         texp = a.exp_time_calculator(ADUpeak=34000)[0]
+        #     elif obs == 'SNO':
+        #         a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+        #                      moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+        #         texp = a.exp_time_calculator(ADUpeak=45000)[0]
+        #     elif obs == 'TS' or obs =='TN':
+        #         a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+        #                      moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+        #         texp = a.exp_time_calculator(ADUpeak=50000)[0]
+        #         print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
+        #     elif obs == 'SSO':
+        #         a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+        #                      moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
+        #         texp = a.exp_time_calculator(ADUpeak=45000)[0]
+        print('texp is : ',texp)
         return texp
 
     def exposure_time(self, day, i):
@@ -1963,48 +1986,51 @@ class Schedules:
         filt_idx = 0
         filt_ = filters[filt_idx]
         if self.telescope == 'Saint-Ex':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,
-                         moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=3.5))
-            texp = a.exp_time_calculator(ADUpeak=20000)[0]
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
+                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.5))
+            texp = a.exp_time_calculator(ADUpeak=34000)[0]
         elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2,\
-                moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=50000)[0]
             print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif self.telescope == 'Artemis':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
-                         moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
-            texp = a.exp_time_calculator(ADUpeak=30000)[0]
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+            texp = a.exp_time_calculator(ADUpeak=45000)[0]
         elif self.telescope == 'Io' or self.telescope == 'Europa' or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
-                         moonphase=0.6, irtf=0.8, num_tel=1, seeing=0.95, gain=1.1))
-            texp = a.exp_time_calculator(ADUpeak=30000)[0]
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
+            texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
         while texp < 10:
+            print('WARNING: Change filter to avoid saturation!!')
             filt_idx += 1
-            if (filt_idx > 3):
-                sys.exit('ERROR: You have to defocus in we want to observe this target')
+            if (filt_idx >= 3):
+                print('ERROR: You have to defocus in we want to observe this target')
+                texp = 10.0001
             filt_ = filters[filt_idx]
             if self.telescope == 'Saint-Ex':
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_,
-                             airmass=1.2,
-                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=3.5))
-                texp = a.exp_time_calculator(ADUpeak=20000)[0]
+                self.target_table_spc['Filter'][i] = filt_
+                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
+                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.5))
+                texp = a.exp_time_calculator(ADUpeak=34000)[0]
             elif self.telescope == 'Artemis':
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_,
-                             airmass=1.2,
-                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
-                texp = a.exp_time_calculator(ADUpeak=30000)[0]
+                self.target_table_spc['Filter'][i] = filt_
+                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+                texp = a.exp_time_calculator(ADUpeak=45000)[0]
             elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
+                self.target_table_spc['Filter'][i] = filt_
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.2, \
                              moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=50000)[0]
                 print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
             elif self.telescope == 'Io' or self.telescope == 'Europa' or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_,
-                             airmass=1.2, \
-                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=0.95, gain=1.1))
-                texp = a.exp_time_calculator(ADUpeak=30000)[0]
+                self.target_table_spc['Filter'][i] = filt_
+                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
+                texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
         return texp
 
@@ -2193,7 +2219,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
             run = par.add_run(
                 'From ' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.minute) +\
                 ' to ' + '{:02d}'.format(Time(end_time_target, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(end_time_target, out_subfmt='date_hm').datetime.minute) +\
-                ' : ' + str(df['Sp_ID'][idx_target].data.data[0]))
+                ' : ' + str(df['Sp_ID'][idx_target].data[0]))
             run.bold = True
             font = run.font
             font.size = Pt(12)

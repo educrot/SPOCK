@@ -17,6 +17,6 @@
 #TAG Donuts=on
 Sp1045-2607	10 45 17.15	-26 07 25.12
 ;
-#quitat 09:42
-#chain Cal_flatdawn.txt
+#quitat 01:48
+#chain Obj_EP249631677.txt
 ;

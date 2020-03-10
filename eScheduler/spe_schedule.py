@@ -1074,6 +1074,7 @@ class SPECULOOSScheduler(Scheduler):
             # with the master open times mask
 
             constraint_scores = score_array[i]
+            print()
 
 
             # Add up the applied constraints to prioritize the best blocks
@@ -1135,7 +1136,7 @@ class SPECULOOSScheduler(Scheduler):
                     good = np.all(_strided_scores > 1e-5, axis=1)#np.where(_strided_scores[2] > 0)#np.where(_strided_scores > 0)[0]
                     sum_scores = np.zeros(len(_strided_scores))
                     sum_scores[good] = np.sum(_strided_scores[good], axis=1)
-                    if(b.duration<1*u.hour):
+                    if(b.duration<0.5*u.hour):
                         sum_scores[good]=0
                     for idx in np.argsort(sum_scores)[::-1]:
                         if sum_scores[idx] <= 1.0E-5:

@@ -1,0 +1,22 @@
+;
+; Sp1048-3956
+;
+; 5393446658454453632
+;
+#waituntil 1, 2020/03/02 23:59:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter i'
+#interval 10
+#TAG Donuts=on
+Sp1048-3956	10 48 14.21	-39 56 06.72
+;
+#quitat 04:53
+#chain Obj_Sp1309-2330.txt
+;

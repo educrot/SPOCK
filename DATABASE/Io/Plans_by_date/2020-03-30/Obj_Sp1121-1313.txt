@@ -1,0 +1,22 @@
+;
+; Sp1121-1313
+;
+; 3562157781229213312
+;
+#waituntil 1, 2020/03/30 23:31:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 29
+#TAG Donuts=on
+Sp1121-1313	11 21 49.15	-13 13 08.76
+;
+#quitat 04:41
+#chain Obj_Sp1456-2809.txt
+;

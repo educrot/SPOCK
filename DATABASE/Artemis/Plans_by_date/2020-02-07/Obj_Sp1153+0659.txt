@@ -13,7 +13,7 @@
 #count 5000
 #binning 1
 #filter I+z
-#interval 15
+#interval 23
 #TAG Donuts=on
 Sp1153+0659	11 53 52.68	+06 59 56.26
 ;

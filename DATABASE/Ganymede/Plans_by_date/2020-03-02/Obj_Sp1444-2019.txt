@@ -1,0 +1,22 @@
+;
+; Sp1444-2019
+;
+; 0
+;
+#waituntil 1, 04:50
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 72
+#TAG Donuts=on
+Sp1444-2019	14 44 20.66	-20 19 22.08
+;
+#quitat 09:47
+#chain Cal_flatdawn.txt
+;

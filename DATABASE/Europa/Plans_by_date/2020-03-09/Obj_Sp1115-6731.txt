@@ -1,0 +1,22 @@
+;
+; Sp1115-6731
+;
+; 5235273458327588224
+;
+#waituntil 1, 23:54
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 25
+#TAG Donuts=on
+Sp1115-6731	11 15 51.24	-67 31 33.24
+;
+#quitat 23:58
+#chain Obj_TOI-736.txt
+;

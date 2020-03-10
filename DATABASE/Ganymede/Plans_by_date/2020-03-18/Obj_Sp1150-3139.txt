@@ -1,0 +1,22 @@
+;
+; Sp1150-3139
+;
+; 3479243059623564160
+;
+#waituntil 1, 2020/03/18 23:46:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 71
+#TAG Donuts=on
+Sp1150-3139	11 50 02.30	-31 39 32.40
+;
+#quitat 04:49
+#chain Obj_Sp1444-2019.txt
+;

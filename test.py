@@ -4,10 +4,15 @@ import SPOCK.plots_scheduler as SPOCKplot
 from astropy.time import Time
 import SPOCK.ETC as ETC
 
-obs = 4
+
+# ---------------------- LONG TERM SCHEDULER ---------------------
+
+obs = 1
 schedule = SPOCKLT.Schedules()
 schedule.load_parameters('./input.csv',obs)
-schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
+#SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
+SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
+
 print()
 # ---------------------- SHORT TERM SCHEDULER ---------------------
 
@@ -17,7 +22,7 @@ if schedule.use == 'special_start_end':
     input_name = 'HW_Vir'
     schedule.special_target_with_start_end(input_name)
 if schedule.use == 'special':
-    input_name = 'HW_Vir'
+    input_name = 'TOI-736'
     schedule.special_target(input_name)
 if schedule.use == 'monitoring':
     input_name = 'Sp0755-2404'
@@ -30,18 +35,6 @@ SPOCKST.make_plans(day=schedule.day_of_night,nb_days=1,telescope=schedule.telesc
 
 print()
 
-# ---------------------- LONG TERM SCHEDULER ---------------------
-
-
-
-obs = 5
-schedule = SPOCKLT.Schedules()
-schedule.load_parameters('./input.csv',obs)
-schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
-
-
-
-print()
 
 
 schedule = SPOCKLT.Schedules()

@@ -1,0 +1,22 @@
+;
+; Sp1206-4017
+;
+; 6149473568131829504
+;
+#waituntil 1, 2020/03/28 23:33:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 124
+#TAG Donuts=on
+Sp1206-4017	12 06 23.59	-40 17 08.88
+;
+#quitat 04:42
+#chain Obj_Sp1512-1032.txt
+;

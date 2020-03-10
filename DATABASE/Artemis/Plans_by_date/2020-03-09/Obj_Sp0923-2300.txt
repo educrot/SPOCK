@@ -1,0 +1,22 @@
+;
+; Sp0923-2300
+;
+; 0
+;
+#waituntil 1, 2020/03/09 20:33:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 21
+#TAG Donuts=on
+Sp0923-2300	09 23 02.95	-23 00 41.04
+;
+#quitat 21:45
+#chain Obj_TOI-736.txt
+;
