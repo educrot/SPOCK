@@ -4,17 +4,20 @@ import SPOCK.plots_scheduler as SPOCKplot
 from astropy.time import Time
 import SPOCK.ETC as ETC
 
-
 # ---------------------- LONG TERM SCHEDULER ---------------------
 
-obs = 1
+obs = 4
 schedule = SPOCKLT.Schedules()
 schedule.load_parameters('./input.csv',obs)
+schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
 #SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
-SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
+#SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
 
 print()
 # ---------------------- SHORT TERM SCHEDULER ---------------------
+obs = 1
+schedule = SPOCKST.Schedules()
+schedule.load_parameters('./input_short_term.csv',obs)
 
 if schedule.use == 'follow_up':
     schedule.transit_follow_up('target_transit_follow_up.txt')
@@ -22,7 +25,7 @@ if schedule.use == 'special_start_end':
     input_name = 'HW_Vir'
     schedule.special_target_with_start_end(input_name)
 if schedule.use == 'special':
-    input_name = 'TOI-736'
+    input_name = 'GJ-299'
     schedule.special_target(input_name)
 if schedule.use == 'monitoring':
     input_name = 'Sp0755-2404'
@@ -34,6 +37,8 @@ schedule.make_night_block()
 SPOCKST.make_plans(day=schedule.day_of_night,nb_days=1,telescope=schedule.telescope)
 
 print()
+
+
 
 
 

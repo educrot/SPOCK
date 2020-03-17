@@ -760,7 +760,7 @@ class Schedules:
             time_since_las_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
                                      Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
             #self.update_nb_hours_all()
-            if abs(time_since_las_update) > 1: # in hours
+            if abs(time_since_las_update) > 0: # in hours
                 print('INFO: Updating the number of hours observed')
                 self.update_nb_hours_all()
 
@@ -780,7 +780,7 @@ class Schedules:
         df = df.sort_values(['Target'])
         df.to_csv('SurveyTotal.txt',sep=' ',index=False)
         df_camserver = pd.read_csv('SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
-        df_camserver['Target'][9] = 'Sp0004-2058'
+        #df_camserver['Target'][9] = 'Sp0004-2058'
         df_camserver['Target'] = [x.strip().replace('SP', 'Sp') for x in df_camserver['Target']]
         df_artemis = pd.read_csv('ObservationHours.txt', delimiter=',')
         df = pd.read_csv('ObservationHours_Saint-Ex.txt',delimiter=',')
@@ -1522,7 +1522,7 @@ class Schedules:
             is_hours_constraint_met_target: boolean, say the hour constraint is ok or not
 
         """
-
+        constraints = self.constraints + [MoonSeparationConstraint(min=35*u.deg)]
 
         dt_1day=Time('2018-01-02 00:00:00',scale='utc')-Time('2018-01-01 00:00:00',scale='utc')
 
@@ -1530,13 +1530,12 @@ class Schedules:
 
         self.observability_table_day['fraction of time observable'] =  self.observability_table_day['fraction of time observable'] * Time(self.night_duration(day)).value * 24
 
-        is_visible_mid_night = is_observable(self.constraints, self.observatory, self.targets, \
+        is_visible_mid_night = is_observable(constraints, self.observatory, self.targets, \
             times= Time(self.observatory.twilight_evening_nautical(Time(day),which='next') + self.night_duration(day)/2))
 
         idx_not_visible_mid_night = np.where((is_visible_mid_night == False))
 
         self.observability_table_day['ever observable'][idx_not_visible_mid_night[0]] = False
-
 
         return self.observability_table_day
 

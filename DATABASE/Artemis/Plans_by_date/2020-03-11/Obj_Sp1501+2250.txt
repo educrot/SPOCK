@@ -3,7 +3,7 @@
 ;
 ; 1262763648230973440
 ;
-#waituntil 1, 23:51
+#waituntil 1, 02:28
 #domeopen
 #chill -60
 #waitinlimits 600

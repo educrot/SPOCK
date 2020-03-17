@@ -11,5 +11,5 @@
 ;
 #quitat 2020/03/16 23:45:20
 ;
-#chain Obj_Sp0830+0947.txt
+#chain Obj_TOI-736.txt
 ;
