@@ -2136,7 +2136,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
                            Time(observatory.twilight_morning_astronomical(date + 1, which='nearest')).iso]
         start_night = table_schedule['start time (UTC)'][0]
         end_night = table_schedule['end time (UTC)'][-1]
-        night_duration = round((Time(end_night) - Time(start_night)).jd * 24, 3) * u.hour
+        night_duration = round((Time(nautic_twilights[1]) - Time(nautic_twilights[0])).jd * 24, 3) * u.hour
 
         run = par.add_run('Night starting on the ' + Time(date, out_subfmt='date').value)
         run.bold = True
@@ -2175,7 +2175,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
             ' / ' + '{:02d}'.format(Time(nautic_twilights[0], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(nautic_twilights[0], out_subfmt='date_hm').datetime.minute) +\
             '-' + '{:02d}'.format(Time(nautic_twilights[1], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(nautic_twilights[1], out_subfmt='date_hm').datetime.minute) +\
             '  / ' + '{:02d}'.format(Time(astro_twilights[0], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(astro_twilights[0], out_subfmt='date_hm').datetime.minute) +\
-            '-' + '{:02d}'.format(Time(astro_twilights[0], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(astro_twilights[0], out_subfmt='date_hm').datetime.minute))
+            '-' + '{:02d}'.format(Time(astro_twilights[1], out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(astro_twilights[1], out_subfmt='date_hm').datetime.minute))
         run.italic = True
         font = run.font
         font.size = Pt(12)

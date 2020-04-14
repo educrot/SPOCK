@@ -13,15 +13,19 @@ from astropy.table import Table
 from datetime import datetime
 import os
 import pandas as pd
-import numpy as np
+from astroplan.utils import time_grid_from_range
 from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
 from SPOCK.make_night_plans import make_np
+from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 import subprocess
 import sys
 import yaml
 import shutil
 import SPOCK.ETC as ETC
+import numpy as np
+import matplotlib.pyplot as plt
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint
+from eScheduler.constraints_spc import CelestialPoleSeparationConstraint
 from astroplan import TimeConstraint
 import astroplan
 import matplotlib.pyplot as plt
@@ -149,6 +153,71 @@ class Schedules:
         sequen_scheduler_SS1(blocks, seq_schedule_SS1)
         self.SS1_night_blocks = seq_schedule_SS1.to_table()  # Table.read(os.path.join(Path,tel,'special_target_test.txt'), format='ascii')#
         return self.SS1_night_blocks
+
+    def dome_rotation(self):
+         # not necessary
+        dur_dome_rotation = 5 / 60 / 24 * u.day  # 5min
+
+        sun_set = Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next'))
+        sun_rise = Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest'))
+
+        time_resolution = 1*u.hour
+        time_grid = time_grid_from_range([sun_set, sun_rise], time_resolution=time_resolution)
+        dom_rot_possible = False
+
+        self.make_scheduled_table()
+        end_times = Time(self.scheduled_table['end time (UTC)'][:]).iso
+
+        for i in range(1,len(time_grid)-1):
+
+            start = time_grid[i]
+            print(start.iso)
+            end = start + dur_dome_rotation
+            idx = np.where((start < end_times[:]))[0]
+
+            coords = SkyCoord(str(int(self.scheduled_table['ra (h)'][idx][0])) +  'h' +   str(int(self.scheduled_table['ra (m)'][idx][0])) + 'm' + str(round(self.scheduled_table['ra (s)'][idx][0],3)) + 's' +\
+                                  ' ' + str(int(self.scheduled_table['dec (d)'][idx][0])) +  'd' +   str(abs(int(self.scheduled_table['dec (m)'][idx][0]))) +\
+                              'm' + str(abs(round(self.scheduled_table['dec (s)'][idx][0],3))) + 's').transform_to(AltAz(obstime=start,location=self.observatory.location))
+            coords_dome_rotation = SkyCoord(alt=coords.alt, az=(coords.az.value - 180) * u.deg, obstime=start,
+                                            frame='altaz', location=self.observatory.location)
+            if (coords.alt.value > 60) or (coords.alt.value < 30):
+                dom_rot_possible = False
+                print('WARNING: not possible at that time because of altitude constraint')# = ' + str(round(coords_dome_rotation.alt.value,3)))
+                #sys.exit('ERROR: No dome rotation possible at that time, altitude = ' + str(coords.alt.value) + '°  (altitude <30° or altitude >60°)')
+
+            else:
+                target = FixedTarget(coord=SkyCoord(ra= coords_dome_rotation.icrs.ra.value * u.degree, dec= coords_dome_rotation.icrs.dec.value * u.degree),
+                        name='dome_rot')
+                dom_rot_possible = True
+
+                df = pd.DataFrame({'target': target.name, 'start time (UTC)': start.iso, 'end time (UTC)': end.iso,
+                              'duration (minutes)': dur_dome_rotation.value * 24 * 60, 'ra (h)': target.coord.ra.hms[0],
+                              'ra (m)': target.coord.ra.hms[1], 'ra (s)': target.coord.ra.hms[2],
+                              'dec (d)': target.coord.dec.dms[0], 'dec (m)': target.coord.dec.dms[1],
+                              'dec (s)': target.coord.dec.dms[2], 'configuration': "{\'filt=I+z\', \'texp=10\'}"}, index=[0])
+                self.SS1_night_blocks = Table.from_pandas(df)
+                return self.SS1_night_blocks
+
+                break
+
+        if dom_rot_possible == False:
+            sys.exit('ERROR: No Dom rotation possible that night')
+
+        # blocks = []
+        # a = ObservingBlock(target, dur_dome_rotation, -1,constraints=constraints_dome_rotation,configuration={'filt=' + 'Clear','texp=' + '1'})
+        #
+        # blocks.append(a)
+        # import SPOCK.plots_scheduler as SPOCKplot
+        # SPOCKplot.constraints_scores(constraints_dome_rotation, target, self.observatory, start, start + dur_dome_rotation)
+        # transitioner = Transitioner(slew_rate=11 * u.deg / u.second)
+        # seq_schedule_SS1 = Schedule(self.day_of_night, self.day_of_night + 1)
+        # sequen_scheduler_SS1 = SPECULOOSScheduler(constraints=constraints_dome_rotation, observer=self.observatory,
+        #                                           transitioner=transitioner)
+        # sequen_scheduler_SS1(blocks, seq_schedule_SS1)
+        # self.SS1_night_blocks  = seq_schedule_SS1.to_table()
+
+          # Table.read(os.path.join(Path,tel,'special_target_test.txt'), format='ascii')#
+
 
     def special_target_with_start_end(self, input_name):
         start = self.start_end_range[0]

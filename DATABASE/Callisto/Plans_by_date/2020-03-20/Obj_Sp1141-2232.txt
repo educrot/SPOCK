@@ -3,7 +3,7 @@
 ;
 ; 3540491079971287552
 ;
-#waituntil 1, 2020/03/20 23:41:40
+#waituntil 1, 23:41
 #domeopen
 #chill -60
 #waitinlimits 600
@@ -17,6 +17,6 @@
 #TAG Donuts=on
 Sp1141-2232	11 41 44.04	-22 32 15.00
 ;
-#quitat 04:45
-#chain Obj_Sp1512-1032.txt
+#quitat 00:41
+#chain Obj_dome_rot.txt
 ;

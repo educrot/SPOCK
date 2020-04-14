@@ -14,7 +14,6 @@ import warnings
 
 # Third-party
 from astropy.time import Time
-import astropy.units as u
 from astropy.coordinates import get_body, get_sun, get_moon, SkyCoord
 from astropy import table
 
@@ -25,13 +24,15 @@ from numpy.lib.stride_tricks import as_strided
 from .moon import moon_illumination
 from .utils import time_grid_from_range
 from .target import get_skycoord
+from astropy.coordinates import Angle
+import astropy.units as u
 
 __all__ = ["AltitudeConstraint", "AirmassConstraint", "AtNightConstraint",
            "is_observable", "is_always_observable", "time_grid_from_range",
            "SunSeparationConstraint", "MoonSeparationConstraint",
            "MoonIlluminationConstraint", "LocalTimeConstraint",
            "PrimaryEclipseConstraint", "SecondaryEclipseConstraint",
-           "Constraint", "TimeConstraint", "observability_table",
+           "Constraint","CelestialPoleSeparationConstraint", "TimeConstraint", "observability_table",
            "months_observable", "max_best_rescale", "min_best_rescale",
            "PhaseConstraint", "is_event_observable"]
 
@@ -304,6 +305,43 @@ class Constraint(object):
         # Should be implemented on each subclass of Constraint
         raise NotImplementedError
 
+class CelestialPoleSeparationConstraint(Constraint):
+    """
+    Constraint the separation from Vega
+    """
+    def __init__(self, min=None, max=None, boolean_constraint=True):
+        """
+        min : `~astropy.units.Quantity` or `None` (optional)
+            Minimum acceptable separation between Vega and target. `None`
+            indicates no limit.
+        max : `~astropy.units.Quantity` or `None` (optional)
+            Minimum acceptable separation between Vega and target. `None`
+            indicates no limit.
+        """
+        self.min = min if min is not None else 0*u.deg
+        self.max = max if max is not None else 180*u.deg
+        self.boolean_constraint = boolean_constraint
+
+    def compute_constraint(self, times, observer, targets):
+
+        celestial_pole = SkyCoord(ra=0*u.deg, dec=90*u.deg)
+
+        # Calculate separation between target and vega
+        # Targets are automatically converted to SkyCoord objects
+        # by __call__ before compute_constraint is called.
+        celestial_pole_separation = celestial_pole.separation(targets)
+
+        if self.boolean_constraint:
+            mask = ((self.min < celestial_pole_separation) & (celestial_pole_separation < self.max))
+            return mask
+
+        # if we want to return a non-boolean score
+        else:
+            # rescale the vega_separation values so that they become
+            # scores between zero and one
+            rescale = min_best_rescale(celestial_pole_separation, self.min,
+                                       self.max, less_than_min=0)
+            return rescale
 
 class AltitudeConstraint(Constraint):
     """

@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 import numpy as np
 import plotly.figure_factory as ff
+from astroplan.utils import time_grid_from_range
 import  os
 
 def charge_observatories(Name):
@@ -304,3 +305,41 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
     plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at ' + name_observatory)
     #plt.title('Visibility plot for target ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")))
     plt.show()
+
+
+def constraints_scores(constraints,target,observatory,start,end):
+    time_resolution = 0.5 * u.hour
+    time_grid = time_grid_from_range([start, end],time_resolution=time_resolution)
+
+    observability_grid = np.zeros((len(constraints), len(time_grid)))
+
+    for i, constraint in enumerate(constraints):
+        # Evaluate each constraint
+        observability_grid[i, :] = constraint(observatory, target, times=time_grid)
+
+    print(observability_grid)
+
+    # Create plot showing observability of the target:
+
+    extent = [-0.5, -0.5 + len(time_grid), -0.5, 2.5]
+
+    fig, ax = plt.subplots()
+    ax.imshow(observability_grid, extent=extent)
+
+    ax.set_yticks(range(0, 3))
+    ax.set_yticklabels([c.__class__.__name__ for c in constraints])
+
+    ax.set_xticks(range(len(time_grid)))
+    ax.set_xticklabels([t.datetime.strftime("%H:%M") for t in time_grid])
+
+    ax.set_xticks(np.arange(extent[0], extent[1]), minor=True)
+    ax.set_yticks(np.arange(extent[2], extent[3]), minor=True)
+
+    ax.grid(which='minor', color='w', linestyle='-', linewidth=2)
+    ax.tick_params(axis='x', which='minor', bottom='off')
+    plt.setp(ax.get_xticklabels(), rotation=30, ha='right')
+    plt.setp(ax.get_yticklabels(), rotation=45, ha='right')
+
+    ax.tick_params(axis='y', which='minor', left='off')
+    ax.set_xlabel('Time on {0} UTC'.format(time_grid[0].datetime.date()))
+    fig.subplots_adjust(left=0.35, right=0.9, top=0.9, bottom=0.1)
