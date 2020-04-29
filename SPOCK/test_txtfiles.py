@@ -7,6 +7,7 @@ import pandas as pd
 startup_time=[]
 hour=[]
 minute=[]
+target_list_path = 'speculoos_target_list_v5.txt'
 
 def Path_txt_files(telescope):
     Path=os.path.join('./DATABASE',telescope,'Plans_by_date')
@@ -184,14 +185,14 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
         out.write(str00)
 
 def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
-    df = pd.read_csv('speculoos_target_list_v3.txt',delimiter = ' ',index_col = False)
+    df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     #print(name)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     elif 'Sp' in name:
-        df2 = pd.read_csv('speculoos_target_list_v3.txt',delimiter=' ',index_col=None)
+        df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
         #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)]
@@ -277,13 +278,13 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
         out.write(str00 + '\n')
 
 def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
-    df = pd.read_csv('speculoos_target_list_v3.txt',delimiter = ' ',index_col = False)
+    df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     elif 'Sp' in name:
-        df2 = pd.read_csv('speculoos_target_list_v3.txt',delimiter=' ',index_col=None)
+        df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
         #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
@@ -367,7 +368,7 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         out.write(str00 + '\n')
 
 def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
-    df = pd.read_csv('speculoos_target_list_v3.txt',delimiter = ' ',index_col = False)
+    df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     idx_target = None
     if 'NOI-105435' in name:
         gaia_id_target = 6915818294923863040
@@ -378,7 +379,7 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         idx_target = np.where((df['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     if not idx_target:
-        df2 = pd.read_csv('speculoos_target_list_v3.txt',delimiter = ',',index_col = False)
+        df2 = pd.read_csv(target_list_path,delimiter = ',',index_col = False)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     date_start=np.datetime64(date_start)
@@ -466,14 +467,14 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         out.write(str00 + '\n')
 
 def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
-    df = pd.read_csv('speculoos_target_list_v3.txt',delimiter = ' ',index_col = False)
+    df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     #print(name)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     elif 'Sp' in name:
-        df2 = pd.read_csv('speculoos_target_list_v3.txt',delimiter=' ',index_col=None)
+        df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
         #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)

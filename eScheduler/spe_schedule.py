@@ -995,8 +995,7 @@ class PriorityScheduler(Scheduler):
 
 class SPECULOOSScheduler(Scheduler):
     """
-    A scheduler that optimizes a prioritized list.  That is, it
-    finds the best time for each ObservingBlock, in order of priority.
+
     """
 
     def __init__(self, *args, **kwargs):
