@@ -145,7 +145,7 @@ class Schedules:
             self.target_table_spc['texp_spc'][idx_first_target]= self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_first_target])
         blocks = []
         a = ObservingBlock(self.targets[idx_first_target], dur_mon_target, -1, constraints=constraints_monitoring_target,\
-                           configuration={'filt=' + str(self.target_table_spc['Filter'][idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][idx_first_target])})
+                           configuration={'filt=' + str(self.target_table_spc['Filter_spc'][idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][idx_first_target])})
         blocks.append(a)
         transitioner = Transitioner(slew_rate=11 * u.deg / u.second)
         seq_schedule_SS1 = Schedule(self.day_of_night, self.day_of_night+1)
@@ -234,7 +234,7 @@ class Schedules:
             self.target_table_spc['texp_spc'][idx_to_insert_target]= self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_to_insert_target])
         blocks = []
         a = ObservingBlock(self.targets[idx_to_insert_target], dur_obs_both_target, -1,constraints=constraints_special_target,
-                           configuration={'filt=' + str(self.target_table_spc['Filter'][idx_to_insert_target]),
+                           configuration={'filt=' + str(self.target_table_spc['Filter_spc'][idx_to_insert_target]),
                                           'texp=' + str(self.target_table_spc['texp_spc'][idx_to_insert_target])})
         blocks.append(a)
         transitioner = Transitioner(slew_rate=11 * u.deg / u.second)
@@ -255,7 +255,7 @@ class Schedules:
             self.target_table_spc['texp_spc'][idx_first_target]= self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_first_target])
         blocks=[]
         a = ObservingBlock(self.targets[idx_first_target],dur_obs_both_target,-1,constraints= constraints_special_target,\
-                         configuration={'filt=' + str(self.target_table_spc['Filter'][idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][idx_first_target])})
+                         configuration={'filt=' + str(self.target_table_spc['Filter_spc'][idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][idx_first_target])})
         blocks.append(a)
         transitioner = Transitioner(slew_rate= 11*u.deg/u.second)
         seq_schedule_SS1 = Schedule(self.day_of_night,self.day_of_night+1)
@@ -318,7 +318,7 @@ class Schedules:
                     df['texp_spc'][idx_first_target] = self.exposure_time(input_name=df['Sp_ID'][idx_first_target])
                 a = ObservingBlock(target[idx_first_target], dur_obs_transit_target, -1,
                                    constraints=constraints_transit_target,
-                                   configuration={'filt=' + str(df['Filter'][idx_first_target]),
+                                   configuration={'filt=' + str(df['Filter_spc'][idx_first_target]),
                                                   'texp=' + str(df['texp_spc'][idx_first_target])})
                 blocks.append(a)
                 transitioner = Transitioner(slew_rate=11 * u.deg / u.second)
@@ -565,7 +565,7 @@ class Schedules:
             spt_type = 'L5'
         elif int(self.target_table_spc['SpT'][i]) > 14:
             spt_type = 'L8'
-        filt_ = str(self.target_table_spc['Filter'][i])
+        filt_ = str(self.target_table_spc['Filter_spc'][i])
         if (filt_ == 'z\'') or (filt_ == 'r\'') or (filt_ == 'i\'') or (filt_ == 'g\''):
             filt_ = filt_.replace('\'', '')
         filters = ['I+z', 'z', 'i', 'r']
@@ -597,26 +597,26 @@ class Schedules:
                 texp = 10.0001
             filt_ = filters[filt_idx]
             if self.telescope == 'Saint-Ex':
-                self.target_table_spc['Filter'][i] = filt_
+                self.target_table_spc['Filter_spc'][i] = filt_
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_,
                              airmass=1.1,
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.5))
                 texp = a.exp_time_calculator(ADUpeak=34000)[0]
             elif self.telescope == 'Artemis':
-                self.target_table_spc['Filter'][i] = filt_
+                self.target_table_spc['Filter_spc'][i] = filt_
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_,
                              airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=45000)[0]
             elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
-                self.target_table_spc['Filter'][i] = filt_
+                self.target_table_spc['Filter_spc'][i] = filt_
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_,
                              airmass=1.2, \
                              moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=50000)[0]
                 print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
             elif self.telescope == 'Io' or self.telescope == 'Europa' or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
-                self.target_table_spc['Filter'][i] = filt_
+                self.target_table_spc['Filter_spc'][i] = filt_
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_,
                              airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
