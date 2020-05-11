@@ -25,8 +25,8 @@ For `long_term_scheduler` reate your *'input_file.csv'* file in the following fo
 --- 
 --- 
     date_range: 
-      - "2019-12-05 15:00:00"
-      - "2020-01-08 15:00:00"
+      - "2020-05-11 15:00:00"
+      - "2020-05-31 15:00:00"
     observatories:
       1:
         name: SSO
@@ -46,7 +46,7 @@ For `long_term_scheduler` reate your *'input_file.csv'* file in the following fo
     strategy: "continuous"
     duration_segments: 20
     nb_segments: 3
-    target_list: speculoos_target_list_v2.txt
+    target_list: speculoos_target_list_v6.txt
 ---
 
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
@@ -86,7 +86,7 @@ For `short_term_scheduler` reate your *'input_file.csv'* file in the following f
       5: 
         name: TN_Oukaimeden
         telescopes: [TN_Oukaimeden]
-    target_list: speculoos_target_list_v2.txt
+    target_list: target_list_special.txt
 ---
 
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
