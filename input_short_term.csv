@@ -1,14 +1,14 @@
 --- 
 day_of_night: 
-  - "2020-03-20 15:00:00"
+  - "2020-05-29 15:00:00"
 start_end_range: 
   - "2020-03-18 05:00:00"
   - "2020-03-18 06:00:00"
-use: "dome_rotation"
+use: "follow_up"
 observatories:
   1:
     name: SSO
-    telescopes: [Callisto,Ganymede,Io,Europa]
+    telescopes: [Io,Callisto,Ganymede,Europa]
   2:
     name: SNO
     telescopes: [Artemis]

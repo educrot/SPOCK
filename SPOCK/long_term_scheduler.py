@@ -619,10 +619,6 @@ class Schedules:
         self.telescope =  []
         self.time_ranges = [Time(['2020-01-01 12:00:00', '2020-01-31 12:00:00']),Time(['2020-02-01 12:00:00', '2020-02-28 12:00:00']),Time(['2020-03-01 15:00:00', '2020-03-31 15:00:00']),Time(['2020-04-01 15:00:00', '2020-04-30 15:00:00']),Time(['2020-05-01 15:00:00', '2020-05-31 15:00:00']),Time(['2020-06-01 15:00:00', '2020-06-30 15:00:00']),Time(['2020-07-01 12:00:00', '2020-07-31 12:00:00']),Time(['2020-08-01 12:00:00', '2020-08-31 12:00:00']),Time(['2020-09-01 12:00:00', '2020-09-30 12:00:00']),Time(['2020-10-01 12:00:00', '2020-10-31 12:00:00']),Time(['2020-11-01 12:00:00', '2020-11-30 12:00:00']),Time(['2020-12-01 12:00:00', '2020-12-31 12:00:00'])]
 
-    @property
-    def exposure_time_table(self):
-        exposure_time_table = pd.read_csv('exposure_time_table.csv',sep=',')
-        return exposure_time_table
 
     @property
     def idx_rise_targets_sorted(self):
@@ -691,7 +687,7 @@ class Schedules:
         saintex_texp = np.zeros(len(self.target_table_spc))
         ts_texp = np.zeros(len(self.target_table_spc))
         tn_texp = np.zeros(len(self.target_table_spc))
-        for i in range(998,len(self.target_table_spc)):
+        for i in range(len(self.target_table_spc)):
             print(i,self.target_table_spc['Sp_ID'][i])
             sso_texp[i] = self.exposure_time_for_table('SSO', day, i)
             sno_texp[i] = self.exposure_time_for_table( 'SNO', day, i)
@@ -1201,25 +1197,25 @@ class Schedules:
             self.priority['priority'][self.idx_planned_TN] = -1000
 
         self.no_obs_with_different_tel()
-
+        read_exposure_time_table = pd.read_csv('exposure_time_table.csv',sep=',')
         if self.observatory.name == 'SSO':
-            texp = self.exposure_time_table['SSO_texp']
+            texp = read_exposure_time_table['SSO_texp']
             idx_texp_too_long = np.where((texp > 150))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'SNO':
-            texp = self.exposure_time_table['SNO_texp']
+            texp = read_exposure_time_table['SNO_texp']
             idx_texp_too_long =  np.where((texp > 90))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'Saint-Ex':
-            texp = self.exposure_time_table['Saintex_texp']
+            texp = read_exposure_time_table['Saintex_texp']
             idx_texp_too_long =  np.where((texp > 150))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'TS_La_Silla':
-            texp = self.exposure_time_table['TS_texp']
+            texp = read_exposure_time_table['TS_texp']
             idx_texp_too_long =  np.where((texp > 100))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'TN_Oukaimeden':
-            texp = self.exposure_time_table['TN_texp']
+            texp = read_exposure_time_table['TN_texp']
             idx_texp_too_long =  np.where((texp > 100))
             self.priority['priority'][idx_texp_too_long] = -1000
 

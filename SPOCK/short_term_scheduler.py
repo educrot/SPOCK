@@ -298,10 +298,21 @@ class Schedules:
                 end_transit = Time(ing_egr[0][1].value + err_T0_pos + oot_time.value + W_err_transit,format='jd') #+ T0_err_transit + W_err_transit + oot_time.value/24 + (timing_to_obs_jd[0] - epoch.jd) / period.value * P_err_transit ,format='jd')
                 #print('INFO: end_transit', end_transit.iso)
                 dur_obs_transit_target = (end_transit - start_transit).value * 1. * u.day
-                constraints_transit_target = [AltitudeConstraint(min=25 * u.deg),
-                                              MoonSeparationConstraint(min=25 * u.deg)]
-                                              #TimeConstraint(start_transit, end_transit)]
-                constraints_transit_target = []
+                if (end_transit > Time(self.observatory.twilight_morning_nautical(self.day_of_night + 1, which='nearest'))) \
+                        or (start_transit < Time(self.observatory.twilight_evening_nautical(self.day_of_night, which='next'))):
+                    if (Time(ing_egr[0][1]) < Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest')))\
+                            and (Time(ing_egr[0][0]) > Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next'))):
+                        constraints_transit_target = [AltitudeConstraint(min=25 * u.deg),
+                                                      MoonSeparationConstraint(min=25 * u.deg),
+                                                      TimeConstraint(Time(ing_egr[0][0]), Time(ing_egr[0][1]))]
+                    else:
+                        print('INFO: Transit not full.')
+                        continue
+                else:
+                    constraints_transit_target = [AltitudeConstraint(min=25 * u.deg),
+                                                  MoonSeparationConstraint(min=25 * u.deg),
+                                                  TimeConstraint(start_transit, end_transit)]
+                #constraints_transit_target = []
                 idx_first_target = int(np.where((df['Sp_ID'] == df['Sp_ID'][i]))[0])
                 if df['texp_spc'][idx_first_target] == 0:
                     df['texp_spc'][idx_first_target] = self.exposure_time(input_name=df['Sp_ID'][idx_first_target])
