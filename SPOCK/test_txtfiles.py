@@ -159,7 +159,7 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
         str1='#waituntil 1, '
         str2='#domeopen\n'
         str3='#chill '
-        str33='-60\n'
+        str33='-55\n'
         str4='#duskflats Cal_flatexo_evening.txt\n'
         str5='#chain '
         str6='#quitat '
@@ -184,7 +184,7 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
         out.write(str5 + 'Obj_' + name + '.txt' + '\n')
         out.write(str00)
 
-def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
+def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope=None):
     df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     #print(name)
     idx_target = None
@@ -247,7 +247,10 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             out.write(str00 + '\n')
         out.write(str1 + str(hour0) + ':' + str(minute0) + '\n')
         out.write(str22)
-        out.write('#chill -60\n')
+        if telescope == 'Artemis':
+            out.write('#chill -55\n')
+        else:
+            out.write('#chill -60\n')
         out.write(str2 + str(waitlimit) + '\n')
         out.write(str3)
         out.write(str33 + str(afinterval) +'\n')

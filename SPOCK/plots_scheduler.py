@@ -17,6 +17,19 @@ from astroplan.utils import time_grid_from_range
 import  os
 
 def charge_observatories(Name):
+    """ charge the observatory
+
+    Parameters
+    ----------
+    Name : str
+        Name of the observatory
+
+    Returns
+    -------
+    list
+        list of the observatory
+    """
+
     observatories = []
     #Oservatories
     if 'SSO' in str(Name):
@@ -46,6 +59,24 @@ def charge_observatories(Name):
     return observatories
 
 def airmass_plot_saved(name_observatory,telescope,day):
+    """
+
+    Parameters
+    ----------
+    name_observatory : str
+        name of the observatory (ex : 'SSO')
+    telescope : str
+        name of the telescope (exx : 'Io')
+    day : date
+        date of day in fmt "yyyy-mm-dd"
+
+
+    Returns
+    -------
+    plot
+         visibility plot on telescope at a given day
+
+    """
     night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
@@ -73,6 +104,24 @@ def airmass_plot_saved(name_observatory,telescope,day):
         plt.legend(loc=2)
 
 def airmass_plot_proposition(name_observatory,telescope,day):
+    """
+
+    Parameters
+    ----------
+    name_observatory : str
+        name of the observatory (ex : 'SSO')
+    telescope : str
+        name of the telescope (exx : 'Io')
+    day : date
+        date of day in fmt "yyyy-mm-dd"
+
+
+    Returns
+    -------
+    plot
+         visibility plot on telescope at a given day
+
+    """
     night_block = pd.read_csv(os.path.join('./night_blocks_propositions/','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
@@ -99,6 +148,24 @@ def airmass_plot_proposition(name_observatory,telescope,day):
         plt.legend(loc=2)
 
 def airmass_altitude_plot_saved(name_observatory,telescope,day):
+    """
+
+    Parameters
+    ----------
+    name_observatory : str
+        name of the observatory (ex : 'SSO')
+    telescope : str
+        name of the telescope (exx : 'Io')
+    day : date
+        date of day in fmt "yyyy-mm-dd"
+
+
+    Returns
+    -------
+    plot
+         visibility plot on telescope at a given day
+
+    """
     night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
@@ -127,6 +194,24 @@ def airmass_altitude_plot_saved(name_observatory,telescope,day):
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
 
 def airmass_altitude_plot_proposition(name_observatory,telescope,day):
+    """
+
+    Parameters
+    ----------
+    name_observatory : str
+        name of the observatory (ex : 'SSO')
+    telescope : str
+        name of the telescope (exx : 'Io')
+    day : date
+        date of day in fmt "yyyy-mm-dd"
+
+
+    Returns
+    -------
+    plot
+         visibility plot on telescope at a given day
+
+    """
     night_block = pd.read_csv(os.path.join('./night_blocks_propositions/','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
@@ -154,6 +239,19 @@ def airmass_altitude_plot_proposition(name_observatory,telescope,day):
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
 
 def gantt_chart_all(target_list):
+    """
+
+    Parameters
+    ----------
+    target_list : path
+        path of the target list
+
+    Returns
+    -------
+    plot
+        gant chart of all scheduled targets so far
+
+    """
     target_table_spc = pd.read_csv(target_list,delimiter=' ')
     all_targets = target_table_spc['Sp_ID']
     files = []
@@ -212,6 +310,23 @@ def gantt_chart_all(target_list):
     offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
 
 def gantt_chart(date_start,date_end,telescope):
+    """
+
+    Parameters
+    ----------
+    date_start : date
+        date start 'yyyy-mm-dd'
+    date_end : date
+        date start 'yyyy-mm-dd'
+    telescope : str
+        name of the  telescope
+
+    Returns
+    -------
+    plot
+        gant chart on a given range of  days
+
+    """
     start = []
     finish = []
     targets = []
@@ -272,6 +387,23 @@ def gantt_chart(date_start,date_end,telescope):
     offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
 
 def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_list):
+    """
+
+    Parameters
+    ----------
+    name_observatory : str
+        name of the observatory
+    day  : date
+        date in format  'yyyy-mm-dd'
+    target :  str
+         name of  target
+    path_target_list  : path
+        path of the target  list
+
+    Returns
+    -------
+
+    """
     if path_target_list is None:
         path_target_list = 'SPECULOOS_target_list_v3.txt'
     observatory = charge_observatories(name_observatory)[0]
@@ -308,6 +440,27 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
 
 
 def constraints_scores(constraints,target,observatory,start,end):
+    """
+
+    Parameters
+    ----------
+    constraints : astroplan.constraints
+         constraints
+    target : astroplan.FixedTarget
+        target
+    observatory : observatory
+        astroplan.observed
+    start : date
+        start  date
+    end : date
+        end date
+
+    Returns
+    -------
+    plot
+        plot of the constraints scores
+
+    """
     time_resolution = 0.5 * u.hour
     time_grid = time_grid_from_range([start, end],time_resolution=time_resolution)
 

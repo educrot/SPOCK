@@ -44,6 +44,14 @@ from astropy.table import Table
 
 
 def get_hours_files_SNO():
+    """ get nb hours obs on SNO
+
+    Returns
+    -------
+    txt file
+        file ObservationHours.txt
+
+    """
     hostname = '172.16.3.11'
     port = 22
     username = 'speculoos'
@@ -66,24 +74,88 @@ def get_hours_files_SNO():
     df = df.sort_values(['Target'])
     df.to_csv('ObservationHours.txt',sep=',',index=False)
 
-# definition of the different fonctions
 def max_unit_list(x):
+    """ return max of list
+
+    Parameters
+    ----------
+    x : list
+
+    Returns
+    -------
+    float
+        max of list
+
+    """
     a = max(x)
     return a.value
 
 def first_elem_list(x):
+    """ first element of list
+
+    Parameters
+    ----------
+    x : list
+
+    Returns
+    -------
+    float
+        first element of list
+
+    """
     a = x[0]
     return a
 
 def last_elem_list(x):
+    """ last element of list
+
+    Parameters
+    ----------
+    x : list
+
+    Returns
+    -------
+    float
+        last element
+
+    """
     a = x[-1]
     return a
 
 def coord_transfotm_to_alt(x,frame):
+    """ transform astropy.coordinates to a given frame
+
+    Parameters
+    ----------
+    x  : astropy.coordinates
+    coordinates
+    frame : str
+        frame in astropy.coordinates
+
+    Returns
+    -------
+    astropy.coordinates
+        coordinates in the frame chosen
+
+    """
     a = (x.coord.transform_to(frame).alt)
     return a
 
 def index_list1_list2(list1, list2): #list 2 longer than list 1
+    """ index of list1 in list2 and list2 in list1
+
+    Parameters
+    ----------
+    list1 : list
+
+    list2 : list
+
+    Returns
+    -------
+    list
+        list of index of list1 in list2 and list2 in list1
+
+    """
     idx_list1_in_list2 = []
     idx_list2_in_list1 = []
     for i in range(len(list2)):
@@ -94,32 +166,34 @@ def index_list1_list2(list1, list2): #list 2 longer than list 1
     return idx_list1_in_list2, idx_list2_in_list1
 
 def Diff_list(li1, li2):
-    """
-    Inform on the difference between two lists
+    """ Inform on the difference between two lists
 
     Parameters
     ----------
-    li1: list numero 1
-    li2: list numero 2
+    li1: list
+    li2: list
 
     Returns
     -------
-    Elements than are in list 1 but not in list 2
+    list
+        Elements than are in list 1 but not in list 2
     """
 
     return (list(set(li1) - set(li2)))
 
 def compare_target_lists(path_target_list):
-    """
-    Compare the target list from the given folder to the one on STARGATE and Cambridge server
+    """ Compare the target list from the given folder to the one on STARGATE and Cambridge server
     If different trigger a warning a tell how many targets are actually different from the referenced target list
+
     Parameters
     ----------
-    path_target_list: path on your computer toward the target list, by default take the one on the Cambridge server
+    path_target_list: str
+        path on your computer toward the target list, by default take the one on the Cambridge server
 
     Returns
     -------
-    An idication about if the target list is the referenced one or not
+    print
+         An idication about if the target list is the referenced one or not
 
     """
     TargetURL="http://www.mrao.cam.ac.uk/SPECULOOS/target_list_gaia.csv"
@@ -137,6 +211,21 @@ def compare_target_lists(path_target_list):
         print('INFO: OK ! User\'s list is similar to the one on the Cambridge server')
 
 def SSO_planned_targets(date,telescope):
+    """ tell which target are scheduled on SSO on a given day
+
+    Parameters
+    ----------
+    date : date
+        date of day in fmt 'yyyy-mm-dd'
+    telescope : str
+        name of telescope
+
+    Returns
+    -------
+    list
+        list of targets scheduled on this SSO telescope that  day
+
+    """
     if (telescope == 'Artemis') or (telescope == 'Saint-Ex') or (telescope == 'TS_La_Silla') or (telescope == 'TN_Oukaimeden'):
         telescopes = ['Io', 'Europa', 'Ganymede', 'Callisto']
     else:
@@ -156,6 +245,19 @@ def SSO_planned_targets(date,telescope):
     return targets_on_SSO_telescopes
 
 def SNO_planned_targets(date):
+    """ tell which target are scheduled on SNO on a given day
+
+    Parameters
+    ----------
+    date : date
+        date of day in fmt 'yyyy-mm-dd'
+
+    Returns
+    -------
+    list
+        list of targets scheduled on this SNO that  day
+
+    """
     telescopes = ['Artemis', 'Saint-Ex']
     targets_on_SNO_telescopes = []
     for i in range(len(telescopes)):
@@ -171,6 +273,19 @@ def SNO_planned_targets(date):
     return targets_on_SNO_telescopes
 
 def TS_planned_targets(date):
+    """ tell which target are scheduled on TS on a given day
+
+    Parameters
+    ----------
+    date : date
+        date of day in fmt 'yyyy-mm-dd'
+
+    Returns
+    -------
+    list
+        list of targets scheduled on this TS that  day
+
+    """
     telescopes = ['TS_La_Silla']
     targets_on_TS_telescopes = []
     for i in range(len(telescopes)):
@@ -185,6 +300,19 @@ def TS_planned_targets(date):
     return targets_on_TS_telescopes
 
 def TN_planned_targets(date):
+    """ tell which target are scheduled on TN on a given day
+
+    Parameters
+    ----------
+    date : date
+        date of day in fmt 'yyyy-mm-dd'
+
+    Returns
+    -------
+    list
+        list of targets scheduled on this TN that  day
+
+    """
     telescopes = ['TN_Oukaimeden']
     targets_on_TN_telescopes = []
     for i in range(len(telescopes)):
@@ -199,16 +327,17 @@ def TN_planned_targets(date):
     return targets_on_TN_telescopes
 
 def update_hours_target_list(path_target_list):
-    """
-    Update the targets hours of observation from Cambridge server
+    """ Update the targets hours of observation from Cambridge server
 
     Parameters
     ----------
-    path_target_list: path on your computer toward the target list, by default take the one on the Cambridge server
+    path_target_list: str
+        path on your computer toward the target list, by default take the one on the Cambridge server
 
     Returns
     -------
-    Same target list but with updated number of hours of observation
+    file
+        Same target list but with updated number of hours of observation
 
     """
     get_hours_files_SNO()
@@ -241,16 +370,17 @@ def update_hours_target_list(path_target_list):
 
 def target_list_good_coord_format(path_target_list):
 
-    """
-    Give target corrdinates in ICRS format (used for astropy.coordinates SkyCoord function)
+    """ Give target corrdinates in ICRS format (used for astropy.coordinates SkyCoord function)
 
     Parameters
     ----------
-    path_target_list: path on your computer toward the target list, by default take the one on the Cambridge server
+    path_target_list: str
+        path on your computer toward the target list, by default take the one on the Cambridge server
 
     Returns
     -------
-    targets: targets list with the following format : [<FixedTarget "Sp0002+0115" at SkyCoord (ICRS): (ra, dec) in deg (0.52591667, 1.26003889)>,
+    targets: astropy.FixedTarget
+        targets list with the following format : [<FixedTarget "Sp0002+0115" at SkyCoord (ICRS): (ra, dec) in deg (0.52591667, 1.26003889)>,
 
 
     """
@@ -260,6 +390,19 @@ def target_list_good_coord_format(path_target_list):
     return targets
 
 def charge_observatories(Name):
+    """
+
+    Parameters
+    ----------
+    Name : str
+        name of the observatory (ex: 'SSO')
+
+    Returns
+    -------
+    astroplan.observer
+        all info on observatory loaded
+
+    """
     observatories = []
     #Oservatories
     if 'SSO' in str(Name):
@@ -289,8 +432,7 @@ def charge_observatories(Name):
     return observatories
 
 def _generate_24hr_grid(t0, start, end, N, for_deriv=False):
-    """
-    Generate a nearly linearly spaced grid of time durations.
+    """ Generate a nearly linearly spaced grid of time durations.
     The midpoints of these grid points will span times from ``t0``+``start``
     to ``t0``+``end``, including the end points, which is useful when taking
     numerical derivatives.
@@ -331,8 +473,7 @@ def _generate_24hr_grid(t0, start, end, N, for_deriv=False):
 
 def altaz(self, time, target=None, obswl=None, grid_times_targets=False):
 
-    """
-    Get an `~astropy.coordinates.AltAz` frame or coordinate.
+    """ Get an `~astropy.coordinates.AltAz` frame or coordinate.
     If ``target`` is None, generates an altitude/azimuth frame. Otherwise,
     calculates the transformation to that frame for the requested ``target``.
     Parameters
@@ -391,20 +532,26 @@ def altaz(self, time, target=None, obswl=None, grid_times_targets=False):
         return target.transform_to(altaz_frame)
 
 def Observability(j,time_range,observatory,targets,constraints):
-    """
-    Give a table with the observability score for each target of targets
+    """ Give a table with the observability score for each target of targets
     regarding the constraints given and for all ranges of time_range
+
     Parameters
     ----------
-        j : list [start end], element of time range (that is to say, month of the year)
-        time_range : List of astropy.Time range with start and end times
-        observatory : observatory chosen
-        targets : target list on the FixedTarget() format from astroplan
-        constraints : general constraints for a target to be shceduled
+        j : list
+            [start end], element of time range (that is to say, month of the year)
+        time_range : list
+            of astropy.Time range with start and end times
+        observatory : astroplan.observer
+            observatory chosen
+        targets : astropy
+            target list on the FixedTarget() format from astroplan
+        constraints : astroplan.constraint
+            general constraints for a target to be shceduled
 
     Returns
     -------
-        Observability table: 12 columns (target name and each element of time_range, e.g months),
+        Observability table: astropy.table.Table
+             12 columns (target name and each element of time_range, e.g months),
         rows= nb of targets
     """
     targets_observable=[]
@@ -425,13 +572,18 @@ def reverse_Observability(observatory,targets,constraints,time_ranges):
     Reverse observability table, rows become columns
     Parameters
     ----------
-        observatory : observatory chosen
-        time_range : List of astropy.Time range with start and end times
-        targets : target list on the FixedTarget() format from astroplan
-        constraints : general constraints for a target to be shceduled
+    observatory : str
+        observatory chosen
+    time_range : list
+        List of astropy.Time range with start and end times
+    targets : list of astropy.FixedTarget
+        target list on the FixedTarget() format from astroplan
+    constraints : astroplan.constraints
+        general constraints for a target to be shceduled
 
     Returns
     -------
+    reverse_df1 : astropy.table
         observability table with no NaN value (0 instead) inversed with targets as columns
         and elements of time_ranges (months) as rows
     """
@@ -454,21 +606,29 @@ def reverse_Observability(observatory,targets,constraints,time_ranges):
         return reverse_df1
 
 def month_option(target_name,reverse_df1):
-    """
-        create a list of the best month for oservation for each target
+    """ create a list of the best month for oservation for each target
 
     Parameters
     ----------
-        target_name: name of the target
-        reverse_df1: observability table with no NaN value (0 instead) inversed with targets as columns
+    target_name : str
+        name of the target
+    reverse_df1 : astropy.table
+        observability table with no NaN value (0 instead) inversed with targets as columns
         and elements of time_ranges (months) as rows
 
     Returns
     -------
-        month: a list with the best month to observe the target
-        month_2nd_option: same but for the second best month
-        months_3rd_option: same but for the third best month
-        etc
+    month : list
+        a list with the best month to observe the target
+    month_2nd_option : list
+        same but for the second best month
+    months_3rd_option : list
+        same but for the third best month
+    months_4th_option : list
+        same but for the fourth best month
+    months_5th_option : list
+        same but for the fiveth best month
+
 
     Remarks
     -------
@@ -492,6 +652,28 @@ def month_option(target_name,reverse_df1):
     return [months, months_2nd_option , months_3rd_option,months_4th_option, months_5th_option]
 
 def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope):
+    """ save schedules in destination
+
+    Parameters
+    ----------
+    input_file : file
+        input file for SPOCKLT
+    nb_observatory : str
+        name of the observatory
+    save : bool
+        True if want to save, False if not
+    over_write : bool
+        True if want overwrite, False if not
+    date_range : list of date
+         list with 2 elements, start date  and end date
+    telescope : str
+        name of telescope for which you which to save the schedules
+
+    Returns
+    -------
+    message
+
+    """
     if input_file is None:
         telescope = telescope
         date_range = date_range
@@ -527,9 +709,41 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
             print('INFO : Those plans have not been saved')
 
 def make_plans(day, nb_days, telescope):
+    """ make plans for telescope for a certain number of day from a start day
+
+    Parameters
+    ----------
+    day : int
+        day
+    nb_days : int
+        number of days
+    telescope : string
+        name telescope
+
+    Returns
+    -------
+
+
+    """
+
     make_np(day, nb_days, telescope)
 
 def upload_plans(day, nb_days, telescope):
+    """ upload plans to DATABASE
+
+    Parameters
+    ----------
+    day : date
+        date in fmt 'yyyy-mm-dd'
+    nb_days : int
+        number of days
+    telescope : str
+        name of telescope
+
+    Returns
+    -------
+
+    """
     if telescope.find('Callisto') is not -1:
         upload_np_calli(day, nb_days)
     if telescope.find('Ganymede') is not -1:
@@ -562,24 +776,15 @@ def upload_plans(day, nb_days, telescope):
 
 
 class Schedules:
+    """
+    Class to Make schedules for the target list, observatory, date_range and startegy indicated
+
+    """
+
 
     def __init__(self):
-        """
-        Class to Make schedules for the target list, observatory, dtae_range and startegy indicated
 
-        Parameters
-        ----------
-        target_list: list of all target with their basic info
-        observatory: list of the observatory , and observatory/telescope if several telescope per observatory
-        startegy: scheduling strategy, either 'continuous' or 'segmented'
-        duration_segement: if strategy segmented chosen need to specify the duration of each segment
-        nb_segments: if strategy segmented chosen, number of target per night
 
-        Returns
-        -------
-        night blocks for the night and telescope according to the strategy selected
-
-        """
         self.Altitude_constraint = 25
         self.constraints = None
         self.date_range = None  # date_range
@@ -622,12 +827,27 @@ class Schedules:
 
     @property
     def idx_rise_targets_sorted(self):
+        """
+        
+        Returns
+        -------
+        list of int
+            index of *rise targets* sorted
+
+        """
         idx_rise_targets=(self.priority_ranked['set or rise']=='rise')
         idx_rise_targets_sorted=self.index_prio[idx_rise_targets]
         return idx_rise_targets_sorted
 
     @property
     def idx_set_targets_sorted(self):
+        """[summary]
+
+        Returns
+        -------
+        [int]
+            [Index targets sorted]
+        """
         idx_set_targets=(self.priority_ranked['set or rise']=='set')
         idx_set_targets_sorted=self.index_prio[idx_set_targets]
         return idx_set_targets_sorted
@@ -1026,9 +1246,12 @@ class Schedules:
 
         Returns
         -------
-            idx_first_target: index first target in target list
-            first_target: row number idx_first_target in priority table
-            idx_second_target: index second target in target list
+            idx_first_target: int
+                index first target in target list
+            first_target: int
+                row number idx_first_target in priority table
+            idx_second_target: int
+                index second target in target list
             second_target: row number idx_second_target in priority table
 
         """
@@ -1832,6 +2055,19 @@ class Schedules:
         df.to_csv('nb_observable_target_prio_50_' + str(self.observatory.name) + '_6hr' + 'prio_50_no_M6' + '.csv', sep=',', index=False)
 
     def exposure_time_for_table(self, obs,day,i): #juste for exposure time table
+        """
+
+        Parameters
+        ----------
+        obs:
+        day
+        i
+
+        Returns
+        -------
+
+        """
+
         if day is None:
             print('INFO: Not using moon phase in ETC')
         #moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
@@ -1990,6 +2226,22 @@ class Schedules:
         print()
 
 def read_night_block(telescope, day):
+    """[summary]
+
+    Parameters
+    ----------
+    telescope : [type]
+        [description]
+    day : [type]
+        [description]
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
+
+
     day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
     scheduler_table = Table.read(
         './DATABASE/' + str(telescope) + '/night_blocks_' + str(telescope) + '_' + str(day_fmt) + '.txt',

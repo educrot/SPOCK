@@ -138,7 +138,8 @@ def make_np(t_now,nb_jours,tel):
 						flatdawn(t_now,date_end[i],sun_rise.iso,Path)
 					if i==(len(name)-1) and telescope.find('Artemis') is not -1:
 						filt[i] = filt[i].replace('\'', '')
-						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i].replace('\'',''),texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],None,Path)
+						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,
+							   filt[i].replace('\'',''),texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],None,Path,telescope='Artemis')
 						flatdawn_artemis(t_now,date_end[i],sun_rise_teide.iso,Path)
 					if i==(len(name)-1) and telescope.find('Saint-Ex') is not -1:
 						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],None,Path)
@@ -162,7 +163,7 @@ def make_np(t_now,nb_jours,tel):
 						flatdawn(t_now,date_end[i],sun_rise.iso,Path)
 					if i==(len(name)-1) and telescope.find('Artemis') is not -1:
 						filt[i] = filt[i].replace('\'', '')
-						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i].replace('\'',''),texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],None,Path)
+						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i].replace('\'',''),texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],None,Path,telescope='Artemis')
 						flatdawn_artemis(t_now,date_end[i],sun_rise_teide.iso,Path)
 					if i==(len(name)-1) and telescope.find('Saint-Ex') is not -1:
 						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],None,Path)

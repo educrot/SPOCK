@@ -1,6 +1,7 @@
 <img align="right" src="./SPOCK_Figures/logo_SPOCK_2.png" width="350" height="100">
 
 
+
 **`SPOCK`** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
 
 *Schedule targets on several criteria:*
