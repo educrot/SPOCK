@@ -14,7 +14,7 @@ Documentation for RTD
 You will find complete documentation for setting up your project at `SPOCK Read
 the Docs site`_.
 
-.. _SPOCK Read the Docs site: file:///Users/elsaducrot/spock_2/doc/build/index.html
+.. _SPOCK Read the Docs site: http://speculoos7.astro.ulg.ac.be/gitlab/-/ide/project/eDucrot/spock/edit/master/-/docs/source/index.rst
 
 Installation
 ---------------------
