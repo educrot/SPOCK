@@ -8,10 +8,10 @@
 Documentation for RTD
 ---------------------
 
-You will find complete documentation for setting up your project at `the Read
+You will find complete documentation for setting up your project at `SPOCK Read
 the Docs site`_.
 
-.. _the Read the Docs site: https://docs.readthedocs.io/
+.. _SPOCK Read the Docs site: file:///Users/elsaducrot/spock_2/doc/build/index.html
 
 Installation
 ---------------------
