@@ -16,6 +16,7 @@ the Docs site`_.
 
 .. _SPOCK Read the Docs site: http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock/blob/9946819dfbc2b4d7c2f96107f44315941fe4d91e/doc/build/index.html
 
+
 Installation
 ---------------------
 
