@@ -11,10 +11,9 @@ Schedule targets on several criteria:
 Documentation SPOCK
 ---------------------
 
-You will find complete documentation for setting up your project at `SPOCK Read
-the Docs site`_.
+You will find complete documentation for setting up your project at.
 
-:doc:`SPOCK </Users/elsaducrot/spock_2/doc/build/index.html>`
+:doc: `SPOCK </Users/elsaducrot/spock_2/doc/build/index.html>`
 
 Installation
 ---------------------
