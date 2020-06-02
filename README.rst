@@ -27,10 +27,10 @@ Use the package manager [git clone]() to install SPOCK::
 
 
 
-Usage
+Input files
 ---------------------
 
-For `long_term_scheduler` reate your *'input_file.csv'* file in the following format::
+For ``long_term_scheduler`` reate your *'input_file.csv'* file in the following format::
 
 
     date_range: 
@@ -58,22 +58,9 @@ For `long_term_scheduler` reate your *'input_file.csv'* file in the following fo
     target_list: speculoos_target_list_v6.txt
 
 
+For ``short_term_scheduler`` create your *'input_file.csv'* file in the following format::
 
-Then, open a python script or the [SPOCK jupyter notebook]() and run:
-
-.. code:: ipython3
-
-    import SPOCK.long_term_scheduler as SPOCKLT
-
-    schedule = SPOCKLT.schedules()
-    obs = 1 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
-    schedule.load_parameters('./input.csv',obs)
-    schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
-
-
-For `short_term_scheduler` create your *'input_file.csv'* file in the following format::
-
-    day_of_night: 
+    day_of_night: `
       - "2019-11-20 15:00:00"
     start_end_range: 
       - "2019-11-21 04:00:00"
@@ -98,52 +85,6 @@ For `short_term_scheduler` create your *'input_file.csv'* file in the following 
     target_list: target_list_special.txt
 
 
-Then, open a python script or the [SPOCK jupyter notebook]() and run:
-
-.. code:: ipython3
-
-    import SPOCK.short_term_scheduler as SPOCKST
-    obs = 2 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
-    schedule = SPOCKST.schedules()
-    schedule.load_parameters('input_short_term.csv',obs)
-
-    if schedule.use == 'follow_up':
-        schedule.transit_follow_up('target_transit_follow_up.txt')
-    if schedule.use == 'special_start_end':
-        input_name = 'Sp0755-2404'
-        schedule.special_target_with_start_end(input_name)
-    if schedule.use == 'special':
-        input_name = 'Sp0000-1245'
-        schedule.special_target(input_name)
-    if schedule.use == 'monitoring':
-        input_name = 'Sp0755-2404'
-        schedule.monitoring(input_name,airmass_max=5,time_monitoring=61)
-
-    schedule.make_scheduled_table()
-    schedule.planification()
-    schedule.make_night_block()
-    SPOCKST.make_np(day=schedule.day_of_night,nb_jours=1,telescope=schedule.telescope)
-
-To plot the schedule you have generated, use the `plots_scheduler` module and execute the following command:
-
-.. code:: ipython3
-
-    import SPOCK.plots_scheduler as SPOCKplot
-    from astropy.time import Time
-
-    day = Time('2019-11-01 15:00:00.000')
-    SPOCKplot.airmass_plot_saved('SSO','Ganymede',day)
-    SPOCKplot.airmass_plot_proposition('SSO','Ganymede',day)
-    SPOCKplot.airmass_altitude_plot_saved('SSO','Io',day)
-    SPOCKplot.airmass_altitude_plot_proposition('SSO','Io',day)
-    SPOCKplot.gantt_chart(day,day+10,['Artemis'])
-    SPOCKplot.gantt_chart_all(schedule.target_list)
-
-
-Example of output image you will obtain:
-
-.. image:: ./SPOCK_Figures/visibiblity_plot_example.png
-   :align: center
 
 Contributing
 ---------------------
