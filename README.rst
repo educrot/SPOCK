@@ -30,10 +30,9 @@ Use the package manager [git clone]() to install SPOCK::
 Usage
 ---------------------
 
-For `long_term_scheduler` reate your *'input_file.csv'* file in the following format:
+For `long_term_scheduler` reate your *'input_file.csv'* file in the following format::
 
-.. jsonschema::
-    {
+
     date_range: 
       - "2020-05-11 15:00:00"
       - "2020-05-31 15:00:00"
@@ -57,7 +56,7 @@ For `long_term_scheduler` reate your *'input_file.csv'* file in the following fo
     duration_segments: 20
     nb_segments: 3
     target_list: speculoos_target_list_v6.txt
-    }
+
 
 
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
@@ -72,10 +71,8 @@ Then, open a python script or the [SPOCK jupyter notebook]() and run:
     schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
 
 
-For `short_term_scheduler` create your *'input_file.csv'* file in the following format:
+For `short_term_scheduler` create your *'input_file.csv'* file in the following format::
 
-.. jsonschema::
-    {
     day_of_night: 
       - "2019-11-20 15:00:00"
     start_end_range: 
@@ -99,7 +96,7 @@ For `short_term_scheduler` create your *'input_file.csv'* file in the following 
         name: TN_Oukaimeden
         telescopes: [TN_Oukaimeden]
     target_list: target_list_special.txt
-    }
+
 
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
 
