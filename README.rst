@@ -1,8 +1,11 @@
-**`SPOCK`** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
+**SPOCK** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
 
-*Schedule targets on several criteria:*
+Schedule targets on several criteria:
+
 *  Visibility of the target
+
 *  Priority (from different metrics)
+
 *  number of hours already performed
 
 Documentation for RTD
@@ -30,6 +33,7 @@ Usage
 For `long_term_scheduler` reate your *'input_file.csv'* file in the following format:
 
 .. code-block:: json
+
     {
     date_range: 
       - "2020-05-11 15:00:00"
@@ -56,9 +60,11 @@ For `long_term_scheduler` reate your *'input_file.csv'* file in the following fo
     target_list: speculoos_target_list_v6.txt
 
     }
+
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
 
-.. code:: ipython
+.. code:: ipython3
+
     import SPOCK.long_term_scheduler as SPOCKLT
 
     schedule = SPOCKLT.schedules()
@@ -70,6 +76,7 @@ Then, open a python script or the [SPOCK jupyter notebook]() and run:
 For `short_term_scheduler` create your *'input_file.csv'* file in the following format:
 
 .. code-block:: json
+
     {
     day_of_night: 
       - "2019-11-20 15:00:00"
@@ -98,7 +105,8 @@ For `short_term_scheduler` create your *'input_file.csv'* file in the following 
 
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
 
-.. code:: ipython
+.. code:: ipython3
+
     import SPOCK.short_term_scheduler as SPOCKST
     obs = 2 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
     schedule = SPOCKST.schedules()
@@ -123,7 +131,8 @@ Then, open a python script or the [SPOCK jupyter notebook]() and run:
 
 To plot the schedule you have generated, use the `plots_scheduler` module and execute the following command:
 
-.. code:: ipython
+.. code:: ipython3
+
     import SPOCK.plots_scheduler as SPOCKplot
     from astropy.time import Time
 
