@@ -4,17 +4,17 @@ Schedule targets on several criteria:
 
 *  Visibility of the target
 
-*  Priority (from different metrics)
+*  Priority
 
-*  number of hours already performed
+*  Number of hours already performed
 
-Documentation for RTD
+Documentation SPOCK
 ---------------------
 
 You will find complete documentation for setting up your project at `SPOCK Read
 the Docs site`_.
 
-.. _SPOCK Read the Docs site: file:///Users/elsaducrot/spock_2/doc/build/index.html
+.. _SPOCK Read the Docs site: http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock/blob/9946819dfbc2b4d7c2f96107f44315941fe4d91e/doc/build/index.html
 
 Installation
 ---------------------
