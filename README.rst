@@ -11,14 +11,11 @@ Schedule targets on several criteria:
 Documentation SPOCK
 ---------------------
 
-You will find complete documentation for setting up your project at:
+You will find complete documentation for setting up your project at `SPOCK Read
+the Docs site`_.
 
+.. _SPOCK Read the Docs site: file:///Users/elsaducrot/spock_2/doc/build/index.html
 
-.. raw:: html
-
-    <embed>
-    <a href="file:///Users/elsaducrot/spock_2/doc/build/index.html">SPOCK documentaion site</a>
-    </embed>
 
 Installation
 ---------------------
@@ -99,3 +96,4 @@ Please make sure to update tests as appropriate.
 License
 ---------------------
 
+<span style=“color:red;”> text </span>
