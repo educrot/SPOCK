@@ -5,7 +5,7 @@
 ;
 #waituntil 1, 20:57
 #domeopen
-#chill -60
+#chill -55
 #waitinlimits 600
 #nopreview 
 ;#afinterval 60
@@ -17,6 +17,6 @@
 #TAG Donuts=on
 Sp1614-0250	16 14 25.20	-02 51 00.76
 ;
-#quitat 23:43
+#quitat 00:01
 #chain Obj_Sp2127+5553.txt
 ;

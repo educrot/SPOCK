@@ -96,6 +96,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/SPOCKLT/examples_spocklt.html">Long term  scheduling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/SPOCKST/examples_spockst.html">Short term scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/SPOCKapp/examples_app.html">SPOCKApp</a></li>
 </ul>
 
             
@@ -988,12 +989,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">idx_rise_targets_sorted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; index for rise targets sorted</span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list of int</span>
-<span class="sd">            index of *rise targets* sorted</span>
+<span class="sd">            index of rise targets sorted</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">idx_rise_targets</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">priority_ranked</span><span class="p">[</span><span class="s1">&#39;set or rise&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;rise&#39;</span><span class="p">)</span>
@@ -1002,12 +1003,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">idx_set_targets_sorted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;[summary]</span>
+        <span class="sd">&quot;&quot;&quot; index for set targets sorted</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        [int]</span>
-<span class="sd">            [Index targets sorted]</span>
+<span class="sd">        list of int</span>
+<span class="sd">            index of set targets sorted</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">idx_set_targets</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">priority_ranked</span><span class="p">[</span><span class="s1">&#39;set or rise&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;set&#39;</span><span class="p">)</span>
         <span class="n">idx_set_targets_sorted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">index_prio</span><span class="p">[</span><span class="n">idx_set_targets</span><span class="p">]</span>
@@ -1015,6 +1016,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">months_obs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; month of obs</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            month number (between 0 and 11)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">date_format</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_ranges</span><span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">date_format</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">date_format</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">date_format</span><span class="p">))</span> <span class="ow">and</span>\
@@ -1029,6 +1038,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">date_range_in_days</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; number of days in date range</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            number of day between date start and date end</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">date_format</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span>
         <span class="n">date_start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">date_format</span><span class="p">)</span>
         <span class="n">date_end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">date_format</span><span class="p">)</span>
@@ -1037,11 +1054,27 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nb_hours_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">nb_hours_threshold</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">]</span><span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_table_spc</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot; number of hours to reach</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            list as long as the target list</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nb_hours_threshold</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">]</span><span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_table_spc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">nb_hours_threshold</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">date_ranges_day_by_day</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; date range day by day</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            list of date ranges</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">date_format</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span>
         <span class="n">d2</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">date_format</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1057,10 +1090,31 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nb_hours_observed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; nb hours observed for each target</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            nb hours observed</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nb_hours_observed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_table_spc</span><span class="p">[</span><span class="s1">&#39;nb_hours_surved&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">nb_hours_observed</span>
 
-    <span class="k">def</span> <span class="nf">exposure_time_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">day</span><span class="p">):</span>
+<div class="viewcode-block" id="Schedules.exposure_time_table"><a class="viewcode-back" href="../../content/api.html#SPOCK.long_term_scheduler.Schedules.exposure_time_table">[docs]</a>    <span class="k">def</span> <span class="nf">exposure_time_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">day</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; generate an exposure time table as the form of a file untitled</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        day : date</span>
+<span class="sd">            date in fmt &#39;yyyy-mm-dd&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        file</span>
+<span class="sd">            file with most appropriate exposure time for each target &quot;exposure_time_table.csv&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">day</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: Not using moon phase in ETC&#39;</span><span class="p">)</span>
         <span class="n">sso_texp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_table_spc</span><span class="p">))</span>
@@ -1079,7 +1133,7 @@
             <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Sp_ID&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">target_table_spc</span><span class="p">[</span><span class="s1">&#39;Sp_ID&#39;</span><span class="p">],</span>\
                                <span class="s1">&#39;SSO_texp&#39;</span><span class="p">:</span><span class="n">sso_texp</span><span class="p">,</span><span class="s1">&#39;SNO_texp&#39;</span><span class="p">:</span><span class="n">sno_texp</span><span class="p">,</span><span class="s1">&#39;Saintex_texp&#39;</span><span class="p">:</span><span class="n">saintex_texp</span><span class="p">,</span>\
                                <span class="s1">&#39;TS_texp&#39;</span><span class="p">:</span><span class="n">ts_texp</span><span class="p">,</span><span class="s1">&#39;TN_texp&#39;</span><span class="p">:</span><span class="n">tn_texp</span><span class="p">,})</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;exposure_time_table.csv&#39;</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;exposure_time_table.csv&#39;</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">idx_SSO_observed_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2216,16 +2270,21 @@
         <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;nb_observable_target_prio_50_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observatory</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_6hr&#39;</span> <span class="o">+</span> <span class="s1">&#39;prio_50_no_M6&#39;</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Schedules.exposure_time_for_table"><a class="viewcode-back" href="../../content/api.html#SPOCK.long_term_scheduler.Schedules.exposure_time_for_table">[docs]</a>    <span class="k">def</span> <span class="nf">exposure_time_for_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span><span class="n">day</span><span class="p">,</span><span class="n">i</span><span class="p">):</span> <span class="c1">#juste for exposure time table</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; calcul of exposure time to store in a table</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        obs:</span>
-<span class="sd">        day</span>
-<span class="sd">        i</span>
+<span class="sd">        obs : str</span>
+<span class="sd">            name of observatory</span>
+<span class="sd">        day : date</span>
+<span class="sd">            day for moon phse calcultation (fmt &#39;yyyy-mm-dd&#39;)</span>
+<span class="sd">        i : int</span>
+<span class="sd">            target index in target list</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            exposure time</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2281,7 +2340,22 @@
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;texp is : &#39;</span><span class="p">,</span><span class="n">texp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">texp</span></div>
 
-    <span class="k">def</span> <span class="nf">exposure_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<div class="viewcode-block" id="Schedules.exposure_time"><a class="viewcode-back" href="../../content/api.html#SPOCK.long_term_scheduler.Schedules.exposure_time">[docs]</a>    <span class="k">def</span> <span class="nf">exposure_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; calculation of the exposure time for a given target</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        day : date</span>
+<span class="sd">            format &#39;yyyy-mm-dd&#39;</span>
+<span class="sd">        i : int</span>
+<span class="sd">            index of target in target_list</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            exposure time</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">day</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: Not using moon phase in ETC&#39;</span><span class="p">)</span>
         <span class="c1"># moon_phase = round(moon_illumination(Time(day.iso, out_subfmt=&#39;date&#39;)), 2)</span>
@@ -2355,9 +2429,18 @@
                              <span class="n">moonphase</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">irtf</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">num_tel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seeing</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="mf">1.1</span><span class="p">))</span>
                 <span class="n">texp</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">exp_time_calculator</span><span class="p">(</span><span class="n">ADUpeak</span><span class="o">=</span><span class="mi">45000</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">texp</span>
+        <span class="k">return</span> <span class="n">texp</span></div>
 
-    <span class="k">def</span> <span class="nf">no_obs_with_different_tel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Schedules.no_obs_with_different_tel"><a class="viewcode-back" href="../../content/api.html#SPOCK.long_term_scheduler.Schedules.no_obs_with_different_tel">[docs]</a>    <span class="k">def</span> <span class="nf">no_obs_with_different_tel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; function to avoid observations of a similar target,</span>
+<span class="sd">        expect for SNO and SAINT-EX were similar target observations are encouraged.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.priority</span>
+<span class="sd">            fill with 0 priority of targets already scheduled</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">idx_observed_SSO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_SSO_observed_targets</span><span class="p">()</span>
         <span class="n">idx_observed_SNO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_SNO_observed_targets</span><span class="p">()</span>
         <span class="n">idx_observed_SaintEx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_SaintEx_observed_targets</span><span class="p">()</span>
@@ -2384,7 +2467,7 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_table_spc</span><span class="p">[</span><span class="s1">&#39;telescope&#39;</span><span class="p">][</span><span class="n">idx_observed_SSO</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">telescope</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_table_spc</span><span class="p">[</span><span class="s1">&#39;telescope&#39;</span><span class="p">][</span><span class="n">idx_observed_SSO</span><span class="p">][</span><span class="n">i</span><span class="p">]:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">priority</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">][</span><span class="n">idx_observed_SSO</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="nb">print</span><span class="p">()</span></div>
+        <span class="nb">print</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="read_night_block"><a class="viewcode-back" href="../../content/api.html#SPOCK.long_term_scheduler.read_night_block">[docs]</a><span class="k">def</span> <span class="nf">read_night_block</span><span class="p">(</span><span class="n">telescope</span><span class="p">,</span> <span class="n">day</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;[summary]</span>

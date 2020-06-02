@@ -469,7 +469,7 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
 
-def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
+def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope=None):
     df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     #print(name)
     idx_target = None
@@ -533,7 +533,10 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write(str00 + '\n')
         out.write(str1 + pd.to_datetime(str(date_start)).strftime('%Y/%m/%d %H:%M:%S') + '\n')#+ str(hour0) + ':' + str(minute0) + '\n')
         out.write(str22)
-        out.write('#chill -60\n')
+        if telescope == 'Artemis':
+            out.write('#chill -55\n')
+        else:
+            out.write('#chill -60\n')
         out.write(str2 + str(waitlimit) + '\n')
         out.write(str3)
         out.write(str33 + str(afinterval) +'\n')

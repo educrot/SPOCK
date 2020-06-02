@@ -827,12 +827,12 @@ class Schedules:
 
     @property
     def idx_rise_targets_sorted(self):
-        """
+        """ index for rise targets sorted
         
         Returns
         -------
         list of int
-            index of *rise targets* sorted
+            index of rise targets sorted
 
         """
         idx_rise_targets=(self.priority_ranked['set or rise']=='rise')
@@ -841,12 +841,12 @@ class Schedules:
 
     @property
     def idx_set_targets_sorted(self):
-        """[summary]
+        """ index for set targets sorted
 
         Returns
         -------
-        [int]
-            [Index targets sorted]
+        list of int
+            index of set targets sorted
         """
         idx_set_targets=(self.priority_ranked['set or rise']=='set')
         idx_set_targets_sorted=self.index_prio[idx_set_targets]
@@ -854,6 +854,14 @@ class Schedules:
 
     @property
     def months_obs(self):
+        """ month of obs
+
+        Returns
+        -------
+        int
+            month number (between 0 and 11)
+
+        """
         date_format = "%Y-%m-%d %H:%M:%S.%f"
         for i,t in enumerate(self.time_ranges):
             if (datetime.strptime(t[0].value,date_format) <= datetime.strptime(self.date_range[0].value,date_format) <= datetime.strptime(t[1].value,date_format)) and\
@@ -868,6 +876,14 @@ class Schedules:
 
     @property
     def date_range_in_days(self):
+        """ number of days in date range
+
+        Returns
+        -------
+        int
+            number of day between date start and date end
+
+        """
         date_format = "%Y-%m-%d %H:%M:%S.%f"
         date_start = datetime.strptime(self.date_range[0].value, date_format)
         date_end = datetime.strptime(self.date_range[1].value, date_format)
@@ -876,11 +892,27 @@ class Schedules:
 
     @property
     def nb_hours_threshold(self):
-        nb_hours_threshold = [50]* len(self.target_table_spc)
+        """ number of hours to reach
+
+        Returns
+        -------
+        list
+            list as long as the target list
+
+        """
+        nb_hours_threshold = [100]* len(self.target_table_spc)
         return nb_hours_threshold
 
     @property
     def date_ranges_day_by_day(self):
+        """ date range day by day
+
+        Returns
+        -------
+        list
+            list of date ranges
+
+        """
         date_format = "%Y-%m-%d %H:%M:%S.%f"
         d2 = datetime.strptime(self.date_range[1].value, date_format)
         i = 0
@@ -896,10 +928,31 @@ class Schedules:
 
     @property
     def nb_hours_observed(self):
+        """ nb hours observed for each target
+
+        Returns
+        -------
+        list
+            nb hours observed
+
+        """
         nb_hours_observed = self.target_table_spc['nb_hours_surved']
         return nb_hours_observed
 
     def exposure_time_table(self,day):
+        """ generate an exposure time table as the form of a file untitled
+
+        Parameters
+        ----------
+        day : date
+            date in fmt 'yyyy-mm-dd'
+
+        Returns
+        -------
+        file
+            file with most appropriate exposure time for each target "exposure_time_table.csv"
+
+        """
         if day is None:
             print('INFO: Not using moon phase in ETC')
         sso_texp = np.zeros(len(self.target_table_spc))
@@ -2055,16 +2108,21 @@ class Schedules:
         df.to_csv('nb_observable_target_prio_50_' + str(self.observatory.name) + '_6hr' + 'prio_50_no_M6' + '.csv', sep=',', index=False)
 
     def exposure_time_for_table(self, obs,day,i): #juste for exposure time table
-        """
+        """ calcul of exposure time to store in a table
 
         Parameters
         ----------
-        obs:
-        day
-        i
+        obs : str
+            name of observatory
+        day : date
+            day for moon phse calcultation (fmt 'yyyy-mm-dd')
+        i : int
+            target index in target list
 
         Returns
         -------
+        float
+            exposure time
 
         """
 
@@ -2121,6 +2179,21 @@ class Schedules:
         return texp
 
     def exposure_time(self, day, i):
+        """ calculation of the exposure time for a given target
+
+        Parameters
+        ----------
+        day : date
+            format 'yyyy-mm-dd'
+        i : int
+            index of target in target_list
+
+        Returns
+        -------
+        float
+            exposure time
+
+        """
         if day is None:
             print('INFO: Not using moon phase in ETC')
         # moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
@@ -2197,6 +2270,15 @@ class Schedules:
         return texp
 
     def no_obs_with_different_tel(self):
+        """ function to avoid observations of a similar target,
+        expect for SNO and SAINT-EX were similar target observations are encouraged.
+
+        Returns
+        -------
+        self.priority
+            fill with 0 priority of targets already scheduled
+
+        """
         idx_observed_SSO = self.idx_SSO_observed_targets()
         idx_observed_SNO = self.idx_SNO_observed_targets()
         idx_observed_SaintEx = self.idx_SaintEx_observed_targets()

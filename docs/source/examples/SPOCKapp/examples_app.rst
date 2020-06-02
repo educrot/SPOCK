@@ -1,18 +1,39 @@
 .. _examples_app:
 
 SPOCKApp
---------------
+==============
+
 
 Planification of SPECULOOS targets observations App
 
-Plans can be created with:
+Launch the App
+-------------------
 
-.. code:: ipython3
+To launch the app open notebook `SPOCKapp.ipynb` and click on `run all cells`. You get the following visual:
 
-    import SPOCK.long_term_scheduler as SPOCKLT
 
-    schedule = SPOCKLT.schedules()
-    obs = 1 # 1 for SSO , 2 for SNO and 3 for Saint-Ex
-    schedule.load_parameters('./input.csv',obs)
-    schedule.make_schedule(Altitude_constraint = 25, Moon_constraint = 30)
 
+Quick start videos
+-------------------
+
+Follow the videos below to learn how to use **SPOCKapp**.
+
+
+
+.. raw:: html
+
+    <div style="text-align: center; margin-bottom: 2em;">
+    <iframe width="100%" height="350" src="/Users/elsaducrot/spock_2/docs/source/examples/SPOCKapp/demo_SPOCKLT_1.mov" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+.. raw:: html
+
+    <div style="text-align: center; margin-bottom: 2em;">
+    <iframe width="100%" height="350" src="/Users/elsaducrot/spock_2/docs/source/examples/SPOCKapp/demo_SPOCKLT_2.mov" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+.. raw:: html
+
+    <div style="text-align: center; margin-bottom: 2em;">
+    <iframe width="100%" height="350" src="/Users/elsaducrot/spock_2/docs/source/examples/SPOCKapp/demo_SPOCKLT_3.mov" frameborder="0" allowfullscreen></iframe>
+    </div>

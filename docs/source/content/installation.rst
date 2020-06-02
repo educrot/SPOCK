@@ -1,25 +1,22 @@
-.. _quick-ref:
+.. _installation:
+
+
+.. warning::
+    You must be part of the SPECULOOS consortium  to download *SPOCK*.
 
 Installation
-===============
+============
 
-Git
-----------
+Please follow the instructions below to install the package
 
-|SPOCK| :py:class:`~SPOCK.long_term_scheduler` class holds methods
+OSX
+---
 
-.. currentmodule:: SPOCK.long_term_scheduler
+Install *SPOCK* locally::
 
-.. rubric:: Long term scheduling
+    git clone http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock.git
 
-.. autosummary::
-   :nosignatures:
+    cd spock
+    python setup.py install
 
-    make_plans
 
-.. rubric:: Short term scheduling
-
-.. autosummary::
-   :nosignatures:
-
-    target_list_good_coord_format

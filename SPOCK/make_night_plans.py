@@ -121,7 +121,7 @@ def make_np(t_now,nb_jours,tel):
 						first_target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],Path)
 					if i==0 and telescope.find('Artemis') is not -1:
 						filt[i] = filt[i].replace('\'', '')
-						first_target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],Path)
+						first_target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],Path,telescope='Artemis')
 
 
 					if i==(len(name)-1) and telescope.find('Europa') is not -1:
@@ -146,7 +146,7 @@ def make_np(t_now,nb_jours,tel):
 						flatdawn(t_now,date_end[i],sun_rise_san_pedro.iso,Path)
 
 					if i<(len(name)-1):
-						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],Path)
+						target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],Path,telescope=tel)
 
 				else:
 					if i==(len(name)-1) and telescope.find('Europa') is not -1:

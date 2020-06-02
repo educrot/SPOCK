@@ -91,7 +91,7 @@
               <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#git">Git</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#osx">OSX</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="quick-ref.html">Quick reference</a></li>
@@ -101,6 +101,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKLT/examples_spocklt.html">Long term  scheduling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKST/examples_spockst.html">Short term scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKapp/examples_app.html">SPOCKApp</a></li>
 </ul>
 
             
@@ -189,35 +190,22 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="installation">
-<span id="quick-ref"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="git">
-<h2>Git<a class="headerlink" href="#git" title="Permalink to this headline">¶</a></h2>
-<p><a href="#id1"><span class="problematic" id="id2">|SPOCK|</span></a> <a class="reference internal" href="api.html#module-SPOCK.long_term_scheduler" title="SPOCK.long_term_scheduler"><code class="xref py py-class docutils literal notranslate"><span class="pre">long_term_scheduler</span></code></a> class holds methods</p>
-<p class="rubric">Long term scheduling</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="api.html#SPOCK.long_term_scheduler.make_plans" title="SPOCK.long_term_scheduler.make_plans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_plans</span></code></a></p></td>
-<td><p>make plans for telescope for a certain number of day from a start day</p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Short term scheduling</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="api.html#SPOCK.long_term_scheduler.target_list_good_coord_format" title="SPOCK.long_term_scheduler.target_list_good_coord_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_list_good_coord_format</span></code></a></p></td>
-<td><p>Give target corrdinates in ICRS format (used for astropy.coordinates SkyCoord function)</p></td>
-</tr>
-</tbody>
-</table>
+<div class="admonition warning" id="installation">
+<p class="admonition-title">Warning</p>
+<p>You must be part of the SPECULOOS consortium  to download <em>SPOCK</em>.</p>
+</div>
+<div class="section" id="id1">
+<h1>Installation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>Please follow the instructions below to install the package</p>
+<div class="section" id="osx">
+<h2>OSX<a class="headerlink" href="#osx" title="Permalink to this headline">¶</a></h2>
+<p>Install <em>SPOCK</em> locally:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">speculoos7</span><span class="o">.</span><span class="n">astro</span><span class="o">.</span><span class="n">ulg</span><span class="o">.</span><span class="n">ac</span><span class="o">.</span><span class="n">be</span><span class="o">/</span><span class="n">gitlab</span><span class="o">/</span><span class="n">eDucrot</span><span class="o">/</span><span class="n">spock</span><span class="o">.</span><span class="n">git</span>
+
+<span class="n">cd</span> <span class="n">spock</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+</pre></div>
+</div>
 </div>
 </div>
 

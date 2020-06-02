@@ -1,6 +1,13 @@
 <img align="right" src="./SPOCK_Figures/logo_SPOCK_2.png" width="350" height="100">
 
 
+Documentation for SPOCK
+------------------------
+
+You will find complete documentation for setting up your project at `the Read
+the Docs site`_.
+
+.. _the Read the Docs site: file:///Users/elsaducrot/spock_2/doc/build/index.html
 
 **`SPOCK`** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
 

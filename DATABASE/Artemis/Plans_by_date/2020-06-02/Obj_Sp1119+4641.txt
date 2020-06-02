@@ -1,0 +1,22 @@
+;
+; Sp1119+4641
+;
+; 788357434913891712
+;
+#waituntil 1, 20:58
+#domeopen
+#chill -55
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter z
+#interval 13
+#TAG Donuts=on
+Sp1119+4641	11 19 30.76	+46 41 43.14
+;
+#quitat 01:08
+#chain Obj_Sp2127+5553.txt
+;

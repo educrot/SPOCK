@@ -18,6 +18,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.githubpages',
     'jupyter_sphinx.execute',
+    'sphinxcontrib.video',
     ]
 
 napoleon_google_docstring = False
@@ -89,6 +90,8 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_style = "css/style.css"
+pygments_style = "friendly"
+
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
