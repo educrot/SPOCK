@@ -13,10 +13,12 @@ Documentation SPOCK
 
 You will find complete documentation for setting up your project at:
 
+
 .. raw:: html
 
+    <embed>
     <a href="file:///Users/elsaducrot/spock_2/doc/build/index.html">SPOCK documentaion site</a>
-
+    </embed>
 
 Installation
 ---------------------
@@ -97,4 +99,3 @@ Please make sure to update tests as appropriate.
 License
 ---------------------
 
-<span style=“color:red;”> text </span>
