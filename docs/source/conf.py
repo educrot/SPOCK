@@ -19,6 +19,7 @@ extensions = [
     'sphinx.ext.githubpages',
     'jupyter_sphinx.execute',
     'sphinxcontrib.video',
+    'sphinx-jsonschema',
     ]
 
 napoleon_google_docstring = False
