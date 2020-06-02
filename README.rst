@@ -34,7 +34,6 @@ For `long_term_scheduler` reate your *'input_file.csv'* file in the following fo
 
 .. code-block:: json
 
-    {
     date_range: 
       - "2020-05-11 15:00:00"
       - "2020-05-31 15:00:00"
@@ -59,7 +58,7 @@ For `long_term_scheduler` reate your *'input_file.csv'* file in the following fo
     nb_segments: 3
     target_list: speculoos_target_list_v6.txt
 
-    }
+
 
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
 
@@ -77,7 +76,6 @@ For `short_term_scheduler` create your *'input_file.csv'* file in the following 
 
 .. code-block:: json
 
-    {
     day_of_night: 
       - "2019-11-20 15:00:00"
     start_end_range: 
@@ -101,7 +99,7 @@ For `short_term_scheduler` create your *'input_file.csv'* file in the following 
         name: TN_Oukaimeden
         telescopes: [TN_Oukaimeden]
     target_list: target_list_special.txt
-    }
+    
 
 Then, open a python script or the [SPOCK jupyter notebook]() and run:
 
