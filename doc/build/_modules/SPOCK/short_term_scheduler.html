@@ -176,25 +176,21 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">astroplan.utils</span> <span class="kn">import</span> <span class="n">time_grid_from_range</span>
-<span class="kn">from</span> <span class="nn">SPOCK.upload_night_plans</span> <span class="kn">import</span> <span class="n">upload_np_calli</span><span class="p">,</span> <span class="n">upload_np_gany</span><span class="p">,</span> <span class="n">upload_np_io</span><span class="p">,</span> <span class="n">upload_np_euro</span><span class="p">,</span><span class="n">upload_np_artemis</span>
 <span class="kn">from</span> <span class="nn">SPOCK.make_night_plans</span> <span class="kn">import</span> <span class="n">make_np</span>
 <span class="kn">from</span> <span class="nn">astropy.coordinates</span> <span class="kn">import</span> <span class="n">SkyCoord</span><span class="p">,</span> <span class="n">EarthLocation</span><span class="p">,</span> <span class="n">AltAz</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">SPOCK.ETC</span> <span class="k">as</span> <span class="nn">ETC</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">astroplan</span> <span class="kn">import</span> <span class="n">FixedTarget</span><span class="p">,</span> <span class="n">AltitudeConstraint</span><span class="p">,</span> <span class="n">MoonSeparationConstraint</span><span class="p">,</span><span class="n">AtNightConstraint</span><span class="p">,</span><span class="n">AirmassConstraint</span>
-<span class="kn">from</span> <span class="nn">eScheduler.constraints_spc</span> <span class="kn">import</span> <span class="n">CelestialPoleSeparationConstraint</span>
 <span class="kn">from</span> <span class="nn">astroplan</span> <span class="kn">import</span> <span class="n">TimeConstraint</span>
 <span class="kn">import</span> <span class="nn">astroplan</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">unique</span>
 <span class="kn">from</span> <span class="nn">astroplan.plots</span> <span class="kn">import</span> <span class="n">plot_airmass</span>
-<span class="kn">from</span> <span class="nn">eScheduler.spe_schedule</span> <span class="kn">import</span> <span class="n">SPECULOOSScheduler</span><span class="p">,</span> <span class="n">Schedule</span><span class="p">,</span> <span class="n">ObservingBlock</span>
-<span class="kn">from</span> <span class="nn">eScheduler.spe_schedule</span> <span class="kn">import</span> <span class="n">Transitioner</span>
+<span class="kn">from</span> <span class="nn">SPOCK.spe_schedule</span> <span class="kn">import</span> <span class="n">SPECULOOSScheduler</span><span class="p">,</span> <span class="n">Schedule</span><span class="p">,</span> <span class="n">ObservingBlock</span>
+<span class="kn">from</span> <span class="nn">SPOCK.spe_schedule</span> <span class="kn">import</span> <span class="n">Transitioner</span>
 
 <span class="n">dt</span><span class="o">=</span><span class="n">Time</span><span class="p">(</span><span class="s1">&#39;2018-01-02 00:00:00&#39;</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;tcg&#39;</span><span class="p">)</span><span class="o">-</span><span class="n">Time</span><span class="p">(</span><span class="s1">&#39;2018-01-01 00:00:00&#39;</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;tcg&#39;</span><span class="p">)</span> <span class="c1">#1 day</span>
 <span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">AltitudeConstraint</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">24</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">),</span> <span class="n">AtNightConstraint</span><span class="p">()]</span> <span class="c1">#MoonSeparationConstraint(min=30*u.deg)</span>
@@ -365,20 +361,6 @@
         <span class="k">if</span> <span class="n">dom_rot_possible</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;ERROR: No Dom rotation possible that night&#39;</span><span class="p">)</span>
 
-        <span class="c1"># blocks = []</span>
-        <span class="c1"># a = ObservingBlock(target, dur_dome_rotation, -1,constraints=constraints_dome_rotation,configuration={&#39;filt=&#39; + &#39;Clear&#39;,&#39;texp=&#39; + &#39;1&#39;})</span>
-        <span class="c1">#</span>
-        <span class="c1"># blocks.append(a)</span>
-        <span class="c1"># import SPOCK.plots_scheduler as SPOCKplot</span>
-        <span class="c1"># SPOCKplot.constraints_scores(constraints_dome_rotation, target, self.observatory, start, start + dur_dome_rotation)</span>
-        <span class="c1"># transitioner = Transitioner(slew_rate=11 * u.deg / u.second)</span>
-        <span class="c1"># seq_schedule_SS1 = Schedule(self.day_of_night, self.day_of_night + 1)</span>
-        <span class="c1"># sequen_scheduler_SS1 = SPECULOOSScheduler(constraints=constraints_dome_rotation, observer=self.observatory,</span>
-        <span class="c1">#                                           transitioner=transitioner)</span>
-        <span class="c1"># sequen_scheduler_SS1(blocks, seq_schedule_SS1)</span>
-        <span class="c1"># self.SS1_night_blocks  = seq_schedule_SS1.to_table()</span>
-
-          <span class="c1"># Table.read(os.path.join(Path,tel,&#39;special_target_test.txt&#39;), format=&#39;ascii&#39;)#</span>
 
     <span class="k">def</span> <span class="nf">special_target_with_start_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_name</span><span class="p">):</span>
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_end_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -530,9 +512,9 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">SS1_night_blocks</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;ERROR: No block to insert &#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;ERROR: Constraints not respected, no block to insert &#39;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;ERROR: No block to insert &#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;ERROR: Constraints not respected, no block to insert &#39;</span><span class="p">)</span>
             <span class="c1">#if self.SS1_night_blocks[&#39;target&#39;][0] == self.scheduled_table[&#39;target&#39;][i]:</span>
             <span class="c1">#    sys.exit(&#39;WARNING: The target &#39; + str(self.SS1_night_blocks[&#39;target&#39;][0]) + &#39;that you wich to insert is already scheduled for this night !&#39;)</span>
             <span class="n">end_before_cut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheduled_table</span><span class="p">[</span><span class="s1">&#39;end time (UTC)&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
@@ -870,37 +852,6 @@
 
 <span class="k">def</span> <span class="nf">make_plans</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">nb_days</span><span class="p">,</span> <span class="n">telescope</span><span class="p">):</span>
     <span class="n">make_np</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">nb_days</span><span class="p">,</span> <span class="n">telescope</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">upload_plans</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">nb_days</span><span class="p">,</span> <span class="n">telescope</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">telescope</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Callisto&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">upload_np_calli</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">nb_days</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">telescope</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Ganymede&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">upload_np_gany</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">nb_days</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">telescope</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Io&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">upload_np_io</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">nb_days</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">telescope</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Europa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">upload_np_euro</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">nb_days</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">telescope</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Artemis&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">upload_np_artemis</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">nb_days</span><span class="p">)</span>
-
-    <span class="c1"># ------------------- update archive date by date plans folder  ------------------</span>
-
-    <span class="n">path_database</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/&#39;</span><span class="p">,</span> <span class="n">telescope</span><span class="p">,</span><span class="s1">&#39;schedule&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: Path database = &#39;</span><span class="p">,</span><span class="n">path_database</span><span class="p">)</span>
-    <span class="n">path_plans</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./DATABASE/&#39;</span><span class="p">,</span> <span class="n">telescope</span><span class="p">,</span><span class="s1">&#39;Plans_by_date/&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: Path local plans by day = &#39;</span><span class="p">,</span><span class="n">path_plans</span><span class="p">)</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sshpass&quot;</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s1">&#39;eij7iaXi&#39;</span><span class="p">,</span> <span class="s2">&quot;scp&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">path_plans</span><span class="p">,</span> <span class="n">path_database</span><span class="p">])</span>
-    <span class="n">path_gant_chart</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./SPOCK_Figures/Preview_schedule.html&#39;</span><span class="p">)</span>
-    <span class="n">path_database_home</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: Path local </span><span class="se">\&#39;</span><span class="s1">Gant chart</span><span class="se">\&#39;</span><span class="s1"> = &#39;</span><span class="p">,</span> <span class="n">path_gant_chart</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: Path database = </span><span class="se">\&#39;</span><span class="s1">Gant chart</span><span class="se">\&#39;</span><span class="s1"> = &#39;</span><span class="p">,</span>  <span class="n">path_database_home</span><span class="p">)</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sshpass&quot;</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s1">&#39;eij7iaXi&#39;</span><span class="p">,</span> <span class="s2">&quot;scp&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">path_gant_chart</span><span class="p">,</span> <span class="n">path_database_home</span> <span class="p">])</span>
-
-    <span class="c1"># ------------------- update archive niht blocks ------------------</span>
-
-    <span class="n">path_night_blocks</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./DATABASE/&#39;</span><span class="p">,</span> <span class="n">telescope</span><span class="p">,</span><span class="s1">&#39;Archive_night_blocks/&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INFO: Path local night blocks = &#39;</span><span class="p">,</span><span class="n">path_night_blocks</span><span class="p">)</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sshpass&quot;</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s1">&#39;eij7iaXi&#39;</span><span class="p">,</span> <span class="s2">&quot;scp&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">path_night_blocks</span><span class="p">,</span> <span class="n">path_database</span><span class="p">])</span>
 
 <span class="k">def</span> <span class="nf">read_night_block</span><span class="p">(</span><span class="n">telescope</span><span class="p">,</span> <span class="n">day</span><span class="p">):</span>
     <span class="n">day_fmt</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;utc&#39;</span><span class="p">,</span> <span class="n">out_subfmt</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>

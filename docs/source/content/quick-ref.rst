@@ -26,7 +26,6 @@ functions and classes to create appropriate plans (in the form of night blocks)f
 
     save_schedule
     make_plans
-    upload_plans
     make_docx_schedule
 
 Short term scheduling
@@ -53,7 +52,6 @@ observations unrelated to SPECULOOS main programs.
 
     save_schedule
     make_plans
-    upload_plans
     make_docx_schedule
 
 Plots
@@ -82,7 +80,7 @@ functions to show visibility plots or gant chart, useful to keep track of schedu
 ACP files
 ----------
 
-*SPOCK* also has modules :mod:`SPOCK.test_txtfiles` and :mod:`SPOCK.make_night_plans`  that contain all the  required
+*SPOCK* also has modules :mod:`SPOCK.txt_files` and :mod:`SPOCK.make_night_plans`  that contain all the  required
 functions to convert the night blocks to ACP readable files.
 
 .. currentmodule:: SPOCK.txt_files

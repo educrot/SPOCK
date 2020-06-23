@@ -11,9 +11,9 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
    :caption: Documentation
    :maxdepth: 1
 
-   content/installation
-   content/quick-ref
-   content/api
+   content/installation.rst
+   content/quick-ref.rst
+   content/api.rst
 
 
 
@@ -26,8 +26,3 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
    examples/SPOCKapp/examples_app.rst
 
 
-.. toctree::
-    :maxdepth: 4
-    :glob:
-
-    examples/SPOCKapp/SPOCKapp.ipynb

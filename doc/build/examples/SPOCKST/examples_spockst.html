@@ -195,10 +195,10 @@
 
 <span class="n">obs</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">schedule</span> <span class="o">=</span> <span class="n">SPOCKST</span><span class="o">.</span><span class="n">Schedules</span><span class="p">()</span>
-<span class="n">schedule</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="s1">&#39;./input_short_term.csv&#39;</span><span class="p">,</span><span class="n">obs</span><span class="p">)</span>
+<span class="n">schedule</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="s1">&#39;./SPOCK/input_short_term.csv&#39;</span><span class="p">,</span><span class="n">obs</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">schedule</span><span class="o">.</span><span class="n">use</span> <span class="o">==</span> <span class="s1">&#39;follow_up&#39;</span><span class="p">:</span>
-    <span class="n">schedule</span><span class="o">.</span><span class="n">transit_follow_up</span><span class="p">(</span><span class="s1">&#39;target_transit_follow_up.txt&#39;</span><span class="p">)</span>
+    <span class="n">schedule</span><span class="o">.</span><span class="n">transit_follow_up</span><span class="p">(</span><span class="s1">&#39;./SPOCK/target_transit_follow_up.txt&#39;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">schedule</span><span class="o">.</span><span class="n">use</span> <span class="o">==</span> <span class="s1">&#39;special_start_end&#39;</span><span class="p">:</span>
     <span class="n">input_name</span> <span class="o">=</span> <span class="s1">&#39;HW_Vir&#39;</span>
     <span class="n">schedule</span><span class="o">.</span><span class="n">special_target_with_start_end</span><span class="p">(</span><span class="n">input_name</span><span class="p">)</span>

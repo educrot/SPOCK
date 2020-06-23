@@ -94,8 +94,8 @@
 <li class="toctree-l1"><a class="reference internal" href="quick-ref.html">Quick reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-SPOCK">The SPOCK API reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#long-term-scheduler">long_term_scheduler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#short-term-scheduler">short_term_scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-SPOCK.long_term_scheduler">long_term_scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-SPOCK.short_term_scheduler">short_term_scheduler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-SPOCK.plots_scheduler">plots_scheduler</a></li>
 </ul>
 </li>
@@ -199,9 +199,9 @@
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-SPOCK">
 <span id="the-spock-api-reference"></span><h2>The SPOCK API reference<a class="headerlink" href="#module-SPOCK" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="long-term-scheduler">
-<h3>long_term_scheduler<a class="headerlink" href="#long-term-scheduler" title="Permalink to this headline">¶</a></h3>
-<span class="target" id="module-SPOCK.long_term_scheduler"></span><dl class="py function">
+<div class="section" id="module-SPOCK.long_term_scheduler">
+<span id="long-term-scheduler"></span><h3>long_term_scheduler<a class="headerlink" href="#module-SPOCK.long_term_scheduler" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
 <dt id="SPOCK.long_term_scheduler.Diff_list">
 <code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">Diff_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">li1</span></em>, <em class="sig-param"><span class="n">li2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Diff_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Diff_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inform on the difference between two lists</p>
@@ -752,51 +752,23 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 <code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">altaz</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obswl</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">grid_times_targets</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#altaz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.altaz" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an <cite>~astropy.coordinates.AltAz</cite> frame or coordinate.
 If <code class="docutils literal notranslate"><span class="pre">target</span></code> is None, generates an altitude/azimuth frame. Otherwise,
-calculates the transformation to that frame for the requested <code class="docutils literal notranslate"><span class="pre">target</span></code>.
-:param time: The time at which the observation is taking place. Will be used as</p>
-<blockquote>
-<div><p>the <code class="docutils literal notranslate"><span class="pre">obstime</span></code> attribute in the resulting frame or coordinate. This
-will be passed in as the first argument to the <cite>~astropy.time.Time</cite>
-initializer, so it can be anything that <cite>~astropy.time.Time</cite> will
-accept (including a <cite>~astropy.time.Time</cite> object)</p>
-</div></blockquote>
+calculates the transformation to that frame for the requested <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>target</strong> (<cite>~astroplan.FixedTarget</cite>, <cite>~astropy.coordinates.SkyCoord</cite>, or list (optional)) – Celestial object(s) of interest. If <code class="docutils literal notranslate"><span class="pre">target</span></code> is <cite>None</cite>, returns
-the <cite>~astropy.coordinates.AltAz</cite> frame without coordinates.</p></li>
-<li><p><strong>obswl</strong> (<cite>~astropy.units.Quantity</cite> (optional)) – Wavelength of the observation used in the calculation.</p></li>
-<li><p><strong>grid_times_targets</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – If True, the target object will have extra dimensions packed
-onto the end, so that calculations with M targets and N times
-will return an (M, N) shaped result. Otherwise, we rely on
-broadcasting the shapes together using standard numpy
-rules. Useful for grid searches for rise/set times etc.</p></li>
+<li><p><strong>time</strong> (<em>astropy.time.Time</em>) – The time at which the observation is taking place.</p></li>
+<li><p><strong>target</strong> (<em>astroplan.FixedTarget</em>) – Celestial object(s) of interest.</p></li>
+<li><p><strong>obswl</strong> (<em>astropy.units.Quantity</em>) – Wavelength of the observation used in the calculation.</p></li>
+<li><p><strong>grid_times_targets</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – If True, the target object will have extra dimensions packed onto the end. Otherwise, we rely on broadcasting the shapes together using standard numpy rules. Useful for grid searches for rise/set times etc.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>If <code class="docutils literal notranslate"><span class="pre">target</span></code> is <cite>None</cite>, returns <cite>~astropy.coordinates.AltAz</cite> frame.
-If <code class="docutils literal notranslate"><span class="pre">target</span></code> is not <cite>None</cite>, returns the <code class="docutils literal notranslate"><span class="pre">target</span></code> transformed to
-the <cite>~astropy.coordinates.AltAz</cite> frame.</p>
+<dd class="field-even"><p></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>~astropy.coordinates.AltAz</cite></p>
+<dd class="field-odd"><p>astropy.coordinates.AltAz</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<p>Create an instance of the <cite>~astropy.coordinates.AltAz</cite> frame for an
-observer at Apache Point Observatory at a particular time:
-&gt;&gt;&gt; from astroplan import Observer
-&gt;&gt;&gt; from astropy.time import Time
-&gt;&gt;&gt; from astropy.coordinates import SkyCoord
-&gt;&gt;&gt; apo = Observer.at_site(“APO”)
-&gt;&gt;&gt; time = Time(‘2001-02-03 04:05:06’)
-&gt;&gt;&gt; target = SkyCoord(0*u.deg, 0*u.deg)
-&gt;&gt;&gt; altaz_frame = apo.altaz(time)
-Now transform the target’s coordinates to the alt/az frame:
-&gt;&gt;&gt; target_altaz = target.transform_to(altaz_frame) # doctest: +SKIP
-Alternatively, construct an alt/az frame and transform the target to
-that frame all in one step:
-&gt;&gt;&gt; target_altaz = apo.altaz(time, target) # doctest: +SKIP</p>
 </dd></dl>
 
 <dl class="py function">
@@ -811,24 +783,6 @@ that frame all in one step:
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>astroplan.observer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="SPOCK.long_term_scheduler.compare_target_lists">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">compare_target_lists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#compare_target_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.compare_target_lists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compare the target list from the given folder to the one on STARGATE and Cambridge server
-If different trigger a warning a tell how many targets are actually different from the referenced target list</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path_target_list</strong> (<em>str</em>) – path on your computer toward the target list, by default take the one on the Cambridge server</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An idication about if the target list is the referenced one or not</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>print</p>
 </dd>
 </dl>
 </dd></dl>
@@ -867,20 +821,6 @@ If different trigger a warning a tell how many targets are actually different fr
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="SPOCK.long_term_scheduler.get_hours_files_SNO">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">get_hours_files_SNO</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#get_hours_files_SNO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.get_hours_files_SNO" title="Permalink to this definition">¶</a></dt>
-<dd><p>get nb hours obs on SNO</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>file ObservationHours.txt</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>txt file</p>
 </dd>
 </dl>
 </dd></dl>
@@ -962,8 +902,7 @@ If different trigger a warning a tell how many targets are actually different fr
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>target_name</strong> (<em>str</em>) – name of the target</p></li>
-<li><p><strong>reverse_df1</strong> (<em>astropy.table</em>) – observability table with no NaN value (0 instead) inversed with targets as columns
-and elements of time_ranges (months) as rows</p></li>
+<li><p><strong>reverse_df1</strong> (<em>astropy.table</em>) – observability table with no NaN value (0 instead) inversed with targets as columns and elements of time_ranges (months) as rows</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -973,14 +912,14 @@ and elements of time_ranges (months) as rows</p></li>
 <li><p><strong>months_3rd_option</strong> (<em>list</em>) – same but for the third best month</p></li>
 <li><p><strong>months_4th_option</strong> (<em>list</em>) – same but for the fourth best month</p></li>
 <li><p><strong>months_5th_option</strong> (<em>list</em>) – same but for the fiveth best month</p></li>
+<li><p><em>Remarks</em></p></li>
+<li><p><em>——-</em></p></li>
+<li><p><em>the 2nd, 3rd etc choices are here in case the target list is not long enough to give</em></p></li>
+<li><p><em>solutions for all the telescopes each months, allows to avoid blancks in observations</em></p></li>
 </ul>
 </p>
 </dd>
 </dl>
-<blockquote>
-<div><p>the 2nd, 3rd etc choices are here in case the target list is not long enough to give
-solutions for all the telescopes each months, allows to avoid blancks in observations</p>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
@@ -1067,42 +1006,10 @@ and elements of time_ranges (months) as rows</p>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt id="SPOCK.long_term_scheduler.update_hours_target_list">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">update_hours_target_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#update_hours_target_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.update_hours_target_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the targets hours of observation from Cambridge server</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path_target_list</strong> (<em>str</em>) – path on your computer toward the target list, by default take the one on the Cambridge server</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Same target list but with updated number of hours of observation</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>file</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="SPOCK.long_term_scheduler.upload_plans">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">upload_plans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">nb_days</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#upload_plans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.upload_plans" title="Permalink to this definition">¶</a></dt>
-<dd><p>upload plans to DATABASE</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>day</strong> (<em>date</em>) – date in fmt ‘yyyy-mm-dd’</p></li>
-<li><p><strong>nb_days</strong> (<em>int</em>) – number of days</p></li>
-<li><p><strong>telescope</strong> (<em>str</em>) – name of telescope</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </div>
-<div class="section" id="short-term-scheduler">
-<h3>short_term_scheduler<a class="headerlink" href="#short-term-scheduler" title="Permalink to this headline">¶</a></h3>
-<span class="target" id="module-SPOCK.short_term_scheduler"></span><dl class="py function">
+<div class="section" id="module-SPOCK.short_term_scheduler">
+<span id="short-term-scheduler"></span><h3>short_term_scheduler<a class="headerlink" href="#module-SPOCK.short_term_scheduler" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
 <dt id="SPOCK.short_term_scheduler.target_list_good_coord_format">
 <code class="sig-prename descclassname">SPOCK.short_term_scheduler.</code><code class="sig-name descname">target_list_good_coord_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/short_term_scheduler.html#target_list_good_coord_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.short_term_scheduler.target_list_good_coord_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Give target corrdinates in ICRS format (used for astropy.coordinates SkyCoord function)</p>

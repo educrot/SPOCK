@@ -13,10 +13,10 @@ Plans can be created with:
 
     obs = 1
     schedule = SPOCKST.Schedules()
-    schedule.load_parameters('./input_short_term.csv',obs)
+    schedule.load_parameters('./SPOCK/input_short_term.csv',obs)
 
     if schedule.use == 'follow_up':
-        schedule.transit_follow_up('target_transit_follow_up.txt')
+        schedule.transit_follow_up('./SPOCK/target_transit_follow_up.txt')
     if schedule.use == 'special_start_end':
         input_name = 'HW_Vir'
         schedule.special_target_with_start_end(input_name)

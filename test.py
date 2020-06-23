@@ -14,7 +14,6 @@ schedule.make_schedule(Altitude_constraint = 24, Moon_constraint = 30)
 #                           schedule.target_list)
 
 #SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
-#SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
 
 print()
 

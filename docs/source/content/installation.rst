@@ -2,7 +2,7 @@
 
 
 .. warning::
-    You must be part of the SPECULOOS consortium  to download *SPOCK*.
+    You must be part of the SPECULOOS consortium to use *SPOCK*.
 
 Installation
 ============
@@ -14,7 +14,7 @@ OSX
 
 Install *SPOCK* locally::
 
-    git clone http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock.git
+    git clone https://github.com/educrot/SPOCK.git
 
     cd spock
     python setup.py install
