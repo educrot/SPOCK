@@ -7,7 +7,7 @@ import pandas as pd
 startup_time=[]
 hour=[]
 minute=[]
-target_list_path = './SPOCK/speculoos_target_list_v6.txt'
+target_list_path = '/Users/elsaducrot/spock/SPOCK/speculoos_target_list_v6.txt'
 
 def Path_txt_files(telescope):
     Path=os.path.join('./DATABASE',telescope,'Plans_by_date')

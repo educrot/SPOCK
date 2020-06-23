@@ -85,7 +85,7 @@ ACP files
 *SPOCK* also has modules :mod:`SPOCK.test_txtfiles` and :mod:`SPOCK.make_night_plans`  that contain all the  required
 functions to convert the night blocks to ACP readable files.
 
-.. currentmodule:: SPOCK.test_txtfiles
+.. currentmodule:: SPOCK.txt_files
 
 .. rubric:: ACP files
 

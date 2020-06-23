@@ -2,13 +2,29 @@ import SPOCK.long_term_scheduler as SPOCKLT
 import SPOCK.short_term_scheduler as SPOCKST
 import SPOCK.plots_scheduler as SPOCKplot
 
+# ---------------------- LONG TERM SCHEDULER ---------------------
+
+obs = 1
+schedule = SPOCKLT.Schedules()
+schedule.load_parameters('./SPOCK/input.csv',obs)
+
+schedule.make_schedule(Altitude_constraint = 24, Moon_constraint = 30)
+
+#SPOCKLT.make_docx_schedule(schedule.observatory, schedule.telescope, schedule.date_range,'Manu',
+#                           schedule.target_list)
+
+#SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
+#SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
+
+print()
+
 # ---------------------- SHORT TERM SCHEDULER ---------------------
 obs = 5
 schedule = SPOCKST.Schedules()
-schedule.load_parameters('./input_short_term.csv',obs)
+schedule.load_parameters('./SPOCK/input_short_term.csv',obs)
 
 if schedule.use == 'follow_up':
-    schedule.transit_follow_up('target_transit_follow_up.txt')
+    schedule.transit_follow_up('./SPOCK/target_transit_follow_up.txt')
 if schedule.use == 'special_start_end':
     input_name = 'HW_Vir'
     schedule.special_target_with_start_end(input_name)
@@ -27,29 +43,6 @@ schedule.make_night_block()
 
 
 SPOCKST.make_plans(day=schedule.day_of_night,nb_days=1,telescope=schedule.telescope)
-
-print()
-
-
-# ---------------------- LONG TERM SCHEDULER ---------------------
-
-obs = 2
-schedule = SPOCKLT.Schedules()
-schedule.load_parameters('./input.csv',obs)
-
-schedule.telescope = 'Artemis'
-SPOCKLT.make_np(schedule.date_range[0], schedule.date_range_in_days, schedule.telescope)
-SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days, telescope=schedule.telescope)
-
-#schedule.exposure_time_table(day=None)
-
-#schedule.make_schedule(Altitude_constraint = 24, Moon_constraint = 30)
-
-#SPOCKLT.make_docx_schedule(schedule.observatory, schedule.telescope, schedule.date_range,'Manu',
-#                           schedule.target_list)
-
-#SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
-#SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
 
 print()
 

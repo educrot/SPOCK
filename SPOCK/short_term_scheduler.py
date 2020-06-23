@@ -14,25 +14,21 @@ from datetime import datetime
 import os
 import pandas as pd
 from astroplan.utils import time_grid_from_range
-from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
 from SPOCK.make_night_plans import make_np
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz
-import subprocess
 import sys
 import yaml
 import shutil
 import SPOCK.ETC as ETC
 import numpy as np
-import matplotlib.pyplot as plt
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint
-from eScheduler.constraints_spc import CelestialPoleSeparationConstraint
 from astroplan import TimeConstraint
 import astroplan
 import matplotlib.pyplot as plt
 from astropy.table import unique
 from astroplan.plots import plot_airmass
-from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock
-from eScheduler.spe_schedule import Transitioner
+from SPOCK.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock
+from SPOCK.spe_schedule import Transitioner
 
 dt=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg') #1 day
 constraints = [AltitudeConstraint(min=24*u.deg), AtNightConstraint()] #MoonSeparationConstraint(min=30*u.deg)
@@ -203,20 +199,6 @@ class Schedules:
         if dom_rot_possible == False:
             sys.exit('ERROR: No Dom rotation possible that night')
 
-        # blocks = []
-        # a = ObservingBlock(target, dur_dome_rotation, -1,constraints=constraints_dome_rotation,configuration={'filt=' + 'Clear','texp=' + '1'})
-        #
-        # blocks.append(a)
-        # import SPOCK.plots_scheduler as SPOCKplot
-        # SPOCKplot.constraints_scores(constraints_dome_rotation, target, self.observatory, start, start + dur_dome_rotation)
-        # transitioner = Transitioner(slew_rate=11 * u.deg / u.second)
-        # seq_schedule_SS1 = Schedule(self.day_of_night, self.day_of_night + 1)
-        # sequen_scheduler_SS1 = SPECULOOSScheduler(constraints=constraints_dome_rotation, observer=self.observatory,
-        #                                           transitioner=transitioner)
-        # sequen_scheduler_SS1(blocks, seq_schedule_SS1)
-        # self.SS1_night_blocks  = seq_schedule_SS1.to_table()
-
-          # Table.read(os.path.join(Path,tel,'special_target_test.txt'), format='ascii')#
 
     def special_target_with_start_end(self, input_name):
         start = self.start_end_range[0]
@@ -368,9 +350,9 @@ class Schedules:
             try:
                 self.SS1_night_blocks['target'][0]
             except IndexError:
-                sys.exit('ERROR: No block to insert ')
+                sys.exit('ERROR: Constraints not respected, no block to insert ')
             except TypeError:
-                sys.exit('ERROR: No block to insert ')
+                sys.exit('ERROR: Constraints not respected, no block to insert ')
             #if self.SS1_night_blocks['target'][0] == self.scheduled_table['target'][i]:
             #    sys.exit('WARNING: The target ' + str(self.SS1_night_blocks['target'][0]) + 'that you wich to insert is already scheduled for this night !')
             end_before_cut = self.scheduled_table['end time (UTC)'][i]
@@ -708,37 +690,6 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
 
 def make_plans(day, nb_days, telescope):
     make_np(day, nb_days, telescope)
-
-def upload_plans(day, nb_days, telescope):
-    if telescope.find('Callisto') is not -1:
-        upload_np_calli(day, nb_days)
-    if telescope.find('Ganymede') is not -1:
-        upload_np_gany(day, nb_days)
-    if telescope.find('Io') is not -1:
-        upload_np_io(day, nb_days)
-    if telescope.find('Europa') is not -1:
-        upload_np_euro(day, nb_days)
-    if telescope.find('Artemis') is not -1:
-        upload_np_artemis(day, nb_days)
-
-    # ------------------- update archive date by date plans folder  ------------------
-
-    path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', telescope,'schedule')
-    print('INFO: Path database = ',path_database)
-    path_plans = os.path.join('./DATABASE/', telescope,'Plans_by_date/')
-    print('INFO: Path local plans by day = ',path_plans)
-    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_plans, path_database])
-    path_gant_chart = os.path.join('./SPOCK_Figures/Preview_schedule.html')
-    path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/')
-    print('INFO: Path local \'Gant chart\' = ', path_gant_chart)
-    print('INFO: Path database = \'Gant chart\' = ',  path_database_home)
-    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_gant_chart, path_database_home ])
-
-    # ------------------- update archive niht blocks ------------------
-
-    path_night_blocks = os.path.join('./DATABASE/', telescope,'Archive_night_blocks/')
-    print('INFO: Path local night blocks = ',path_night_blocks)
-    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_night_blocks, path_database])
 
 def read_night_block(telescope, day):
     day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")

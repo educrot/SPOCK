@@ -10,16 +10,18 @@ Launch the App
 -------------------
 
 To launch the app open notebook `SPOCKapp.ipynb` and click on `run all cells`. You get the following visual:
+Then Follow the videos in :ref:`quick start video` to learn how to use **SPOCKapp**.
 
-
+.. _quick start video:
 
 Quick start videos
 -------------------
 
-Follow the videos below to learn how to use **SPOCKapp**.
+Long term, i.e SPECULOOS core program
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-
+First pick the date range on which we wish to run
+^
 .. raw:: html
 
     <div style="text-align: center; margin-bottom: 2em;">

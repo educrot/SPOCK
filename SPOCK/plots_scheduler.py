@@ -307,7 +307,7 @@ def gantt_chart_all(target_list):
     config = {
         'scrollZoom': True
     }
-    offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
+    offline.plot(fig,auto_open=True,filename='./SPOCK/SPOCK_Figures/Preview_schedule.html',config=config)
 
 def gantt_chart(date_start,date_end,telescope):
     """
