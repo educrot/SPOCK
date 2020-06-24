@@ -35,6 +35,8 @@ Use the package manager [git clone]() to install SPOCK::
 
     cd spock
 
+    python setup.py install
+
 
 
 Input files
