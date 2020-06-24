@@ -31,17 +31,17 @@ First pick the date range on which we wish to run
 .. raw:: html
 
     <div style="text-align: center; margin-bottom: 2em;">
-    <iframe width="100%" height="350" src="https://github.com/educrot/SPOCK/tree/master/docs/source/examples/SPOCKappdemo_SPOCKLT_1.mov" frameborder="0" allowfullscreen></iframe>
+    <iframe width="100%" height="350" src="https://github.com/educrot/SPOCK/tree/master/docs/source/examples/SPOCKapp/demo_SPOCKLT_1.mov" frameborder="0" allowfullscreen></iframe>
     </div>
 
 .. raw:: html
 
     <div style="text-align: center; margin-bottom: 2em;">
-    <iframe width="100%" height="350" src="https://github.com/educrot/SPOCK/tree/master/docs/source/examples/SPOCKappdemo_SPOCKLT_2.mov" frameborder="0" allowfullscreen></iframe>
+    <iframe width="100%" height="350" src="https://github.com/educrot/SPOCK/tree/master/docs/source/examples/SPOCKapp/demo_SPOCKLT_2.mov" frameborder="0" allowfullscreen></iframe>
     </div>
 
 .. raw:: html
 
     <div style="text-align: center; margin-bottom: 2em;">
-    <iframe width="100%" height="350" src="https://github.com/educrot/SPOCK/tree/master/docs/source/examples/SPOCKappdemo_SPOCKLT_3.mov" frameborder="0" allowfullscreen></iframe>
+    <iframe width="100%" height="350" src="https://github.com/educrot/SPOCK/tree/master/docs/source/examples/SPOCKapp/demo_SPOCKLT_3.mov" frameborder="0" allowfullscreen></iframe>
     </div>
