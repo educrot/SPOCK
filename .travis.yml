@@ -1,19 +1,14 @@
-# Doctr requires python >=3.5
 language: python
+
 python:
   - 3.7
 
-# This gives Doctr the key we've generated
-sudo: false
-env:
-  global:
-    secure: "<your secure key from Doctr here>"
+install:
+  - pip install .
 
-# This is the script to build the docs on travis, then deploy
-script:
-  - set -e
-  - pip install doctr
-  - cd docs
-  - make html
-  - cd ..
-  - doctr deploy . --built-docs path/to/built/html/
+after_success: 
+  - sudo apt-get -qq update
+  - sudo apt-get install -y pandoc
+  - pip install travis-sphinx nbsphinx sphinx_rtd_theme jupyter_client ipykernel
+  - travis-sphinx build -n
+  - travis-sphinx deploy
