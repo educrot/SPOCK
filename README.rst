@@ -92,9 +92,8 @@ For ``short_term_scheduler`` create your *'input_file.csv'* file in the followin
 
 Contributing
 ---------------------
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Suggestions are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Please make sure to update tests as appropriate.
 
 License
 ---------------------

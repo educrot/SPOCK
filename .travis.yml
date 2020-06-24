@@ -7,7 +7,6 @@ install:
   - pip install astropy
   - pip install astroplan
   - pip install numpy
-  - python setup.py install
 
 after_success: 
   - sudo apt-get -qq update
