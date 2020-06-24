@@ -1,13 +1,18 @@
 .. image:: https://img.shields.io/badge/docs-dev-blue.svg
     :target: https://educrot.github.io/SPOCK/index.html
 
+.. image:: figures/logo_SPOCK_2.png
+   :width: 600
+
 **SPOCK** (Speculoos Observatory SChedule maKer) is a python package developed to handle
 the planification of observation of the SPECULOOS telescopes. The project SPECULOOS -Search for habitable Planets EClipsing ULtra-cOOl Stars –
 searches for potentially habitable exoplanets around the smallest and coolest stars
 of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4259452/fr/speculoos>`_.
-Schedule targets on several criteria:
 
-*  Visibility of the target
+
+Targets are scheduled following several criteria:
+
+*  Observability
 
 *  Priority
 
