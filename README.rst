@@ -17,7 +17,7 @@ Documentation SPOCK
 You will find complete documentation for setting up your project at `SPOCK Read
 the Docs site`_.
 
-.. _SPOCK Read the Docs site : file:///Users/elsaducrot/spock/doc/build/index.html
+.. _SPOCK Read the Docs site : https://educrot.github.io/SPOCK/index.html
 
 
 Installation
