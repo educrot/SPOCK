@@ -9,6 +9,6 @@ install:
 script:
   - sudo apt-get -qq update
   - sudo apt-get install -y pandoc
-  - pip install travis-sphinx nbsphinx sphinx_rtd_theme jupyter_client ipykernel
+  - pip install travis-sphinx nbsphinx sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx
   - travis-sphinx build -n
   - travis-sphinx deploy
