@@ -1,7 +1,7 @@
 .. image:: https://img.shields.io/badge/docs-dev-blue.svg
     :target: https://educrot.github.io/SPOCK/index.html
 
-.. image:: figures/logo_SPOCK_2.png
+.. image:: figures/logo_SPOCK.png
    :width: 600
 
 **SPOCK** (Speculoos Observatory SChedule maKer) is a python package developed to handle
@@ -21,10 +21,9 @@ Targets are scheduled following several criteria:
 Documentation SPOCK
 ---------------------
 
-You will find complete documentation for setting up your project at `SPOCK Read
-the Docs site`_.
+You will find complete documentation for setting up your project at `SPOCK documentation site`_.
 
-.. _SPOCK Read the Docs site : https://educrot.github.io/SPOCK/index.html
+.. _SPOCK documentation site : https://educrot.github.io/SPOCK/index.html
 
 
 Installation
