@@ -17,11 +17,11 @@ Then Follow the videos in :ref:`quick start video` to learn how to use **SPOCKap
 Quick start videos
 -------------------
 
-Long term, i.e SPECULOOS core program
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Long term (i.e, SPECULOOS core program)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 First pick the date range on which we wish to run
-^
+
 .. raw:: html
 
     <div style="text-align: center; margin-bottom: 2em;">

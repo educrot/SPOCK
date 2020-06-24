@@ -100,7 +100,7 @@ For ``short_term_scheduler`` create your *'input_file.csv'* file in the followin
 
 Contributing
 ---------------------
-Suggestions are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Suggestions are welcome and feel free to open an issue if you see a bug.
 
 
 License
