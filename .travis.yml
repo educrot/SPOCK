@@ -4,7 +4,10 @@ python:
   - 3.7
 
 install:
-  - pip install .
+  - pip install astropy
+  - pip install atroplan
+  - pip install numpy
+  - python setup.py install
 
 after_success: 
   - sudo apt-get -qq update
