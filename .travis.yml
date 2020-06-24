@@ -7,6 +7,10 @@ install:
   - pip install astropy
   - pip install astroplan
   - pip install numpy
+  - pip install pytest
+
+  script:
+    - pytest
 
 after_success: 
   - sudo apt-get -qq update
