@@ -5,7 +5,7 @@ python:
 
 install:
   - pip install astropy
-  - pip install atroplan
+  - pip install astroplan
   - pip install numpy
   - python setup.py install
 
