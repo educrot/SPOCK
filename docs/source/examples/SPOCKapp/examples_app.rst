@@ -21,7 +21,13 @@ Quick start videos
 Long term (i.e, SPECULOOS core program)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-First pick the date range on which we wish to run
+First pick the date range on which we wish to run:
+
+.. video:: https://educrot.github.io/SPOCK/_static/demo_SPOCKLT_1.mp4
+   :width: 500
+   :height: 300
+   :autoplay:
+   :nocontrols:
 
 .. raw:: html
 
