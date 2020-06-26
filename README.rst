@@ -17,7 +17,7 @@ Targets are scheduled following several criteria:
 
 *  Observability
 
-*  Priority
+*  Priority (calculated from stellar parameters)
 
 *  Number of hours already performed
 
