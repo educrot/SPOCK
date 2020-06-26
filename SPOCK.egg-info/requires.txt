@@ -1,0 +1,9 @@
+pandas
+numpy
+astroplan
+astropy
+matplotlib
+datetime
+pyaml
+docx
+plotly

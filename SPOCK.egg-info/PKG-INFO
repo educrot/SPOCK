@@ -6,14 +6,24 @@ Home-page: https://github.com/educrot/SPOCK/
 Author: Elsa Ducrot
 Author-email: educrot@uliege.be
 License: UNKNOWN
-Description: .. image:: https://img.shields.io/badge/docs-dev-blue.svg
+Description: .. image:: https://travis-ci.com/educrot/SPOCK.svg?token=JyPx6cqUzxMxHWAk8xyS&branch=master
+            :target: https://travis-ci.com/educrot/SPOCK
+        
+        .. image:: https://img.shields.io/badge/docs-dev-blue.svg
             :target: https://educrot.github.io/SPOCK/index.html
         
-        **SPOCK** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
+        .. image:: figures/logo_SPOCK.png
+           :width: 600
         
-        Schedule targets on several criteria:
+        **SPOCK** (Speculoos Observatory SChedule maKer) is a python package developed to handle
+        the planification of observation of the SPECULOOS telescopes. The project SPECULOOS -Search for habitable Planets EClipsing ULtra-cOOl Stars –
+        searches for potentially habitable exoplanets around the smallest and coolest stars
+        of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4259452/fr/speculoos>`_.
         
-        *  Visibility of the target
+        
+        Targets are scheduled following several criteria:
+        
+        *  Observability
         
         *  Priority
         
@@ -22,10 +32,9 @@ Description: .. image:: https://img.shields.io/badge/docs-dev-blue.svg
         Documentation SPOCK
         ---------------------
         
-        You will find complete documentation for setting up your project at `SPOCK Read
-        the Docs site`_.
+        You will find complete documentation for setting up your project at `SPOCK documentation site`_.
         
-        .. _SPOCK Read the Docs site : file:///Users/elsaducrot/spock/doc/build/index.html
+        .. _SPOCK documentation site : https://educrot.github.io/SPOCK/index.html
         
         
         Installation
@@ -33,9 +42,11 @@ Description: .. image:: https://img.shields.io/badge/docs-dev-blue.svg
         
         Use the package manager [git clone]() to install SPOCK::
         
-            git clone http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock.git
+            git clone https://github.com/educrot/SPOCK.git
         
             cd spock
+        
+            python setup.py install
         
         
         
@@ -100,7 +111,7 @@ Description: .. image:: https://img.shields.io/badge/docs-dev-blue.svg
         
         Contributing
         ---------------------
-        Suggestions are welcome. For major changes, please open an issue first to discuss what you would like to change.
+        Suggestions are welcome and feel free to open an issue if you see a bug.
         
         
         License
