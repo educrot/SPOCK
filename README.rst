@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.com/educrot/SPOCK.svg?token=JyPx6cqUzxMxHWAk8xyS&branch=master
+    :target: https://travis-ci.com/educrot/SPOCK
+
 .. image:: https://img.shields.io/badge/docs-dev-blue.svg
     :target: https://educrot.github.io/SPOCK/index.html
 
@@ -31,7 +34,7 @@ Installation
 
 Use the package manager [git clone]() to install SPOCK::
 
-    git clone http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock.git
+    git clone https://github.com/educrot/SPOCK.git
 
     cd spock
 
