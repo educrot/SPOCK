@@ -22,7 +22,7 @@ Targets are scheduled following several criteria:
 *  Number of hours already performed
 
 Documentation SPOCK
----------------------
+--------------------
 
 You will find complete documentation for setting up your project at `SPOCK documentation site`_.
 
