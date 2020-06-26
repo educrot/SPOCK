@@ -15,5 +15,5 @@ setup(
     url = 'https://github.com/educrot/SPOCK/',
     packages = find_packages(),
     long_description = read('README.rst'),
-    install_requires = ['pandas','numpy','astroplan','astropy','matplotlib','datetime','pyaml','docx','plotly'],
+    install_requires = ['pandas','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml','docx','plotly'],
 )
