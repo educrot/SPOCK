@@ -159,7 +159,7 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
         str1='#waituntil 1, '
         str2='#domeopen\n'
         str3='#chill '
-        str33='-55\n'
+        str33='-50\n'
         str4='#duskflats Cal_flatexo_evening.txt\n'
         str5='#chain '
         str6='#quitat '
@@ -248,7 +248,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
         out.write(str1 + str(hour0) + ':' + str(minute0) + '\n')
         out.write(str22)
         if telescope == 'Artemis':
-            out.write('#chill -55\n')
+            out.write('#chill -50\n')
         else:
             out.write('#chill -60\n')
         out.write(str2 + str(waitlimit) + '\n')
@@ -534,7 +534,7 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
         out.write(str1 + pd.to_datetime(str(date_start)).strftime('%Y/%m/%d %H:%M:%S') + '\n')#+ str(hour0) + ':' + str(minute0) + '\n')
         out.write(str22)
         if telescope == 'Artemis':
-            out.write('#chill -55\n')
+            out.write('#chill -50\n')
         else:
             out.write('#chill -60\n')
         out.write(str2 + str(waitlimit) + '\n')
