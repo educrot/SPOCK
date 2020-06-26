@@ -1,30 +1,9 @@
-.. _api:
-
 ***
 API
 ***
 
-The SPOCK API reference
-=============================
+.. autosummary::
+   :toctree: api/
 
-.. automodule:: SPOCK
-   :members:
-
-long_term_scheduler
------------------------
-
-.. automodule:: SPOCK.long_term_scheduler
-   :members:
-
-short_term_scheduler
------------------------
-
-.. automodule:: SPOCK.short_term_scheduler
-   :members:
-
-plots_scheduler
-------------------
-
-.. automodule:: SPOCK.plots_scheduler
-   :members:
-
+   SPOCK.long_term_scheduler
+   SPOCK.short_term_scheduler
