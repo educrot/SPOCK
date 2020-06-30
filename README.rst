@@ -1,9 +1,6 @@
 .. image:: https://travis-ci.com/educrot/SPOCK.svg?token=JyPx6cqUzxMxHWAk8xyS&branch=master
     :target: https://travis-ci.com/educrot/SPOCK
 
-.. image:: https://img.shields.io/badge/docs-dev-blue.svg
-    :target: https://educrot.github.io/SPOCK/index.html
-
 .. image:: figures/logo_SPOCK.png
    :width: 600
 
