@@ -14,5 +14,5 @@ script:
   - sudo apt-get -qq update
   - sudo apt-get install -y pandoc
   - travis-sphinx build -n
-  - pipenv run make html # build the docs
+  - make html # build the docs
 
