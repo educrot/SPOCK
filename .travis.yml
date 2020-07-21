@@ -24,6 +24,5 @@ install:
 
 script:
   - if [[ "${DOCS}" == "true" ]]; then
-      cd docs;
-      make html;
+      travis-sphinx build -n;
     fi
