@@ -20,15 +20,11 @@ install:
   - sudo apt-get install python3-pip
   - sudo pip3 install requests
   - pip install -U pip
-  - pip install travis-sphinx==2.2.1 nbsphinx==0.7.0 sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema
+  - pip install travis-sphinx==2.2.1 nbsphinx==0.7.0 sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema autoapi.extension
 
 script:
   - if [[ "${DOCS}" == "true" ]]; then
       cd docs;
       make html;
+      sphinx-build -b html . _build
     fi
-deploy:
-  provider: pages # deploy on github pages
-  skip_cleanup: true
-  github_token: "$GH_TOKEN" # defined via the Travis interface
-  local_dir: ./docs/build/html
