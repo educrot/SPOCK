@@ -1,3 +1,4 @@
+dist: xenial # needed to use python 3.7
 language: python
 
 python:
@@ -5,6 +6,7 @@ python:
   - 3.7
 
 install:
+  - pip install -U pip
   - pip install .
   - pip install travis-sphinx==2.2.1 nbsphinx==0.7.0 sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema
 
@@ -12,3 +14,5 @@ script:
   - sudo apt-get -qq update
   - sudo apt-get install -y pandoc
   - travis-sphinx build -n
+  - pipenv run make html # build the docs
+
