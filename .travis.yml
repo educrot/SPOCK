@@ -1,19 +1,29 @@
-dist: xenial # needed to use python 3.7
 language: python
-branches:
-  only:
-    - master
+
+sudo: false
+env:
+  matrix:
+    - DOCS="true"
+
 python:
-  - 3.7
-cache: pip
-before_install:
+  - 3.5
+  - 3.6
+
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
+      env:
+        - DOCS="true"
+
+install:
   - sudo apt-get install python3-pip
   - sudo pip3 install requests
-install:
   - pip install -U pip
   - pip install travis-sphinx==2.2.1 nbsphinx==0.7.0 sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema
+
 script:
-  - |
-    if [[ "${DOCS}" == "true" ]]; then
+  - if [[ "${DOCS}" == "true" ]]; then
       cd docs;
       make html;
