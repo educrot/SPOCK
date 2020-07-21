@@ -24,5 +24,11 @@ install:
 
 script:
   - if [[ "${DOCS}" == "true" ]]; then
-      travis-sphinx build -n;
+      cd docs;
+      make html;
     fi
+deploy:
+  provider: pages # deploy on github pages
+  skip_cleanup: true
+  github_token: "$GH_TOKEN" # defined via the Travis interface
+  local_dir: ./docs/build/html
