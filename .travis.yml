@@ -5,26 +5,12 @@ branches:
     - master
 python:
   - 3.7
+cache: pip
+before_install:
+  - sudo apt-get install python3-pip
+  - sudo pip3 install requests
 install:
   - pip install -U pip
-  - pip install pipenv
-  - pipenv install # set up the environment
   - pip install travis-sphinx==2.2.1 nbsphinx==0.7.0 sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema
 script:
-  - skip # Travis requires a `script` property, but we do not need it
-stages:
-  - deploy
-jobs:
-  include:
-    - stage: build and test # This stage builds and lints in parallel
-      name: Build
-      script: pipenv run make html # build the docs
-    - stage: deploy
-      name: Deploy to GitHub Pages
-      if: (NOT type IN (pull_request)) AND (branch = master) # only deploy if merging on master
-      script: pipenv run make html
-      deploy:
-        provider: pages # deploy on github pages
-        skip_cleanup: true
-        github_token: "$token" # defined via the Travis interface
-        local_dir: build/html
+  - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then source .ci/build-docs.sh; fi
