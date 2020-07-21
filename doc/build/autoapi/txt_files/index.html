@@ -1,0 +1,452 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>txt_files &mdash; SPOCK 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/jupyter-sphinx.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> SPOCK
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../content/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../content/quick-ref.html">Quick reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../content/api.html">API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Quick start</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/SPOCKLT/examples_spocklt.html">Long term  scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/SPOCKST/examples_spockst.html">Short term scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/SPOCKapp/examples_app.html">SPOCKApp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPOCK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">txt_files</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/autoapi/txt_files/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-txt_files">
+<span id="txt-files"></span><h1><a class="reference internal" href="#module-txt_files" title="txt_files"><code class="xref py py-mod docutils literal notranslate"><span class="pre">txt_files</span></code></a><a class="headerlink" href="#module-txt_files" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.Path_txt_files" title="txt_files.Path_txt_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Path_txt_files</span></code></a>(telescope)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.startup_no_flats" title="txt_files.startup_no_flats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startup_no_flats</span></code></a>(t_now, name, sun_set, date_start, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.startup" title="txt_files.startup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startup</span></code></a>(t_now, name, sun_set, date_start, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.startup_artemis" title="txt_files.startup_artemis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startup_artemis</span></code></a>(t_now, name, sun_set, date_start, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.target" title="txt_files.target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code></a>(t_now, name, date_start, date_end, waitlimit, afinterval, autofocus, count, filt, exptime, ra1, ra2, ra3, dec1, dec2, dec3, name_2, Path, telescope=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.target_no_DONUTS" title="txt_files.target_no_DONUTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_no_DONUTS</span></code></a>(t_now, name, date_start, date_end, waitlimit, afinterval, autofocus, count, filt, exptime, ra1, ra2, ra3, dec1, dec2, dec3, name_2, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.target_offset" title="txt_files.target_offset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_offset</span></code></a>(t_now, name, date_start, date_end, waitlimit, afinterval, autofocus, count, filt, exptime, ra1, ra2, ra3, dec1, dec2, dec3, name_2, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.first_target" title="txt_files.first_target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">first_target</span></code></a>(t_now, name, date_start, date_end, waitlimit, afinterval, autofocus, count, filt, exptime, ra1, ra2, ra3, dec1, dec2, dec3, name_2, Path, telescope=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.first_target_offset" title="txt_files.first_target_offset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">first_target_offset</span></code></a>(t_now, name, date_start, date_end, waitlimit, afinterval, autofocus, count, filt, exptime, ra1, ra2, ra3, dec1, dec2, dec3, name_2, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.first_target_no_DONUTS" title="txt_files.first_target_no_DONUTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">first_target_no_DONUTS</span></code></a>(t_now, name, date_start, date_end, waitlimit, afinterval, autofocus, count, filt, exptime, ra1, ra2, ra3, dec1, dec2, dec3, name_2, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.flatdawn" title="txt_files.flatdawn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatdawn</span></code></a>(t_now, date_end, sun_rise, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.flatdawn_artemis" title="txt_files.flatdawn_artemis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatdawn_artemis</span></code></a>(t_now, date_end, sun_rise, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.flatdawn_no_flats" title="txt_files.flatdawn_no_flats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatdawn_no_flats</span></code></a>(t_now, date_end, sun_rise, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.flatexo_gany" title="txt_files.flatexo_gany"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatexo_gany</span></code></a>(Path, t_now, filt, nbOIII=None, nbHa=None, nbSII=None, nbz=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.flatexo_calli" title="txt_files.flatexo_calli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatexo_calli</span></code></a>(Path, t_now, filt, nbu=None, nbB=None, nbz=None, nbV=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.flatexo_euro" title="txt_files.flatexo_euro"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatexo_euro</span></code></a>(Path, t_now, filt, nbRc=None, nbB=None, nbz=None, nbV=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.flatexo_saintex" title="txt_files.flatexo_saintex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatexo_saintex</span></code></a>(Path, t_now, filt, nbu=None, nbz=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.flatexo_io" title="txt_files.flatexo_io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatexo_io</span></code></a>(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.flatexo_artemis_morning" title="txt_files.flatexo_artemis_morning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatexo_artemis_morning</span></code></a>(Path, t_now, filt, nbu=None, nbz=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.flatexo_artemis_evening" title="txt_files.flatexo_artemis_evening"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatexo_artemis_evening</span></code></a>(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.biasdark" title="txt_files.biasdark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">biasdark</span></code></a>(t_now, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#txt_files.biasdark_comete" title="txt_files.biasdark_comete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">biasdark_comete</span></code></a>(t_now, Path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#txt_files.shutdown" title="txt_files.shutdown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutdown</span></code></a>(t_now, Path)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt id="txt_files.startup_time">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">startup_time</code><em class="property"> = []</em><a class="reference internal" href="../../_modules/txt_files.html#startup_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.startup_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt id="txt_files.hour">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">hour</code><em class="property"> = []</em><a class="reference internal" href="../../_modules/txt_files.html#hour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.hour" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt id="txt_files.minute">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">minute</code><em class="property"> = []</em><a class="reference internal" href="../../_modules/txt_files.html#minute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.minute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt id="txt_files.target_list_path">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">target_list_path</code><em class="property"> = /Users/elsaducrot/spock/SPOCK/speculoos_target_list_v6.txt</em><a class="reference internal" href="../../_modules/txt_files.html#target_list_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.target_list_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.Path_txt_files">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">Path_txt_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#Path_txt_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.Path_txt_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.startup_no_flats">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">startup_no_flats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">sun_set</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#startup_no_flats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.startup_no_flats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.startup">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">startup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">sun_set</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#startup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.startup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.startup_artemis">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">startup_artemis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">sun_set</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#startup_artemis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.startup_artemis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.target">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">waitlimit</span></em>, <em class="sig-param"><span class="n">afinterval</span></em>, <em class="sig-param"><span class="n">autofocus</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">exptime</span></em>, <em class="sig-param"><span class="n">ra1</span></em>, <em class="sig-param"><span class="n">ra2</span></em>, <em class="sig-param"><span class="n">ra3</span></em>, <em class="sig-param"><span class="n">dec1</span></em>, <em class="sig-param"><span class="n">dec2</span></em>, <em class="sig-param"><span class="n">dec3</span></em>, <em class="sig-param"><span class="n">name_2</span></em>, <em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">telescope</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.target" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.target_no_DONUTS">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">target_no_DONUTS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">waitlimit</span></em>, <em class="sig-param"><span class="n">afinterval</span></em>, <em class="sig-param"><span class="n">autofocus</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">exptime</span></em>, <em class="sig-param"><span class="n">ra1</span></em>, <em class="sig-param"><span class="n">ra2</span></em>, <em class="sig-param"><span class="n">ra3</span></em>, <em class="sig-param"><span class="n">dec1</span></em>, <em class="sig-param"><span class="n">dec2</span></em>, <em class="sig-param"><span class="n">dec3</span></em>, <em class="sig-param"><span class="n">name_2</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#target_no_DONUTS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.target_no_DONUTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.target_offset">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">target_offset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">waitlimit</span></em>, <em class="sig-param"><span class="n">afinterval</span></em>, <em class="sig-param"><span class="n">autofocus</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">exptime</span></em>, <em class="sig-param"><span class="n">ra1</span></em>, <em class="sig-param"><span class="n">ra2</span></em>, <em class="sig-param"><span class="n">ra3</span></em>, <em class="sig-param"><span class="n">dec1</span></em>, <em class="sig-param"><span class="n">dec2</span></em>, <em class="sig-param"><span class="n">dec3</span></em>, <em class="sig-param"><span class="n">name_2</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#target_offset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.target_offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.first_target">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">first_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">waitlimit</span></em>, <em class="sig-param"><span class="n">afinterval</span></em>, <em class="sig-param"><span class="n">autofocus</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">exptime</span></em>, <em class="sig-param"><span class="n">ra1</span></em>, <em class="sig-param"><span class="n">ra2</span></em>, <em class="sig-param"><span class="n">ra3</span></em>, <em class="sig-param"><span class="n">dec1</span></em>, <em class="sig-param"><span class="n">dec2</span></em>, <em class="sig-param"><span class="n">dec3</span></em>, <em class="sig-param"><span class="n">name_2</span></em>, <em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">telescope</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#first_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.first_target" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.first_target_offset">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">first_target_offset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">waitlimit</span></em>, <em class="sig-param"><span class="n">afinterval</span></em>, <em class="sig-param"><span class="n">autofocus</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">exptime</span></em>, <em class="sig-param"><span class="n">ra1</span></em>, <em class="sig-param"><span class="n">ra2</span></em>, <em class="sig-param"><span class="n">ra3</span></em>, <em class="sig-param"><span class="n">dec1</span></em>, <em class="sig-param"><span class="n">dec2</span></em>, <em class="sig-param"><span class="n">dec3</span></em>, <em class="sig-param"><span class="n">name_2</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#first_target_offset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.first_target_offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.first_target_no_DONUTS">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">first_target_no_DONUTS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">waitlimit</span></em>, <em class="sig-param"><span class="n">afinterval</span></em>, <em class="sig-param"><span class="n">autofocus</span></em>, <em class="sig-param"><span class="n">count</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">exptime</span></em>, <em class="sig-param"><span class="n">ra1</span></em>, <em class="sig-param"><span class="n">ra2</span></em>, <em class="sig-param"><span class="n">ra3</span></em>, <em class="sig-param"><span class="n">dec1</span></em>, <em class="sig-param"><span class="n">dec2</span></em>, <em class="sig-param"><span class="n">dec3</span></em>, <em class="sig-param"><span class="n">name_2</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#first_target_no_DONUTS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.first_target_no_DONUTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatdawn">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatdawn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">sun_rise</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatdawn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatdawn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatdawn_artemis">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatdawn_artemis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">sun_rise</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatdawn_artemis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatdawn_artemis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatdawn_no_flats">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatdawn_no_flats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">sun_rise</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatdawn_no_flats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatdawn_no_flats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatexo_gany">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatexo_gany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">nbOIII</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbHa</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbSII</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbIz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbExo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbClear</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatexo_gany"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatexo_gany" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatexo_calli">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatexo_calli</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">nbu</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbB</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbV</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbIz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbExo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbClear</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatexo_calli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatexo_calli" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatexo_euro">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatexo_euro</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">nbRc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbB</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbV</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbIz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbExo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbClear</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatexo_euro"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatexo_euro" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatexo_saintex">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatexo_saintex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">nbu</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbIz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbExo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbClear</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatexo_saintex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatexo_saintex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatexo_io">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatexo_io</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">nbu</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbHa</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbRc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbIz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbExo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbClear</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatexo_io"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatexo_io" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatexo_artemis_morning">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatexo_artemis_morning</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">nbu</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbIz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbExo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbClear</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatexo_artemis_morning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatexo_artemis_morning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.flatexo_artemis_evening">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">flatexo_artemis_evening</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Path</span></em>, <em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">filt</span></em>, <em class="sig-param"><span class="n">nbu</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbHa</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbRc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbIz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbExo</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nbClear</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#flatexo_artemis_evening"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.flatexo_artemis_evening" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.biasdark">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">biasdark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#biasdark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.biasdark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.biasdark_comete">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">biasdark_comete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#biasdark_comete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.biasdark_comete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="txt_files.shutdown">
+<code class="sig-prename descclassname">txt_files.</code><code class="sig-name descname">shutdown</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t_now</span></em>, <em class="sig-param"><span class="n">Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/txt_files.html#shutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#txt_files.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Elsa Ducrot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

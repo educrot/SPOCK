@@ -1,0 +1,66 @@
+:mod:`make_night_plans`
+=======================
+
+.. py:module:: make_night_plans
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   make_night_plans.make_np
+
+
+.. data:: filt
+   
+
+   
+
+.. data:: texp
+   
+
+   
+
+.. data:: index
+   
+
+   
+
+.. data:: ra1
+   
+
+   
+
+.. data:: dec1
+   
+
+   
+
+.. data:: ra2
+   
+
+   
+
+.. data:: dec2
+   
+
+   
+
+.. data:: ra3
+   
+
+   
+
+.. data:: dec3
+   
+
+   
+
+.. function:: make_np(t_now, nb_jours, tel)
+
+

@@ -1,0 +1,49 @@
+:mod:`ETC`
+==========
+
+.. py:module:: ETC
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   ETC.etc
+
+
+
+.. py:class:: etc(mag_val=None, mag_band=None, spt=None, filt=None, airmass=None, moonphase=None, irtf=None, num_tel=None, seeing=None, gain=None)
+
+   .. attribute:: airmass
+      
+
+      Class to Make schedules for the target list, observatory, dtae_range and startegy indicated
+
+      :param target_list:
+      :type target_list: list of all target with their basic info
+      :param observatory:
+      :type observatory: list of the observatory , and observatory/telescope if several telescope per observatory
+      :param startegy:
+      :type startegy: scheduling strategy, either 'continuous' or 'segmented'
+      :param duration_segement:
+      :type duration_segement: if strategy segmented chosen need to specify the duration of each segment
+      :param nb_segments:
+      :type nb_segments: if strategy segmented chosen, number of target per night
+
+      :returns:
+      :rtype: night blocks for the night and telescope according to the strategy selected
+
+
+   .. method:: peak_calculation(self, exp_t=10)
+
+
+
+   .. method:: exp_time_calculator(self, ADUpeak=None)
+
+
+
+

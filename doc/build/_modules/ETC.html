@@ -1,0 +1,683 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ETC &mdash; SPOCK 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/jupyter-sphinx.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SPOCK
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../content/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../content/quick-ref.html">Quick reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../content/api.html">API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Quick start</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKLT/examples_spocklt.html">Long term  scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKST/examples_spockst.html">Short term scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKapp/examples_app.html">SPOCKApp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPOCK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>ETC</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ETC</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">ascii</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span><span class="n">Column</span><span class="p">,</span> <span class="n">MaskedColumn</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+
+
+<div class="viewcode-block" id="etc"><a class="viewcode-back" href="../autoapi/ETC/index.html#ETC.etc">[docs]</a><span class="k">class</span> <span class="nc">etc</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mag_val</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">mag_band</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">spt</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">filt</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">airmass</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">moonphase</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">irtf</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>\
+                 <span class="n">num_tel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">seeing</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">gain</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mag_val</span> <span class="o">=</span> <span class="n">mag_val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mag_band</span> <span class="o">=</span> <span class="n">mag_band</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spt</span> <span class="o">=</span> <span class="n">spt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filt</span> <span class="o">=</span> <span class="n">filt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span> <span class="o">=</span> <span class="n">airmass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moonphase</span> <span class="o">=</span> <span class="n">moonphase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irtf</span> <span class="o">=</span> <span class="n">irtf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_tel</span> <span class="o">=</span><span class="n">num_tel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seeing</span> <span class="o">=</span> <span class="n">seeing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="n">gain</span>
+<div class="viewcode-block" id="etc.airmass"><a class="viewcode-back" href="../autoapi/ETC/index.html#ETC.etc.airmass">[docs]</a>        <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span> <span class="o">=</span> <span class="n">airmass</span></div>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class to Make schedules for the target list, observatory, dtae_range and startegy indicated</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_list: list of all target with their basic info</span>
+<span class="sd">        observatory: list of the observatory , and observatory/telescope if several telescope per observatory</span>
+<span class="sd">        startegy: scheduling strategy, either &#39;continuous&#39; or &#39;segmented&#39;</span>
+<span class="sd">        duration_segement: if strategy segmented chosen need to specify the duration of each segment</span>
+<span class="sd">        nb_segments: if strategy segmented chosen, number of target per night</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        night blocks for the night and telescope according to the strategy selected</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">########## CCD</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npix</span>        <span class="o">=</span> <span class="mi">2048</span> <span class="c1">#Number of pixels x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npiy</span>        <span class="o">=</span> <span class="mi">2048</span> <span class="c1">#Number of pixels y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mipi</span>        <span class="o">=</span> <span class="mf">13.5</span> <span class="c1">#picelscale</span>
+        <span class="c1">#self.gain        = 1.1  #Gain [el/ADU] # SSO</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tqe</span>         <span class="o">=</span> <span class="mi">243</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qefac</span>       <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1">#coefficient</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d0</span>          <span class="o">=</span> <span class="mf">2e4</span>  <span class="c1">#dark_293K</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ron</span>         <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tccd</span>        <span class="o">=</span> <span class="o">-</span><span class="mi">60</span>  <span class="c1">#CCD temperature [degree C]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binning</span>     <span class="o">=</span> <span class="mi">1</span>    <span class="c1">#CCD binning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tlost</span>       <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#read-out &amp; overhead time [s]</span>
+
+        <span class="c1">########## Optics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m1dia</span>       <span class="o">=</span> <span class="mi">1030</span> <span class="c1">#M1 free aperture [mm]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m2dia</span>       <span class="o">=</span> <span class="mi">300</span>  <span class="c1">#M2 mechanical aperture [mm]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">focrat</span>      <span class="o">=</span> <span class="mf">8.0</span>  <span class="c1">#Focal ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mloss</span>       <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#system loss [%]</span>
+
+        <span class="c1">########## Observatory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alti</span>        <span class="o">=</span> <span class="mi">2500</span> <span class="c1">#Altitude [m]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_tel</span>     <span class="o">=</span> <span class="mi">1</span>    <span class="c1">#Number of telescopes</span>
+
+        <span class="c1">########## Light curve</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bin_lc</span>      <span class="o">=</span> <span class="mf">7.2</span>  <span class="c1">#Time bin for SNR [min]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rednoise</span>    <span class="o">=</span> <span class="mf">0.</span>   <span class="c1">#Red noise[ppm]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span>      <span class="o">=</span> <span class="mf">5.</span>   <span class="c1">#</span>
+
+        <span class="c1">########## constants</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsun</span>        <span class="o">=</span> <span class="mf">695800.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rearth</span>      <span class="o">=</span> <span class="mf">6371.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span>           <span class="o">=</span> <span class="mf">299792458.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scinfac</span>     <span class="o">=</span> <span class="mf">0.09</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span>           <span class="o">=</span> <span class="mf">6.62607E-34</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e</span>           <span class="o">=</span> <span class="mf">2.71828</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">c1_file</span><span class="o">=</span><span class="s2">&quot;/Users/elsaducrot/spock/SPOCK/files_ETC/coating_1.dat&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="o">=</span><span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c1_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1">#plt.grid(True)</span>
+        <span class="c1">#plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+        <span class="c1">#plt.ylabel(&quot;Efficiency&quot;)</span>
+        <span class="c1">#plt.plot(c1[&#39;col1&#39;],c1[&#39;col2&#39;])</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">c2_file</span> <span class="o">=</span> <span class="s2">&quot;/Users/elsaducrot/spock/SPOCK/files_ETC/coating_2.dat&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c2</span> <span class="o">=</span> <span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c2_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># plt.grid(True)</span>
+        <span class="c1"># plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+        <span class="c1"># plt.ylabel(&quot;Efficiency&quot;)</span>
+        <span class="c1"># plt.plot(c2[&#39;col1&#39;],c2[&#39;col2&#39;])</span>
+        <span class="c1"># plt.show()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ccd_file</span><span class="o">=</span><span class="s2">&quot;/Users/elsaducrot/spock/SPOCK/files_ETC/ccd.dat&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ccd</span><span class="o">=</span><span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ccd_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="c1">#plt.grid(True)</span>
+        <span class="c1">#plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+        <span class="c1">#plt.ylabel(&quot;Efficiency&quot;)</span>
+        <span class="c1">#plt.plot(ccd[&#39;col1&#39;],ccd[&#39;col2&#39;])</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">qet_file</span><span class="o">=</span><span class="s2">&quot;/Users/elsaducrot/spock/SPOCK/files_ETC/qet.dat&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qet</span><span class="o">=</span><span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qet_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1">#plt.grid(True)</span>
+        <span class="c1">#plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+        <span class="c1">#plt.ylabel(&quot;Efficiency&quot;)</span>
+        <span class="c1">#plt.plot(qet[&#39;col1&#39;],qet[&#39;col2&#39;])</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_file</span><span class="o">=</span><span class="s2">&quot;/Users/elsaducrot/spock/SPOCK/files_ETC/window.dat&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">=</span><span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1">#plt.grid(True)</span>
+        <span class="c1">#plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+        <span class="c1">#plt.ylabel(&quot;Efficiency&quot;)</span>
+        <span class="c1">#plt.plot(window[&#39;col1&#39;],window[&#39;col2&#39;])</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="c1">#System</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mloss</span><span class="o">=</span><span class="mi">1</span><span class="o">-</span><span class="mf">0.01</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">mloss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surf</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m1dia</span><span class="o">*</span><span class="mf">0.5</span><span class="o">*</span><span class="mf">1.0e-3</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m2dia</span><span class="o">*</span><span class="mf">0.5</span><span class="o">*</span><span class="mf">1.0e-3</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eape</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surf</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">**.</span><span class="mi">5</span>    <span class="c1">#effective aperture</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">mloss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">mloss</span>
+
+        <span class="c1">#CCD corrections</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binning</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mipi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mipi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">binning</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">npix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">npix</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">binning</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">npiy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">npiy</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">binning</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">binning</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pixelscale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mipi</span> <span class="o">*</span> <span class="mf">206.265</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focrat</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">m1dia</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">npix</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixelscale</span><span class="o">/</span><span class="mf">60.</span>
+
+        <span class="c1">#convert to percent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rednoise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rednoise</span><span class="o">/</span><span class="mf">1.0e6</span>
+        <span class="c1">#convert from celsius to K</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tccd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tccd</span><span class="o">+</span><span class="mi">273</span>
+        <span class="n">dt</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tccd</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">tqe</span><span class="p">)</span><span class="o">/</span><span class="mf">125.</span>
+
+        <span class="c1">#Dark current</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d0</span><span class="o">*</span><span class="mi">122</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tccd</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">6400</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tccd</span><span class="o">-</span><span class="mi">10</span><span class="p">))</span>
+
+        <span class="c1">#Correction of ccd response for low temperatures</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qet</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">qet</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">qefac</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qet</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">qet</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ccd</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ccd</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">qet</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span>
+
+        <span class="n">bg_file</span><span class="o">=</span><span class="s2">&quot;/Users/elsaducrot/spock/SPOCK/files_ETC/background.dat&quot;</span>
+        <span class="n">bg</span><span class="o">=</span><span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bg_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#plt.xlim(500,510)</span>
+
+        <span class="c1">#plt.plot(bg[&#39;col1&#39;],bg[&#39;col6&#39;],bg[&#39;col1&#39;],bg[&#39;col5&#39;],bg[&#39;col1&#39;],bg[&#39;col4&#39;],bg[&#39;col1&#39;],bg[&#39;col3&#39;],bg[&#39;col1&#39;],bg[&#39;col2&#39;])</span>
+        <span class="n">moonph_sin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moonphase</span><span class="p">)</span><span class="o">*</span><span class="mi">360</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="c1">#Moonphase dependence of background</span>
+        <span class="k">if</span> <span class="n">moonph_sin</span><span class="o">&gt;=</span><span class="mf">0.</span> <span class="ow">and</span> <span class="n">moonph_sin</span> <span class="o">&lt;</span><span class="mf">45.</span><span class="p">:</span>
+            <span class="n">m1</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">m2</span><span class="o">=</span><span class="mi">1</span>
+            <span class="n">moonzero</span><span class="o">=</span><span class="mf">0.</span>
+        <span class="k">elif</span>  <span class="n">moonph_sin</span><span class="o">&gt;=</span><span class="mf">45.</span> <span class="ow">and</span> <span class="n">moonph_sin</span> <span class="o">&lt;</span><span class="mf">90.</span><span class="p">:</span>
+            <span class="n">m1</span><span class="o">=</span><span class="mi">1</span>
+            <span class="n">m2</span><span class="o">=</span><span class="mi">2</span>
+            <span class="n">moonzero</span><span class="o">=</span><span class="mf">45.</span>
+        <span class="k">elif</span>  <span class="n">moonph_sin</span><span class="o">&gt;=</span><span class="mf">90.</span> <span class="ow">and</span> <span class="n">moonph_sin</span> <span class="o">&lt;</span><span class="mf">135.</span><span class="p">:</span>
+            <span class="n">m1</span><span class="o">=</span><span class="mi">2</span>
+            <span class="n">m2</span><span class="o">=</span><span class="mi">3</span>
+            <span class="n">moonzero</span><span class="o">=</span><span class="mf">90.</span>
+        <span class="k">elif</span>  <span class="n">moonph_sin</span><span class="o">&gt;=</span><span class="mf">135.</span> <span class="ow">and</span> <span class="n">moonph_sin</span> <span class="o">&lt;=</span><span class="mf">180.</span><span class="p">:</span>
+            <span class="n">m1</span><span class="o">=</span><span class="mi">3</span>
+            <span class="n">m2</span><span class="o">=</span><span class="mi">4</span>
+            <span class="n">moonzero</span><span class="o">=</span><span class="mf">135.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;moonphase unrealistic&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">0.</span><span class="p">)</span>
+
+        <span class="c1">#Airmass dependence of background</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span><span class="o">&gt;=</span><span class="mf">1.</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span> <span class="o">&lt;</span><span class="mf">1.5</span><span class="p">:</span>
+            <span class="n">l1</span><span class="o">=</span><span class="mi">2</span>
+            <span class="n">l2</span><span class="o">=</span><span class="mi">3</span>
+            <span class="n">airzero</span><span class="o">=</span><span class="mf">1.</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span><span class="o">&gt;=</span><span class="mf">1.5</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span> <span class="o">&lt;</span><span class="mf">2.</span><span class="p">:</span>
+            <span class="n">l1</span><span class="o">=</span><span class="mi">3</span>
+            <span class="n">l2</span><span class="o">=</span><span class="mi">4</span>
+            <span class="n">airzero</span><span class="o">=</span><span class="mf">1.5</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span><span class="o">&gt;=</span><span class="mf">2.</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span> <span class="o">&lt;</span><span class="mf">2.5</span><span class="p">:</span>
+            <span class="n">l1</span><span class="o">=</span><span class="mi">4</span>
+            <span class="n">l2</span><span class="o">=</span><span class="mi">5</span>
+            <span class="n">airzero</span><span class="o">=</span><span class="mf">2.</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span><span class="o">&gt;=</span><span class="mf">2.5</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">airmass</span> <span class="o">&lt;</span><span class="mf">3.</span><span class="p">:</span>
+            <span class="n">l1</span><span class="o">=</span><span class="mi">5</span>
+            <span class="n">l2</span><span class="o">=</span><span class="mi">6</span>
+            <span class="n">airzero</span><span class="o">=</span><span class="mf">2.5</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;airmass not supported (1-3)&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">0.</span><span class="p">)</span>
+
+        <span class="c1">#only use first 5 entries of background.dat!!!</span>
+        <span class="n">exdif</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bg</span><span class="p">[</span><span class="s1">&#39;col&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l1</span><span class="p">))][:</span><span class="mi">5</span><span class="p">]</span><span class="o">-</span><span class="n">bg</span><span class="p">[</span><span class="s1">&#39;col&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l2</span><span class="p">))][:</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">backe</span><span class="o">=</span><span class="n">bg</span><span class="p">[</span><span class="s1">&#39;col&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l1</span><span class="p">))][:</span><span class="mi">5</span><span class="p">]</span><span class="o">-</span><span class="n">exdif</span><span class="o">*</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">airmass</span><span class="o">-</span><span class="n">airzero</span><span class="p">)</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">exdif</span><span class="o">=</span><span class="n">backe</span><span class="p">[</span><span class="n">m1</span><span class="p">]</span><span class="o">-</span><span class="n">backe</span><span class="p">[</span><span class="n">m2</span><span class="p">]</span>
+
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">back</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ccd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">back</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">back</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]))</span><span class="o">+</span><span class="n">backe</span><span class="p">[</span><span class="n">m1</span><span class="p">]</span><span class="o">-</span><span class="n">exdif</span><span class="o">*</span><span class="p">((</span><span class="n">moonph_sin</span><span class="o">-</span><span class="n">moonzero</span><span class="p">)</span><span class="o">/</span><span class="mf">45.</span><span class="p">)</span>
+        <span class="c1">#plt.grid(True)</span>
+        <span class="c1">#plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+        <span class="c1">#plt.ylabel(&quot;Background&quot;)</span>
+        <span class="c1">#plt.plot(back[&#39;col1&#39;],back[&#39;col2&#39;])</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="n">extind_file</span><span class="o">=</span><span class="s2">&quot;/Users/elsaducrot/spock/SPOCK/files_ETC/extin.dat&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extind</span><span class="o">=</span><span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">extind_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#plt.plot(extind[&#39;col1&#39;],extind[&#39;col6&#39;],extind[&#39;col1&#39;],extind[&#39;col5&#39;],extind[&#39;col1&#39;],extind[&#39;col4&#39;], \</span>
+        <span class="c1">#         extind[&#39;col1&#39;],extind[&#39;col3&#39;],extind[&#39;col1&#39;],extind[&#39;col2&#39;])#,extind[&#39;col1&#39;],extin,&#39;o&#39;)</span>
+
+        <span class="c1">#select right extiction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exdif</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extind</span><span class="p">[</span><span class="s1">&#39;col&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l1</span><span class="p">))]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">extind</span><span class="p">[</span><span class="s1">&#39;col&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l2</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extind</span><span class="p">[</span><span class="s1">&#39;col&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l1</span><span class="p">))]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">exdif</span><span class="o">*</span><span class="p">((</span><span class="n">airmass</span><span class="o">-</span><span class="n">airzero</span><span class="p">)</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="c1">#plt.grid(True)</span>
+        <span class="c1">#plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+        <span class="c1">#plt.ylabel(&quot;Extiction&quot;)</span>
+        <span class="c1">#plt.plot(extind[&#39;col1&#39;],extin)</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="c1">#available spectral types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="o">=</span><span class="n">Table</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">,</span><span class="s1">&#39;vmj&#39;</span><span class="p">,</span><span class="s1">&#39;vref&#39;</span><span class="p">,</span><span class="s1">&#39;rs&#39;</span><span class="p">,</span><span class="s1">&#39;file&#39;</span><span class="p">],</span>
+                      <span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;B0&#39;</span><span class="p">,</span><span class="s1">&#39;B1&#39;</span><span class="p">,</span><span class="s1">&#39;B3&#39;</span><span class="p">,</span><span class="s1">&#39;B6&#39;</span><span class="p">,</span><span class="s1">&#39;B8&#39;</span><span class="p">,</span> \
+                        <span class="s1">&#39;A0&#39;</span><span class="p">,</span><span class="s1">&#39;A2&#39;</span><span class="p">,</span><span class="s1">&#39;A3&#39;</span><span class="p">,</span><span class="s1">&#39;A5&#39;</span><span class="p">,</span> \
+                        <span class="s1">&#39;F0&#39;</span><span class="p">,</span><span class="s1">&#39;F2&#39;</span><span class="p">,</span><span class="s1">&#39;F5&#39;</span><span class="p">,</span><span class="s1">&#39;F8&#39;</span><span class="p">,</span> \
+                        <span class="s1">&#39;G0&#39;</span><span class="p">,</span><span class="s1">&#39;G1&#39;</span><span class="p">,</span><span class="s1">&#39;G2&#39;</span><span class="p">,</span><span class="s1">&#39;G5&#39;</span><span class="p">,</span><span class="s1">&#39;G8&#39;</span><span class="p">,</span> \
+                        <span class="s1">&#39;K0&#39;</span><span class="p">,</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span><span class="s1">&#39;K5&#39;</span><span class="p">,</span><span class="s1">&#39;K7&#39;</span><span class="p">,</span> \
+                        <span class="s1">&#39;M0&#39;</span><span class="p">,</span><span class="s1">&#39;M2&#39;</span><span class="p">,</span><span class="s1">&#39;M4&#39;</span><span class="p">,</span><span class="s1">&#39;M5&#39;</span><span class="p">,</span><span class="s1">&#39;M6&#39;</span><span class="p">,</span><span class="s1">&#39;M7&#39;</span><span class="p">,</span><span class="s1">&#39;M8&#39;</span><span class="p">,</span><span class="s1">&#39;M9&#39;</span><span class="p">,</span> \
+                        <span class="s1">&#39;L2&#39;</span><span class="p">,</span><span class="s1">&#39;L5&#39;</span><span class="p">,</span><span class="s1">&#39;L8&#39;</span><span class="p">],</span> \
+                        <span class="p">[</span><span class="o">-</span><span class="mf">0.8</span><span class="p">,</span><span class="o">-</span><span class="mf">0.73</span><span class="p">,</span><span class="o">-</span><span class="mf">0.60</span><span class="p">,</span><span class="o">-</span><span class="mf">0.46</span><span class="p">,</span><span class="o">-</span><span class="mf">0.36</span><span class="p">,</span> \
+                        <span class="o">-</span><span class="mf">0.16</span><span class="p">,</span><span class="o">-</span><span class="mf">0.07</span><span class="p">,</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span><span class="mf">0.09</span><span class="p">,</span> \
+                        <span class="mf">0.37</span><span class="p">,</span><span class="mf">0.48</span><span class="p">,</span><span class="mf">0.67</span><span class="p">,</span><span class="mf">0.79</span><span class="p">,</span> \
+                        <span class="mf">1.03</span><span class="p">,</span><span class="mf">1.055</span><span class="p">,</span><span class="mf">1.08</span><span class="p">,</span><span class="mf">1.25</span><span class="p">,</span><span class="mf">1.32</span><span class="p">,</span> \
+                        <span class="mf">1.46</span><span class="p">,</span><span class="mf">1.81</span><span class="p">,</span><span class="mf">2.22</span><span class="p">,</span><span class="mf">2.71</span><span class="p">,</span> \
+                        <span class="mf">2.96</span><span class="p">,</span><span class="mf">3.58</span><span class="p">,</span><span class="mf">4.42</span><span class="p">,</span><span class="mf">5.39</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span><span class="mf">0.00</span><span class="p">,</span><span class="mf">0.00</span><span class="p">,</span> \
+                        <span class="mf">0.00</span><span class="p">,</span><span class="mf">0.00</span><span class="p">,</span><span class="mf">0.00</span><span class="p">],</span>\
+                        <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span> \
+                        <span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span> \
+                        <span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span> \
+                        <span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span> \
+                        <span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span> \
+                        <span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">7.09</span><span class="p">,</span><span class="mf">9.78</span><span class="p">,</span><span class="mf">9.91</span><span class="p">,</span><span class="mf">9.54</span><span class="p">,</span> \
+                        <span class="mf">13.41</span><span class="p">,</span><span class="mf">12.83</span><span class="p">,</span><span class="mf">13.25</span><span class="p">],</span>
+                        <span class="p">[</span><span class="mf">7.4</span><span class="p">,</span><span class="mf">6.5</span><span class="p">,</span><span class="mf">4.8</span><span class="p">,</span><span class="mf">3.7</span><span class="p">,</span><span class="mf">3.0</span><span class="p">,</span> \
+                         <span class="mf">2.4</span><span class="p">,</span><span class="mf">2.15</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">1.7</span><span class="p">,</span> \
+                         <span class="mf">1.5</span><span class="p">,</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">1.3</span><span class="p">,</span><span class="mf">1.2</span><span class="p">,</span> \
+                         <span class="mf">1.1</span><span class="p">,</span><span class="mf">1.05</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.92</span><span class="p">,</span><span class="mf">0.88</span><span class="p">,</span> \
+                         <span class="mf">0.85</span><span class="p">,</span><span class="mf">0.80</span><span class="p">,</span><span class="mf">0.72</span><span class="p">,</span><span class="mf">0.67</span><span class="p">,</span> \
+                         <span class="mf">0.60</span><span class="p">,</span><span class="mf">0.44</span><span class="p">,</span><span class="mf">0.26</span><span class="p">,</span><span class="mf">0.18</span><span class="p">,</span><span class="mf">0.135</span><span class="p">,</span><span class="mf">0.12</span><span class="p">,</span><span class="mf">0.105</span><span class="p">,</span><span class="mf">0.09</span><span class="p">,</span> \
+                         <span class="mf">0.105</span><span class="p">,</span><span class="mf">0.105</span><span class="p">,</span><span class="mf">0.105</span><span class="p">],</span>
+                         <span class="p">[</span><span class="s1">&#39;b0_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;b1_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;b3_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;b6_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;b8_pickles.dat&#39;</span><span class="p">,</span> \
+                          <span class="s1">&#39;a0_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;a2_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;a3_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;a5_pickles.dat&#39;</span><span class="p">,</span> \
+                          <span class="s1">&#39;f0_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;f2_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;f5_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;f8_pickles.dat&#39;</span><span class="p">,</span> \
+                          <span class="s1">&#39;g0_ltt7379.dat&#39;</span><span class="p">,</span><span class="s1">&#39;g1_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;g2_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;g5_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;g8_pickles.dat&#39;</span><span class="p">,</span> \
+                          <span class="s1">&#39;k0_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;k2_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;k5_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;k7_pickles.dat&#39;</span><span class="p">,</span> \
+                          <span class="s1">&#39;m0_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;m2_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;m4_pickles.dat&#39;</span><span class="p">,</span><span class="s1">&#39;m5_pickles.dat&#39;</span><span class="p">,</span> \
+                          <span class="s1">&#39;m6_gl406.dat&#39;</span><span class="p">,</span><span class="s1">&#39;m7_gj644c.dat&#39;</span><span class="p">,</span><span class="s1">&#39;m8_vb10.dat&#39;</span><span class="p">,</span><span class="s1">&#39;m9_den1048.dat&#39;</span><span class="p">,</span> \
+                          <span class="s1">&#39;l2_kelu1.dat&#39;</span><span class="p">,</span><span class="s1">&#39;l5_2mass1507.dat&#39;</span><span class="p">,</span><span class="s1">&#39;l8_den0255.dat&#39;</span><span class="p">]])</span>
+        <span class="c1">#Changed vref from 10.23 0. for G0 standard star</span>
+        <span class="n">spt_sel</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1">#get spectral type information</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spt</span><span class="o">==</span><span class="n">spt_sel</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;spectral type not in list&quot;</span><span class="p">)</span>
+            <span class="c1">#print(5/0)</span>
+
+        <span class="c1">#available spectra are in folder Spectra</span>
+        <span class="n">path</span><span class="o">=</span><span class="s1">&#39;/Users/elsaducrot/spock/SPOCK/files_ETC/Spectra/&#39;</span>
+        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">=</span><span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">spec_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1">#plt.grid(True)</span>
+        <span class="c1">#plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+        <span class="c1">#plt.ylabel(&quot;Intensity&quot;)</span>
+        <span class="c1">#plt.title(spectra[&#39;file&#39;][i][:-4])</span>
+        <span class="c1">#plt.plot(spec[&#39;col1&#39;],spec[&#39;col2&#39;])</span>
+        <span class="c1">#plt.show()</span>
+
+        <span class="c1"># available filters are in folder Filters, check available files</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;/Users/elsaducrot/spock/SPOCK/files_ETC/Filters/&#39;</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># r=root, d=directories, f = files</span>
+        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="c1"># convert to lower case</span>
+        <span class="n">files_low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
+        <span class="c1"># check, if selceted filter is contained</span>
+        <span class="c1"># in_filter_list=np.where(np.char.find(files_low, filt.lower()+&#39;.dat&#39;)!=-1)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">in_filter_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">files_low</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">filt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;.dat&#39;</span><span class="p">)</span>
+            <span class="n">filter_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">files</span><span class="p">[</span><span class="n">in_filter_list</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span> <span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filter_file</span><span class="p">,</span> <span class="n">data_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># plt.grid(True)</span>
+            <span class="c1"># plt.xlabel(&quot;Wavelength [nm]&quot;)</span>
+            <span class="c1"># plt.ylabel(&quot;Troughput&quot;)</span>
+            <span class="c1"># plt.title(filt)</span>
+            <span class="c1"># plt.plot(filter[&#39;col1&#39;], filter[&#39;col2&#39;])</span>
+            <span class="c1"># plt.show()</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Filter not available&quot;</span><span class="p">)</span>
+
+        <span class="c1">#get spectral type information</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">i</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spt</span><span class="o">==</span><span class="n">spt_sel</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;spectral type not in list&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">#frequency instead of wavelength</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ener</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-9</span><span class="p">)</span>
+
+        <span class="c1">####colour correction</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mag_band</span> <span class="o">==</span> <span class="s2">&quot;V&quot;</span><span class="p">:</span>
+            <span class="c1">#do nothing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mag_val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mag_val</span><span class="o">+</span><span class="mf">0.</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mag_band</span> <span class="o">==</span> <span class="s2">&quot;J&quot;</span><span class="p">:</span>
+            <span class="c1">#apply V-J correction for spectral type</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mag_val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mag_val</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="p">[</span><span class="s1">&#39;vmj&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#ToDo add K-magnitude</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Band not implemented&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">0.</span><span class="p">)</span>
+
+        <span class="c1">#Apply IRTF/UCS flux correction to photomeric standards of M-dwarfs</span>
+        <span class="c1">#Standards were obtained with</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spt</span><span class="o">==</span><span class="n">spt_sel</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">spt_sel</span><span class="o">==</span><span class="s1">&#39;M6&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]:])[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">corcal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">irtf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">corcal</span><span class="o">=</span><span class="mf">1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">corcal</span>
+
+        <span class="c1">#Correction factor, accounting the apparent magnitude of the target.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">corflux</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="p">[</span><span class="s1">&#39;vref&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">mag_val</span><span class="p">)</span><span class="o">/</span><span class="mf">2.5</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="etc.peak_calculation"><a class="viewcode-back" href="../autoapi/ETC/index.html#ETC.etc.peak_calculation">[docs]</a>    <span class="k">def</span> <span class="nf">peak_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">exp_t</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+
+        <span class="c1">#Object independend effective troughput of the system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ccd</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span>
+
+        <span class="c1">#Background collected by system</span>
+        <span class="n">back2</span><span class="o">=</span><span class="n">Table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">back</span><span class="p">)</span>
+        <span class="n">back2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">back</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">effi</span><span class="o">*</span><span class="n">exp_t</span><span class="o">*</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">surf</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixelscale</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">tback</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">back2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span>    <span class="c1">#Background [el/pixel]</span>
+
+        <span class="c1">#print(tback)</span>
+        <span class="c1">#Starlight collected by system</span>
+        <span class="n">spec2</span><span class="o">=</span><span class="n">Table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">spec2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">ener</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">corflux</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">extin</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">effi</span><span class="o">*</span><span class="n">exp_t</span><span class="o">*</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">surf</span>
+
+        <span class="n">signal</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">spec2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span>
+        <span class="c1">#print(signal)</span>
+
+        <span class="c1">#light curve calculations</span>
+        <span class="n">bin_lc_c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_lc</span><span class="o">*</span><span class="mi">60</span>
+        <span class="n">npbin</span><span class="o">=</span><span class="n">bin_lc_c</span><span class="o">/</span><span class="p">(</span><span class="n">exp_t</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">tlost</span><span class="p">)</span>  <span class="c1">#Nexp per bin</span>
+        <span class="n">earthtra</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rearth</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="p">[</span><span class="s1">&#39;rs&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>    <span class="c1">#earth transit depth for spectral type</span>
+
+        <span class="c1">#sum (I do not really understand this)</span>
+        <span class="c1">#lambsum=sum(spec2[&#39;col2&#39;])</span>
+        <span class="c1">#lambeff=sum(spec2[&#39;col1&#39;]*spec2[&#39;col2&#39;])/lambsum</span>
+
+        <span class="n">seeing_p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seeing</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">pixelscale</span>
+        <span class="n">nape</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">seeing_p</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>    <span class="c1">#Npixels in aperture</span>
+
+        <span class="n">tdark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="o">*</span><span class="n">exp_t</span>      <span class="c1">#Dark [el\pixel]</span>
+        <span class="n">tdarkape</span><span class="o">=</span><span class="n">tdark</span><span class="o">*</span><span class="n">nape</span>
+        <span class="n">tbackape</span><span class="o">=</span><span class="n">tback</span><span class="o">*</span><span class="n">nape</span>
+        <span class="n">tronape</span><span class="o">=</span><span class="n">nape</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ron</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">peak</span><span class="o">=</span><span class="n">signal</span><span class="o">*</span><span class="mf">0.66</span><span class="o">/</span><span class="p">(</span><span class="n">seeing_p</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+        <span class="c1">#scintilations (from model)</span>
+        <span class="n">scinti</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scinfac</span><span class="o">*</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">eape</span><span class="o">*</span><span class="mf">100.</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">0.6666</span><span class="p">))</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">airmass</span><span class="o">**</span><span class="p">(</span><span class="mf">1.75</span><span class="p">)</span>
+        <span class="n">scinti_alt</span><span class="o">=</span><span class="n">scinti</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">alti</span><span class="o">/</span><span class="mf">8000.</span><span class="p">)</span>
+        <span class="n">scinti_exp</span><span class="o">=</span><span class="n">scinti_alt</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">exp_t</span><span class="p">)</span>
+        <span class="n">scinti2</span><span class="o">=</span><span class="p">(</span><span class="n">scinti_exp</span><span class="o">*</span><span class="n">signal</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">snr</span> <span class="o">=</span> <span class="n">signal</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">signal</span><span class="o">+</span><span class="n">tbackape</span><span class="o">+</span><span class="n">tronape</span><span class="o">+</span><span class="n">tdarkape</span><span class="o">+</span><span class="n">scinti2</span><span class="p">)</span>
+
+        <span class="c1">#more (similar) telescopes used?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_tel</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">snr</span><span class="o">=</span><span class="n">snr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_tel</span><span class="p">)</span>
+
+        <span class="n">snrbin</span> <span class="o">=</span> <span class="n">snr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">npbin</span><span class="p">)</span>       <span class="c1">#snr for each bin in the light-curve</span>
+        <span class="n">errorbin</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">snrbin</span>
+        <span class="n">errorbin_rn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">errorbin</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">rednoise</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#planet sensitivity</span>
+        <span class="n">sensi</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span><span class="o">*</span><span class="n">errorbin_rn</span><span class="o">/</span><span class="n">earthtra</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Peak [ADU]:</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">peak</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gain</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sky [ADU]:</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">tbackape</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gain</span><span class="p">)</span>
+        <span class="n">peak_ADU</span> <span class="o">=</span> <span class="n">peak</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gain</span>
+        <span class="n">sky_gain</span> <span class="o">=</span> <span class="n">tbackape</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gain</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="etc.exp_time_calculator"><a class="viewcode-back" href="../autoapi/ETC/index.html#ETC.etc.exp_time_calculator">[docs]</a>    <span class="k">def</span> <span class="nf">exp_time_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ADUpeak</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1">##########  Observation</span>
+        <span class="c1"># ADUpeak = 33000  # counts in peak desired [ADU]</span>
+        <span class="c1"># seeing = 0.95  # effective seeing [arcsec]</span>
+        <span class="c1"># airmass = 1.2  # Airmass</span>
+        <span class="c1"># num_tel = 1</span>
+
+        <span class="n">peak</span><span class="o">=</span><span class="n">ADUpeak</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">gain</span>
+
+        <span class="c1">#Object independend effective troughput of the system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ccd</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span>
+
+        <span class="c1">#Starlight collected by system</span>
+        <span class="n">spec2</span><span class="o">=</span><span class="n">Table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">spec2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">ener</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">corflux</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">extin</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">effi</span><span class="o">*</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">surf</span>
+        <span class="n">signal</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">spec2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span>
+
+        <span class="c1">#calculate exposure time from desired peak value</span>
+        <span class="n">seeing_p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seeing</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">pixelscale</span>
+        <span class="c1">#peak=self.exp_t*signal*0.66/(seeing_p)**2</span>
+
+        <span class="n">exp_t</span><span class="o">=</span><span class="n">peak</span><span class="o">*</span><span class="p">(</span><span class="n">seeing_p</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">signal</span><span class="o">*</span><span class="mf">0.66</span><span class="p">)</span>
+        <span class="c1"># print(&quot;Exposure [s]:\t&quot;,exp_t)</span>
+
+        <span class="c1">#Background collected by system</span>
+        <span class="n">back2</span><span class="o">=</span><span class="n">Table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">back</span><span class="p">)</span>
+        <span class="n">back2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">back</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">effi</span><span class="o">*</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">surf</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixelscale</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">tback</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">back2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">exp_t</span>    <span class="c1">#Background [el/pixel]</span>
+
+        <span class="c1">#light curve calculations</span>
+        <span class="n">bin_lc_c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_lc</span><span class="o">*</span><span class="mi">60</span>
+        <span class="n">npbin</span><span class="o">=</span><span class="n">bin_lc_c</span><span class="o">/</span><span class="p">(</span><span class="n">exp_t</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">tlost</span><span class="p">)</span>  <span class="c1">#Nexp per bin</span>
+
+        <span class="n">nape</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">seeing_p</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>    <span class="c1">#Npixels in aperture</span>
+        <span class="n">earthtra</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rearth</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="p">[</span><span class="s1">&#39;rs&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>    <span class="c1">#earth transit depth for spectral type</span>
+
+        <span class="c1">#sum (I do not really understand this)</span>
+
+        <span class="n">lambsum</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">spec2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span>
+        <span class="n">lambeff</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">spec2</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">spec2</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">])</span><span class="o">/</span><span class="n">lambsum</span>
+
+        <span class="n">tdark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dark</span><span class="o">*</span><span class="n">exp_t</span>      <span class="c1">#Dark [el\pixel]</span>
+        <span class="n">tdarkape</span><span class="o">=</span><span class="n">tdark</span><span class="o">*</span><span class="n">nape</span>
+        <span class="n">tbackape</span><span class="o">=</span><span class="n">tback</span><span class="o">*</span><span class="n">nape</span>
+        <span class="n">tronape</span><span class="o">=</span><span class="n">nape</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ron</span><span class="o">**</span><span class="mi">2</span>
+
+        <span class="c1">#scintilations</span>
+        <span class="n">scinti</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scinfac</span><span class="o">*</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">eape</span><span class="o">*</span><span class="mf">100.</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">0.6666</span><span class="p">))</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">airmass</span><span class="o">**</span><span class="p">(</span><span class="mf">1.75</span><span class="p">)</span>
+        <span class="n">scinti_alt</span><span class="o">=</span><span class="n">scinti</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">alti</span><span class="o">/</span><span class="mf">8000.</span><span class="p">)</span>
+        <span class="n">scinti_exp</span><span class="o">=</span><span class="n">scinti_alt</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">exp_t</span><span class="p">)</span>
+        <span class="n">scinti2</span><span class="o">=</span><span class="p">(</span><span class="n">scinti_exp</span><span class="o">*</span><span class="n">signal</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">snr</span> <span class="o">=</span> <span class="n">signal</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">signal</span><span class="o">+</span><span class="n">tbackape</span><span class="o">+</span><span class="n">tronape</span><span class="o">+</span><span class="n">tdarkape</span><span class="o">+</span><span class="n">scinti2</span><span class="p">)</span>
+
+        <span class="c1">#more (similar) telescopes used?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_tel</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">snr</span><span class="o">=</span><span class="n">snr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_tel</span><span class="p">)</span>
+
+        <span class="n">snrbin</span> <span class="o">=</span> <span class="n">snr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">npbin</span><span class="p">)</span>       <span class="c1">#snr for each bin in the light-curve</span>
+        <span class="n">errorbin</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">snrbin</span>
+        <span class="n">errorbin_rn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">errorbin</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">rednoise</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#planet sensitivity</span>
+        <span class="n">sensi</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsigma</span><span class="o">*</span><span class="n">errorbin_rn</span><span class="o">/</span><span class="n">earthtra</span><span class="p">)</span>
+
+        <span class="c1"># print(&quot;Peak [ADU]:\t&quot;, peak/self.gain)</span>
+        <span class="c1"># print(&quot;Sky [ADU]:\t&quot;, tbackape/self.gain)</span>
+        <span class="n">peak_ADU</span> <span class="o">=</span> <span class="n">peak</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gain</span>
+        <span class="n">sky_ADU</span> <span class="o">=</span>  <span class="n">tbackape</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gain</span>
+        <span class="k">return</span> <span class="n">exp_t</span><span class="p">,</span> <span class="n">peak_ADU</span><span class="p">,</span><span class="n">sky_ADU</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Elsa Ducrot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

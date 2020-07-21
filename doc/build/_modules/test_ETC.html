@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>test_ETC &mdash; SPOCK 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/jupyter-sphinx.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SPOCK
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../content/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../content/quick-ref.html">Quick reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../content/api.html">API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Quick start</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKLT/examples_spocklt.html">Long term  scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKST/examples_spockst.html">Short term scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKapp/examples_app.html">SPOCKApp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPOCK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>test_ETC</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for test_ETC</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">ascii</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span><span class="n">Column</span><span class="p">,</span> <span class="n">MaskedColumn</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+
+
+<span class="kn">import</span> <span class="nn">ETC</span>
+
+<span class="c1">##########  Observation</span>
+<div class="viewcode-block" id="mag_val"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.mag_val">[docs]</a><span class="n">mag_val</span>     <span class="o">=</span> <span class="mf">11.92</span> <span class="c1">#star magnitude</span></div>
+<div class="viewcode-block" id="mag_band"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.mag_band">[docs]</a><span class="n">mag_band</span>    <span class="o">=</span> <span class="s1">&#39;J&#39;</span>   <span class="c1">#Band (J or V)</span></div>
+<div class="viewcode-block" id="spt"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.spt">[docs]</a><span class="n">spt</span>         <span class="o">=</span> <span class="s1">&#39;M6&#39;</span>  <span class="c1">#spectral type</span></div>
+<div class="viewcode-block" id="filt"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.filt">[docs]</a><span class="n">filt</span>        <span class="o">=</span> <span class="s1">&#39;r&#39;</span> <span class="c1">#Filter in use</span></div>
+<div class="viewcode-block" id="exp_t"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.exp_t">[docs]</a><span class="n">exp_t</span>       <span class="o">=</span> <span class="mi">100</span>    <span class="c1">#Exposure time</span></div>
+<div class="viewcode-block" id="ADUpeak"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.ADUpeak">[docs]</a><span class="n">ADUpeak</span>     <span class="o">=</span> <span class="mi">33000</span> <span class="c1">#counts in peak desired [ADU]</span></div>
+<div class="viewcode-block" id="seeing"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.seeing">[docs]</a><span class="n">seeing</span>      <span class="o">=</span> <span class="mf">0.95</span>  <span class="c1">#effective seeing [arcsec]</span></div>
+<div class="viewcode-block" id="airmass"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.airmass">[docs]</a><span class="n">airmass</span>     <span class="o">=</span> <span class="mf">1.2</span>   <span class="c1">#Airmass</span></div>
+<div class="viewcode-block" id="moonphase"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.moonphase">[docs]</a><span class="n">moonphase</span>   <span class="o">=</span> <span class="mf">0.6</span>   <span class="c1">#Moon phase (0.=new moon, 1.=full moon)</span></div>
+<div class="viewcode-block" id="irtf"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.irtf">[docs]</a><span class="n">irtf</span>        <span class="o">=</span> <span class="mf">0.8</span>   <span class="c1">#IRTF/UCS flux correction</span></div>
+
+
+<div class="viewcode-block" id="a"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.a">[docs]</a><span class="n">a</span> <span class="o">=</span> <span class="n">ETC</span><span class="o">.</span><span class="n">etc</span><span class="p">(</span><span class="n">mag_val</span> <span class="o">=</span> <span class="mf">11.9</span><span class="p">,</span><span class="n">mag_band</span> <span class="o">=</span> <span class="s1">&#39;J&#39;</span><span class="p">,</span><span class="n">spt</span> <span class="o">=</span> <span class="s1">&#39;M6&#39;</span><span class="p">,</span><span class="n">filt</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">airmass</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">,</span><span class="n">moonphase</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span><span class="n">irtf</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span><span class="n">num_tel</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">seeing</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="texp"><a class="viewcode-back" href="../autoapi/test_ETC/index.html#test_ETC.texp">[docs]</a><span class="n">texp</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">exp_time_calculator</span><span class="p">(</span><span class="n">ADUpeak</span> <span class="o">=</span> <span class="mi">33000</span><span class="p">)</span></div>
+
+
+<span class="nb">print</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Elsa Ducrot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -16,6 +16,12 @@ matrix:
       env:
         - DOCS="true"
 
+cache:
+  pip: true
+  directories:
+     # manually cache ruby dependencies
+     - $TRAVIS_BUILD_DIR/tk-doc-generator/vendor/bundle
+
 install:
   - sudo apt-get install python3-pip
   - sudo pip3 install requests
@@ -26,5 +32,17 @@ script:
   - if [[ "${DOCS}" == "true" ]]; then
       cd docs;
       make html;
-      sphinx-build -b html . _build
     fi
+
+
+deploy:
+  # When commiting to master, auto-deploy to github-pages
+  # This will copy the contents of the _build folder to gh-pages branch and push
+- provider: pages
+  local-dir: ./doc/build
+  target-branch: gh-pages
+  skip-cleanup: true
+  github-token: $GH_TOKEN
+  on:
+    # only do this when on the master branch
+    branch: master

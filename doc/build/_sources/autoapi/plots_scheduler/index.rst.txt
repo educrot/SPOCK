@@ -1,0 +1,140 @@
+:mod:`plots_scheduler`
+======================
+
+.. py:module:: plots_scheduler
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   plots_scheduler.charge_observatories
+   plots_scheduler.airmass_plot_saved
+   plots_scheduler.airmass_plot_proposition
+   plots_scheduler.airmass_altitude_plot_saved
+   plots_scheduler.airmass_altitude_plot_proposition
+   plots_scheduler.gantt_chart_all
+   plots_scheduler.gantt_chart
+   plots_scheduler.airmass_altitude_plot_given_target
+   plots_scheduler.constraints_scores
+
+
+.. function:: charge_observatories(Name)
+
+   charge the observatory
+
+   :param Name: Name of the observatory
+   :type Name: str
+
+   :returns: list of the observatory
+   :rtype: list
+
+
+.. function:: airmass_plot_saved(name_observatory, telescope, day)
+
+   :param name_observatory: name of the observatory (ex : 'SSO')
+   :type name_observatory: str
+   :param telescope: name of the telescope (exx : 'Io')
+   :type telescope: str
+   :param day: date of day in fmt "yyyy-mm-dd"
+   :type day: date
+
+   :returns: visibility plot on telescope at a given day
+   :rtype: plot
+
+
+.. function:: airmass_plot_proposition(name_observatory, telescope, day)
+
+   :param name_observatory: name of the observatory (ex : 'SSO')
+   :type name_observatory: str
+   :param telescope: name of the telescope (exx : 'Io')
+   :type telescope: str
+   :param day: date of day in fmt "yyyy-mm-dd"
+   :type day: date
+
+   :returns: visibility plot on telescope at a given day
+   :rtype: plot
+
+
+.. function:: airmass_altitude_plot_saved(name_observatory, telescope, day)
+
+   :param name_observatory: name of the observatory (ex : 'SSO')
+   :type name_observatory: str
+   :param telescope: name of the telescope (exx : 'Io')
+   :type telescope: str
+   :param day: date of day in fmt "yyyy-mm-dd"
+   :type day: date
+
+   :returns: visibility plot on telescope at a given day
+   :rtype: plot
+
+
+.. function:: airmass_altitude_plot_proposition(name_observatory, telescope, day)
+
+   :param name_observatory: name of the observatory (ex : 'SSO')
+   :type name_observatory: str
+   :param telescope: name of the telescope (exx : 'Io')
+   :type telescope: str
+   :param day: date of day in fmt "yyyy-mm-dd"
+   :type day: date
+
+   :returns: visibility plot on telescope at a given day
+   :rtype: plot
+
+
+.. function:: gantt_chart_all(target_list)
+
+   :param target_list: path of the target list
+   :type target_list: path
+
+   :returns: gant chart of all scheduled targets so far
+   :rtype: plot
+
+
+.. function:: gantt_chart(date_start, date_end, telescope)
+
+   :param date_start: date start 'yyyy-mm-dd'
+   :type date_start: date
+   :param date_end: date start 'yyyy-mm-dd'
+   :type date_end: date
+   :param telescope: name of the  telescope
+   :type telescope: str
+
+   :returns: gant chart on a given range of  days
+   :rtype: plot
+
+
+.. function:: airmass_altitude_plot_given_target(name_observatory, day, target, path_target_list)
+
+   :param name_observatory: name of the observatory
+   :type name_observatory: str
+   :param day: date in format  'yyyy-mm-dd'
+   :type day: date
+   :param target: name of  target
+   :type target: str
+   :param path_target_list: path of the target  list
+   :type path_target_list: path
+
+
+.. function:: constraints_scores(constraints, target, observatory, start, end)
+
+   :param constraints: constraints
+   :type constraints: astroplan.constraints
+   :param target: target
+   :type target: astroplan.FixedTarget
+   :param observatory: astroplan.observed
+   :type observatory: observatory
+   :param start: start  date
+   :type start: date
+   :param end: end date
+   :type end: date
+
+   :returns: plot of the constraints scores
+   :rtype: plot
+
+
