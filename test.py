@@ -2,23 +2,9 @@ import SPOCK.long_term_scheduler as SPOCKLT
 import SPOCK.short_term_scheduler as SPOCKST
 import SPOCK.plots_scheduler as SPOCKplot
 
-# ---------------------- LONG TERM SCHEDULER ---------------------
-
-obs = 1
-schedule = SPOCKLT.Schedules()
-schedule.load_parameters('./SPOCK/input.csv',obs)
-
-schedule.make_schedule(Altitude_constraint = 24, Moon_constraint = 30)
-
-#SPOCKLT.make_docx_schedule(schedule.observatory, schedule.telescope, schedule.date_range,'Manu',
-#                           schedule.target_list)
-
-#SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
-
-print()
 
 # ---------------------- SHORT TERM SCHEDULER ---------------------
-obs = 5
+obs = 2
 schedule = SPOCKST.Schedules()
 schedule.load_parameters('./SPOCK/input_short_term.csv',obs)
 
@@ -28,7 +14,7 @@ if schedule.use == 'special_start_end':
     input_name = 'HW_Vir'
     schedule.special_target_with_start_end(input_name)
 if schedule.use == 'special':
-    input_name = 'GJ-299'
+    input_name = 'Sp0025+5422'
     schedule.special_target(input_name)
 if schedule.use == 'monitoring':
     input_name = 'Sp0755-2404'
@@ -45,3 +31,17 @@ SPOCKST.make_plans(day=schedule.day_of_night,nb_days=1,telescope=schedule.telesc
 
 print()
 
+# ---------------------- LONG TERM SCHEDULER ---------------------
+
+obs = 1
+schedule = SPOCKLT.Schedules()
+schedule.load_parameters('./SPOCK/input.csv',obs)
+
+schedule.make_schedule(Altitude_constraint = 24, Moon_constraint = 30)
+
+#SPOCKLT.make_docx_schedule(schedule.observatory, schedule.telescope, schedule.date_range,'Manu',
+#                           schedule.target_list)
+
+#SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
+
+print()

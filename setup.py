@@ -16,4 +16,5 @@ setup(
     packages = find_packages(),
     long_description = read('README.rst'),
     install_requires = ['pandas','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml','docx','plotly'],
+    python_requires='>=3.6',
 )

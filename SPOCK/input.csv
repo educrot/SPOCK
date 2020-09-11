@@ -1,7 +1,7 @@
 --- 
 date_range: 
-  - "2020-05-31 15:00:00"
-  - "2020-06-01 15:00:00"
+  - "2020-07-07 15:00:00"
+  - "2020-08-01 15:00:00"
 observatories:
   1:
     name: SSO
@@ -21,4 +21,4 @@ observatories:
 strategy: "continuous"
 duration_segments: 20
 nb_segments: 3
-target_list: ./SPOCK/speculoos_target_list_v6.txt
+target_list: speculoos_target_list_v6.txt

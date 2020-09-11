@@ -1,6 +1,6 @@
 --- 
 day_of_night: 
-  - "2020-06-07 15:00:00"
+  - "2020-09-02 15:00:00"
 start_end_range: 
   - "2020-03-18 05:00:00"
   - "2020-03-18 06:00:00"
@@ -21,4 +21,4 @@ observatories:
   5: 
     name: TN_Oukaimeden
     telescopes: [TN_Oukaimeden]
-target_list: ./SPOCK/target_list_special.txt
+target_list: target_list_special.txt

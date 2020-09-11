@@ -1,4 +1,4 @@
-Metadata-Version: 1.0
+Metadata-Version: 1.2
 Name: SPOCK
 Version: 0.0.0
 Summary: Speculoos Observatory SChedule maKer
@@ -25,12 +25,12 @@ Description: .. image:: https://travis-ci.com/educrot/SPOCK.svg?token=JyPx6cqUzx
         
         *  Observability
         
-        *  Priority
+        *  Priority (calculated from stellar parameters)
         
         *  Number of hours already performed
         
         Documentation SPOCK
-        ---------------------
+        --------------------
         
         You will find complete documentation for setting up your project at `SPOCK documentation site`_.
         
@@ -119,3 +119,4 @@ Description: .. image:: https://travis-ci.com/educrot/SPOCK.svg?token=JyPx6cqUzx
         
         <span style=“color:red;”> text </span>
 Platform: UNKNOWN
+Requires-Python: >=3.6

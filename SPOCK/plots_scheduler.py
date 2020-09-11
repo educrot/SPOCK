@@ -14,7 +14,9 @@ from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 import numpy as np
 import plotly.figure_factory as ff
 from astroplan.utils import time_grid_from_range
-import  os
+import os
+import requests
+import io
 
 def charge_observatories(Name):
     """ charge the observatory
@@ -307,7 +309,7 @@ def gantt_chart_all(target_list):
     config = {
         'scrollZoom': True
     }
-    offline.plot(fig,auto_open=True,filename='./SPOCK/SPOCK_Figures/Preview_schedule.html',config=config)
+    offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
 
 def gantt_chart(date_start,date_end,telescope):
     """
@@ -405,7 +407,7 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
 
     """
     if path_target_list is None:
-        path_target_list = 'SPECULOOS_target_list_v3.txt'
+        path_target_list = 'SPECULOOS_target_list_v6.txt'
     observatory = charge_observatories(name_observatory)[0]
     delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day, which='next').jd - 0.07, \
                                       observatory.twilight_morning_nautical(day + 1, which='nearest').jd + 0.07, 100),
@@ -496,3 +498,80 @@ def constraints_scores(constraints,target,observatory,start,end):
     ax.tick_params(axis='y', which='minor', left='off')
     ax.set_xlabel('Time on {0} UTC'.format(time_grid[0].datetime.date()))
     fig.subplots_adjust(left=0.35, right=0.9, top=0.9, bottom=0.1)
+
+def coverage(t, p):
+    if p==0:
+        return 1
+    else:
+        ph = ((t + 0.5*p)%p - (0.5*p))
+        sph_in = np.sort(ph)
+        sph_out = sph_in[::-1]
+
+        sph_in_diff = np.abs(np.diff(sph_in))
+        sph_out_diff = np.abs(np.diff(sph_out))
+
+        df = np.min(np.diff(t))
+
+        spaces_in = np.sort(sph_in[np.hstack([*np.argwhere(sph_in_diff > 4*df).T, len(sph_in)-1])])
+        spaces_out = np.sort(sph_out[np.hstack([*np.argwhere(sph_out_diff > 4*df).T, len(sph_in)-1])])
+
+        return np.sum(spaces_in - spaces_out)/p
+
+def getSPClcV2(target, ap = '', pwvCorr = 0, user="educrot", password="58JMSGgdmzTB"):
+    urlGet = "http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_tls_prep_v2.php?date=*&id=" + target + "&filter=&telescope=&ap=" + str(ap) + "&pwvCorr=" + str(pwvCorr)
+    rGET = requests.get(urlGet, auth=(user, password))
+    names = ['TMID-2450000', 'BJDMID-2450000', 'DIFF_FLUX', 'ERROR', 'DIFF_FLUX_PWV', 'RA_MOVE', 'DEC_MOVE', 'FWHM', 'PSF_a_5', 'PSF_b_5', 'SKYLEVEL', 'AIRMASS', 'EXPOSURE']
+    lc = pd.read_csv(io.StringIO(rGET.text), header=None, names=names, delimiter='\s+')
+    return lc
+
+def phase_coverage_given_target(name_observatory,target,path_target_list,pmin,pmax):
+
+    if path_target_list is None:
+        path_target_list = 'SPECULOOS_target_list_v6.txt'
+
+    target_list = pd.read_csv(path_target_list,sep=' ')
+    idx_target_list = list(target_list['Sp_ID']).index(target)
+
+    observatory = charge_observatories(name_observatory)[0]
+
+    data = getSPClcV2(target=target, ap='', pwvCorr=0)
+
+    t = data['BJDMID-2450000']
+    t = t.fillna(0)
+
+    colors_start_new_target = ['black', 'darkgray', 'lightgray']
+
+    plot_styles = {'linestyle': '-', 'color': 'k'}
+    if name_observatory == 'SSO':
+        plot_styles = {'linestyle': '-', 'color': 'skyblue'}
+    if name_observatory == 'SNO':
+        plot_styles = {'linestyle': '-', 'color': 'teal'}
+    if name_observatory == 'Saint-Ex':
+        plot_styles = {'linestyle': '-', 'color': 'gold'}
+
+    P_min = pmin
+    P_max = pmax
+    periods = np.arange(P_min, P_max, 0.01)
+
+    try:
+        covs = [coverage(t, period) for period in periods]
+        mean_cov = np.mean(covs)*100
+        fig, ax = plt.subplots(1, figsize=(9, 7))
+        plt.plot(periods, covs, c="silver",label='Effective cov = ' +  str(round(mean_cov,1)) + ' %')
+        plt.plot(periods, covs, ".", c="k",label=r'$SNR_{JWST}$ = ' +  str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3)))
+        # ax.annotate(r'$SNR_{JWST}$ = ' +  str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3)), (3,1),
+        #             xytext=(0.8, 0.85), textcoords='axes fraction',
+        #             fontsize=16,
+        #             horizontalalignment='right', verticalalignment='top')
+        # ax.annotate(r'Effective cov = ' +  str(round(mean_cov,1)) + ' %', (3,1),
+        #             xytext=(0.8, 0.8), textcoords='axes fraction',
+        #             fontsize=16,
+        #             horizontalalignment='right', verticalalignment='top')
+        plt.ylabel('Phase coverage in %')
+        plt.xlabel('Period in days')
+        plt.legend(fontsize=16)
+        plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
+        plt.title(r'Phase coverage for ' + target + ' with periods $\in$ ' + str(pmin) + ' - ' + str(pmax) )
+        plt.show()
+    except ValueError:
+        print('ERROR: No data for this target ! ')
