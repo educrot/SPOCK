@@ -1,12 +1,11 @@
 install:
   - pip install .
-
-
-script:
   - sudo apt-get install python3-pip
   - sudo pip3 install requests
   - pip install -U pip
   - pip install travis-sphinx==2.2.1 nbsphinx==0.7.0 sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema autoapi
+
+script:
   - if [[ "${DOCS}" == "true" ]]; then
       cd docs;
       make html;
