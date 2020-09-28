@@ -16,7 +16,7 @@ Schedule targets on several criteria:
 
 *  Visibility of the target
 
-*  Priority
+*  Priority (calculated from stellar parameters)
 
 *  Number of hours already performed
 
@@ -32,14 +32,26 @@ the Docs site <https://educrot.github.io/SPOCK/index.html>`_.
 Installation
 ---------------------
 
-Use the package manager [git clone]() to install SPOCK::
+.. _installation:
 
-    git clone http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock.git
+
+.. warning::
+    You must be part of the SPECULOOS consortium to use *SPOCK*.
+
+Installation
+============
+
+Please follow the instructions below to install the package
+
+OSX
+---
+
+Install *SPOCK* locally::
+
+    git clone https://github.com/educrot/SPOCK.git
 
     cd spock
-
     python setup.py install
-
 
 
 Input files
@@ -103,9 +115,9 @@ For ``short_term_scheduler`` create your *'input_file.csv'* file in the followin
 
 Contributing
 ---------------------
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Please make sure to update tests as appropriate.
+Suggestions are welcome and feel free to open an issue if you see a bug.
+
 
 License
 ---------------------
