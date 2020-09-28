@@ -1,3 +1,6 @@
+env:
+  - DOCS="true"
+
 install:
   - pip install .
   - sudo apt-get install python3-pip
