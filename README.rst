@@ -1,4 +1,15 @@
-**SPOCK** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
+.. image:: https://travis-ci.com/educrot/SPOCK_chilean.svg?token=JyPx6cqUzxMxHWAk8xyS&branch=master
+    :target: https://travis-ci.com/educrot/SPOCK
+
+.. image:: https://img.shields.io/badge/docs-dev-green.svg
+    :target: https://educrot.github.io/SPOCK/index.html
+
+<img align="right" src="./SPOCK_Figures/logo_SPOCK_2.png" width="350" height="100">
+
+**SPOCK** (Speculoos Observatory SChedule maKer) is a python package developed to handle the
+planification of observation of the SPECULOOS telescopes. The project SPECULOOS -Search for habitable Planets EClipsing ULtra-cOOl Stars –
+searches for potentially habitable exoplanets around the smallest and coolest stars
+of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4259452/fr/speculoos>`_.
 
 Schedule targets on several criteria:
 
@@ -8,13 +19,15 @@ Schedule targets on several criteria:
 
 *  Number of hours already performed
 
+*  Coordination between different site
+
 Documentation SPOCK
 ---------------------
 
 You will find complete documentation for setting up your project at `SPOCK Read
 the Docs site`_.
 
-.. _SPOCK Read the Docs site: file:///Users/elsaducrot/spock_2/doc/build/index.html
+.. _SPOCK documentation site : https://educrot.github.io/SPOCK/index.html
 
 
 Installation
@@ -25,6 +38,8 @@ Use the package manager [git clone]() to install SPOCK::
     git clone http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock.git
 
     cd spock
+
+    python setup.py install
 
 
 
