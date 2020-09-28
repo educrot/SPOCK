@@ -1,0 +1,22 @@
+;
+; Sp0419+4233
+;
+; 229155579195699456
+;
+#waituntil 1, 2019/12/19 19:08:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 16
+#TAG Donuts=on
+Sp0419+4233	04 19 52.33	+42 33 30.43
+;
+#quitat 00:59
+#chain Obj_Sp0829+2646.txt
+;

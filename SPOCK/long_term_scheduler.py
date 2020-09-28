@@ -975,7 +975,7 @@ class Schedules:
             time_since_las_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
                                      Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
             #self.update_nb_hours_all()
-            if abs(time_since_las_update) > 10: # in hours
+            if abs(time_since_las_update) > 1: # in hours
                 print('INFO: Updating the number of hours observed')
                 self.update_nb_hours_all()
 
@@ -1067,11 +1067,11 @@ class Schedules:
                         target_list['nb_hours_surved'][i] += df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
                         target_list['telescope'][i].append('TRAPPIST')
 
-                if np.any((np.asarray(artemis_in_targetlist)== i)) and np.all((np.asarray(camserver_in_targetlist) != i)) \
+                if np.any((np.asarray(artemis_in_targetlist) == i)) and np.all((np.asarray(camserver_in_targetlist) != i)) \
                         and np.all((np.asarray(SaintEx_in_targetlist) != i)):
                     idx_artemis = np.argwhere((np.asanyarray(artemis_in_targetlist) == i))[0][0]
                     target_list['nb_hours_surved'][i] = df_artemis['Observation Hours '][targetlist_in_artemis[idx_artemis]]
-                    target_list['telescope'][i].append('Saint-Ex')
+                    target_list['telescope'][i].append('Artemis')
                     if np.any((np.asarray(TRAPPIST_in_targetlist) == i)):
                         idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
                         target_list['nb_hours_surved'][i] += df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]

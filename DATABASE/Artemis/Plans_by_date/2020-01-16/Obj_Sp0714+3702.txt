@@ -1,0 +1,22 @@
+;
+; Sp0714+3702
+;
+; 898275195732381440
+;
+#waituntil 1, 2020/01/16 19:26:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 38
+#TAG Donuts=on
+Sp0714+3702	07 14 03.92	+37 02 46.03
+;
+#quitat 00:03
+#chain Obj_Sp1048+0111.txt
+;

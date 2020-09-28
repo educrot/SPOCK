@@ -1,0 +1,22 @@
+;
+; Sp0652-2534
+;
+; 2920995300823950720
+;
+#waituntil 1, 2020/02/11 00:18:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 50
+#TAG Donuts=on
+Sp0652-2534	06 52 19.74	-25 34 50.47
+;
+#quitat 04:52
+#chain Obj_Sp1155-2224.txt
+;

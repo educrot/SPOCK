@@ -1,0 +1,22 @@
+;
+; Sp0253-2336
+;
+; 5076670520902556544
+;
+#waituntil 1, 2019/12/07 00:16:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 49
+#TAG Donuts=on
+Sp0253-2336	02 53 27.24	-23 36 57.88
+;
+#quitat 04:28
+#chain Obj_Sp0921-2104.txt
+;

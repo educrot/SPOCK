@@ -1,0 +1,22 @@
+;
+; Sp0207-3721
+;
+; 4967628688601251200
+;
+#waituntil 1, 23:44
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 46
+#TAG Donuts=on
+Sp0207-3721	02 07 14.16	-37 21 50.31
+;
+#quitat 04:25
+#chain Obj_Sp0553-7133.txt
+;

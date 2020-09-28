@@ -1,0 +1,22 @@
+;
+; Sp2029+5750
+;
+; 2188222203084317184
+;
+#waituntil 1, 20:57
+#domeopen
+#chill -50
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 31
+#TAG Donuts=on
+Sp2029+5750	20 29 11.98	+57 50 31.66
+;
+#quitat 00:12
+#chain Obj_Trappist-1c.txt
+;

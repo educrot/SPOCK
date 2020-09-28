@@ -1,0 +1,22 @@
+;
+; Sp0440-0530
+;
+; 3200303384927512960
+;
+#waituntil 1, 03:07
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 11
+#TAG Donuts=on
+Sp0440-0530	04 40 23.28	-05 30 08.13
+;
+#quitat 04:35
+#chain Obj_Sp0828-1309.txt
+;

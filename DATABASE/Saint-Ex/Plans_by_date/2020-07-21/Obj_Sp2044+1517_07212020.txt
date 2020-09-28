@@ -1,0 +1,22 @@
+;
+; Sp2044+1517
+;
+; 1762523981210977664
+;
+#waituntil 1, 07/22/2020 04:01:20
+#domeopen
+#chill -70
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 63
+#TAG Donuts=on
+Sp2044+1517	20 44 37.49	+15 17 34.78
+;
+#quitat 07/22/2020 11:54:20
+#chain Cal_flatdawn_07212020.txt
+;

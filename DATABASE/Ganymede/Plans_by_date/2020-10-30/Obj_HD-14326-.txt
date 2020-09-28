@@ -1,0 +1,22 @@
+;
+; HD-14326-
+;
+; 4971670733861816320
+;
+#waituntil 1, 23:47
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 10
+#TAG Donuts=on
+HD-14326-	02 18 13.16	-31 05 17.39
+;
+#quitat 09:02
+#chain Cal_flatdawn.txt
+;

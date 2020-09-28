@@ -1,0 +1,22 @@
+;
+; Sp1037+3011
+;
+; 735453264711448064
+;
+#waituntil 1, 2020/03/22 20:10:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 38
+#TAG Donuts=on
+Sp1037+3011	10 37 28.75	+30 11 10.68
+;
+#quitat 00:28
+#chain Obj_Sp1428+1356.txt
+;

@@ -2,13 +2,11 @@
 from astropy import units as u
 from astropy.time import Time
 from astroplan.plots import dark_style_sheet
-from astropy.coordinates import SkyCoord, EarthLocation
 from astroplan import Observer
 from astroplan.periodic import EclipsingSystem
 from astroplan.constraints import is_event_observable
 from docx import Document
 from docx.shared import *
-from docx.enum.text import *
 from astropy.table import Table
 from datetime import datetime
 import os
@@ -23,9 +21,7 @@ import yaml
 import shutil
 import SPOCK.ETC as ETC
 import numpy as np
-import matplotlib.pyplot as plt
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint
-from eScheduler.constraints_spc import CelestialPoleSeparationConstraint
 from astroplan import TimeConstraint
 import astroplan
 import matplotlib.pyplot as plt
@@ -728,7 +724,6 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
                 print('INFO : ' + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
     if not save:
         print('INFO : Those plans have not been saved')
-
 
 def make_plans(day, nb_days, telescope):
     make_np(day, nb_days, telescope)

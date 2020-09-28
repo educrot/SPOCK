@@ -1,0 +1,22 @@
+;
+; Sp1056+0700
+;
+; 0
+;
+#waituntil 1, 2020/03/28 23:33:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter r'
+#interval 10
+#TAG Donuts=on
+Sp1056+0700	10 56 28.99	+07 00 51.84
+;
+#quitat 04:42
+#chain Obj_Sp1454-6604.txt
+;

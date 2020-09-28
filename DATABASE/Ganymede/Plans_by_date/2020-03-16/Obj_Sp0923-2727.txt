@@ -1,0 +1,22 @@
+;
+; Sp0923-2727
+;
+; 5637175400984142336
+;
+#waituntil 1, 2020/03/16 23:45:20
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 71
+#TAG Donuts=on
+Sp0923-2727	09 23 30.31	-27 27 20.88
+;
+#quitat 04:45
+#chain Obj_Sp1444-2019.txt
+;

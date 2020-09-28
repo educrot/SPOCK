@@ -1,0 +1,22 @@
+;
+; BD-16-52-
+;
+; 2368434186094242688
+;
+#waituntil 1, 23:32
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 10
+#TAG Donuts=on
+BD-16-52-	00 21 00.77	-16 07 28.61
+;
+#quitat 08:48
+#chain Obj_Sp0451-5818.txt
+;

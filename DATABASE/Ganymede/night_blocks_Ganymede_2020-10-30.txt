@@ -1,0 +1,2 @@
+target "start time (UTC)" "end time (UTC)" "duration (minutes)" "ra (h)" "ra (m)" "ra (s)" "dec (d)" "dec (m)" "dec (s)" configuration
+HD-14326- "2020-10-30 23:47:40.019" "2020-10-31 09:02:20.019" 554.6666666666669 2.0 18.0 13.157640000000725 -31.0 -5.0 -17.38860000000102 "{'texp=10', 'filt=I+z'}"

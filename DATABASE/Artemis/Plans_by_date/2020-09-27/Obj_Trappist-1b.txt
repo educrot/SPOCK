@@ -1,0 +1,22 @@
+;
+; Trappist-1b
+;
+; 2635476908753563008
+;
+#waituntil 1, 21:56
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 23
+#TAG Donuts=on
+Trappist-1b	23 06 29.00	-05 02 28.00
+;
+#quitat 00:30
+#chain Obj_Sp2138+5257_2.txt
+;

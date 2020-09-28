@@ -1,0 +1,22 @@
+;
+; Sp0417-0800
+;
+; 3192982561632526208
+;
+#waituntil 1, 2020/01/12 00:32:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 46
+#TAG Donuts=on
+Sp0417-0800	04 17 37.50	-08 00 00.60
+;
+#quitat 04:46
+#chain Obj_Sp1141-2232.txt
+;

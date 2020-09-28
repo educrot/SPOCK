@@ -1,0 +1,25 @@
+;
+; dome_rot
+;
+; None
+;
+#waituntil 1, 23:58
+;#domeopen
+;#chill -60
+#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Dome_rot
+#waitinlimits 600
+#nopointing
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 1
+#binning 1
+#filter I+z
+#interval 10
+#TAG Donuts=off
+dome_rot	18 19 23.87	+05 42 19.73
+;
+#dir
+#quitat 00:00
+#chain Obj_TYC-7533-1169-1-.txt
+;

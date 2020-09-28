@@ -1,0 +1,22 @@
+;
+; Sp0339-3525
+;
+; 4860376345833699840
+;
+#waituntil 1, 2019/12/09 00:18:20
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 15
+#TAG Donuts=on
+Sp0339-3525	03 39 35.33	-35 25 43.63
+;
+#quitat 04:29
+#chain Obj_Sp0830+0947.txt
+;

@@ -1,0 +1,22 @@
+;
+; Sp0006-0732
+;
+; 2441630500517079808
+;
+#waituntil 1, 23:33
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter r'
+#interval 12
+#TAG Donuts=on
+Sp0006-0732	00 06 43.19	-07 32 17.02
+;
+#quitat 04:25
+#chain Obj_Sp0254-1934.txt
+;

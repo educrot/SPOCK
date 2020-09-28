@@ -1,0 +1,22 @@
+;
+; J1509-10
+;
+; 6318875045448396032
+;
+#waituntil 1, 04:41
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter z'
+#interval 10
+#TAG Donuts=on
+J1509-10	15 09 40.95	-10 52 10.19
+;
+#quitat 09:46
+#chain Cal_flatdawn.txt
+;

@@ -1,0 +1,22 @@
+;
+; Sp0510+2714
+;
+; 3421840993510952192
+;
+#waituntil 1, 09/29/2020 07:31:00
+#domeopen
+#chill -70
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 46
+#TAG Donuts=on
+Sp0510+2714	05 10 20.06	+27 14 01.87
+;
+#quitat 09/29/2020 12:42:20
+#chain Cal_flatdawn_09282020.txt
+;

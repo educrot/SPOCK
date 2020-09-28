@@ -1,0 +1,22 @@
+;
+; Sp2228-1325
+;
+; 2601148128510120576
+;
+#waituntil 1, 23:50
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 20
+#TAG Donuts=on
+Sp2228-1325	22 28 54.34	-13 25 19.46
+;
+#quitat 00:14
+#chain Obj_Sp0320+1854.txt
+;

@@ -1,0 +1,22 @@
+;
+; Sp2044+1517
+;
+; 1762523981210977664
+;
+#waituntil 1, 08/16/2020 03:19:40
+#domeopen
+#chill -70
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 63
+#TAG Donuts=on
+Sp2044+1517	20 44 37.49	+15 17 34.78
+;
+#quitat 08/16/2020 07:42:20
+#chain Obj_Sp0036+1821_08152020.txt
+;

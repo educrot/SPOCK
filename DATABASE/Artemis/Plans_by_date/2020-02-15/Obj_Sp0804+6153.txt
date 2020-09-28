@@ -1,0 +1,22 @@
+;
+; Sp0804+6153
+;
+; 1085037832803001344
+;
+#waituntil 1, 2020/02/15 19:48:00
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 90
+#TAG Donuts=on
+Sp0804+6153	08 04 05.73	+61 53 32.87
+;
+#quitat 01:15
+#chain Obj_Sp1444+3002.txt
+;

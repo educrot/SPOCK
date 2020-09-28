@@ -1,0 +1,22 @@
+;
+; Sp0523-1403
+;
+; 2985035874544160384
+;
+#waituntil 1, 2020/01/20 00:30:20
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 180
+#TAG Donuts=on
+Sp0523-1403	05 23 38.23	-14 03 02.01
+;
+#quitat 04:48
+#chain Obj_Sp1159-5247.txt
+;

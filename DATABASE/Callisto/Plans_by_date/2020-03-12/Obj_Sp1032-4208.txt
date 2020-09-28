@@ -1,0 +1,22 @@
+;
+; Sp1032-4208
+;
+; 5392287051645815168
+;
+#waituntil 1, 2020/03/12 23:49:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 71
+#TAG Donuts=on
+Sp1032-4208	10 32 13.73	-42 08 57.12
+;
+#quitat 04:07
+#chain Obj_Sp1309-5438.txt
+;

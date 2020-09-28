@@ -2,12 +2,16 @@
 import os
 import shutil
 from astropy.table import Table
-from astroplan import Observer
+from astroplan import Observer,FixedTarget
 from astropy.time import Time
 from SPOCK.test_txtfiles import startup, startup_no_flats, Path_txt_files, flatexo_gany, flatexo_io, flatexo_euro, first_target_offset, flatexo_artemis_morning, flatexo_artemis_evening, startup_artemis,flatexo_saintex
 from SPOCK.test_txtfiles import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy import units as u
+import pandas as pd
+pd.set_option('display.max_columns', 50)
+import numpy as np
+from astroplan.utils import time_grid_from_range
 
 #initialisation
 filt={}
@@ -19,6 +23,143 @@ ra2={}
 dec2={}
 ra3={}
 dec3={}
+
+
+def make_scheduled_table(telescope,day_of_night):
+    Path = './DATABASE'
+    scheduled_table = None
+    day_of_night = Time(day_of_night)
+    try:
+        os.path.exists(os.path.join(Path, telescope,
+                                    'night_blocks_' + telescope + '_' + day_of_night.tt.datetime[0].strftime(
+                                        "%Y-%m-%d") + '.txt'))
+        print('INFO: Path exists and is: ', os.path.join(Path, telescope, 'night_blocks_' + telescope + '_' +
+                                                         day_of_night.tt.datetime[0].strftime(
+                                                             "%Y-%m-%d") + '.txt'))
+    except TypeError:
+        os.path.exists(os.path.join(Path, telescope,
+                                    'night_blocks_' + telescope + '_' + day_of_night.tt.datetime.strftime(
+                                        "%Y-%m-%d") + '.txt'))
+        print('INFO: Path exists and is: ', os.path.join(Path, telescope,
+                                                         'night_blocks_' + telescope + '_' + day_of_night.tt.datetime.strftime(
+                                                             "%Y-%m-%d") + '.txt'))
+    except NameError:
+        print('INFO: no input night_block for this day')
+    except FileNotFoundError:
+        print('INFO: no input night_block for this day')
+
+    if not (scheduled_table is None):
+        return scheduled_table
+    else:
+        try:
+            scheduled_table = Table.read(os.path.join(Path, telescope,
+                                                           'night_blocks_' + telescope + '_' +
+                                                           day_of_night.tt.datetime[0].strftime(
+                                                               "%Y-%m-%d") + '.txt'), format='ascii')
+            return scheduled_table
+        except TypeError:
+            scheduled_table = Table.read(os.path.join(Path, telescope,
+                                                           'night_blocks_' + telescope + '_' + day_of_night.tt.datetime.strftime(
+                                                               "%Y-%m-%d") + '.txt'), format='ascii')
+            return scheduled_table
+
+
+def dome_rotation(day_of_night,telescope):
+    scheduled_table = make_scheduled_table(telescope,day_of_night)
+    location = EarthLocation.from_geodetic(-70.40300000000002 * u.deg, -24.625199999999996 * u.deg,
+                                           2635.0000000009704 * u.m)
+    paranal = Observer(location=location, name="paranal", timezone="UTC")
+    dur_dome_rotation = 2 / 60 / 24   # 5min
+    number_of_targets = len(scheduled_table['target'])
+
+    if number_of_targets == 1:
+        old_end_time = scheduled_table['end time (UTC)'][0]
+
+        start_dome_rot = Time((Time(scheduled_table['start time (UTC)'][0],format='iso').jd +
+                              Time(scheduled_table['end time (UTC)'][0],format='iso').jd)/2,format='jd')
+
+        end_dome_rot = Time(start_dome_rot.jd + dur_dome_rotation, format='jd')
+
+        dur_first_block = Time(start_dome_rot.jd - Time(scheduled_table['start time (UTC)'][0],format='iso').jd,format='jd').jd
+        dur_second_block = Time(Time(old_end_time).jd - end_dome_rot.jd,format='jd').jd
+
+        coords = SkyCoord(str(int(scheduled_table['ra (h)'][0])) + 'h' + str(
+            int(scheduled_table['ra (m)'][0])) + 'm' + str(
+            round(scheduled_table['ra (s)'][0], 3)) + 's' + \
+                          ' ' + str(int(scheduled_table['dec (d)'][0])) + 'd' + str(
+            abs(int(scheduled_table['dec (m)'][0]))) + \
+                          'm' + str(abs(round(scheduled_table['dec (s)'][0], 3))) + 's').transform_to(
+            AltAz(obstime=start_dome_rot, location=paranal.location))
+        coords_dome_rotation = SkyCoord(alt=coords.alt, az=(coords.az.value - 180) * u.deg, obstime=start_dome_rot,
+                                        frame='altaz', location=paranal.location)
+        if (coords.alt.value < 50):
+            print('WARNING: not possible at that time because of altitude constraint, adding 20 degrees altitude')
+            coords_dome_rotation = SkyCoord(alt=coords.alt + 20 * u.deg, az=(coords.az.value - 180) * u.deg,
+                                            obstime=start_dome_rot, frame='altaz', location=paranal.location)
+
+        target = FixedTarget(coord=SkyCoord(ra=coords_dome_rotation.icrs.ra.value * u.degree,
+                                            dec=coords_dome_rotation.icrs.dec.value * u.degree),
+                             name='dome_rot')
+
+        scheduled_table.add_row([target.name, start_dome_rot.iso,  end_dome_rot.iso,
+                           dur_dome_rotation * 24 * 60,
+                            target.coord.ra.hms[0],
+                            target.coord.ra.hms[1],  target.coord.ra.hms[2],
+                            target.coord.dec.dms[0],  target.coord.dec.dms[1],
+                            target.coord.dec.dms[2],  "{\'filt=I+z\', \'texp=10\'}"])
+
+        scheduled_table['end time (UTC)'][0] = start_dome_rot.iso
+        scheduled_table['duration (minutes)'][0] = dur_first_block* 24 * 60
+
+        scheduled_table.add_row([scheduled_table['target'][0], end_dome_rot.iso,  old_end_time,
+                           dur_second_block* 24 * 60,
+                            scheduled_table['ra (h)'][0],
+                            scheduled_table['ra (m)'][0],  scheduled_table['ra (s)'][0],
+                            scheduled_table['dec (d)'][0],  scheduled_table['dec (m)'][0],
+                            scheduled_table['dec (s)'][0],  scheduled_table['configuration'][0]])
+
+        df = scheduled_table.to_pandas()
+        df['target'][2] = df['target'][2] + '_2'
+
+        scheduled_table = Table.from_pandas(df)
+        scheduled_table.sort('start time (UTC)')
+
+
+    if number_of_targets > 1:
+        start_dome_rot = Time(scheduled_table['end time (UTC)'][0],format='iso')
+
+        end_dome_rot = Time(start_dome_rot.jd + dur_dome_rotation, format='jd')
+
+        coords = SkyCoord(str(int(scheduled_table['ra (h)'][0])) + 'h' + str(
+            int(scheduled_table['ra (m)'][0])) + 'm' + str(
+            round(scheduled_table['ra (s)'][0], 3)) + 's' + \
+                          ' ' + str(int(scheduled_table['dec (d)'][0])) + 'd' + str(
+            abs(int(scheduled_table['dec (m)'][0]))) + \
+                          'm' + str(abs(round(scheduled_table['dec (s)'][0], 3))) + 's').transform_to(
+            AltAz(obstime=start_dome_rot, location=paranal.location))
+        coords_dome_rotation = SkyCoord(alt=coords.alt, az=(coords.az.value - 180) * u.deg, obstime=start_dome_rot,
+                                        frame='altaz', location=paranal.location)
+        if (coords.alt.value < 50):
+            print('WARNING: not possible at that time because of altitude constraint, adding 20 degrees altitude')
+            coords_dome_rotation = SkyCoord(alt=coords.alt + 20 * u.deg, az=(coords.az.value - 180) * u.deg,
+                                            obstime=start_dome_rot,frame='altaz', location=paranal.location)
+
+        target = FixedTarget(coord=SkyCoord(ra=coords_dome_rotation.icrs.ra.value * u.degree,
+                                            dec=coords_dome_rotation.icrs.dec.value * u.degree),
+                             name='dome_rot')
+
+        scheduled_table.add_row([target.name, start_dome_rot.iso,  end_dome_rot.iso,
+                           dur_dome_rotation * 24 * 60,
+                            target.coord.ra.hms[0],
+                            target.coord.ra.hms[1],  target.coord.ra.hms[2],
+                            target.coord.dec.dms[0],  target.coord.dec.dms[1],
+                            target.coord.dec.dms[2],  "{\'filt=I+z\', \'texp=10\'}"])
+
+        scheduled_table['start time (UTC)'][1] = end_dome_rot.iso
+
+        scheduled_table.sort('start time (UTC)')
+
+    return scheduled_table
 
 
 def make_np(t_now,nb_jours,tel):
@@ -33,7 +174,12 @@ def make_np(t_now,nb_jours,tel):
         if not os.path.exists(p):
             os.makedirs(p)
 
-        scheduler_table=Table.read('./DATABASE/' + str(telescope) +'/night_blocks_'+ str(telescope) +'_' + str(t_now)+'.txt', format='ascii')
+        scheduler_table = Table.read('./DATABASE/' + str(telescope) +'/night_blocks_'+ str(telescope) +'_' + str(t_now)+'.txt', format='ascii')
+
+        if (tel == 'Io') or tel == ('Europa') or (tel == 'Ganymede') or (tel == 'Callisto'):
+            scheduler_table = dome_rotation(telescope=tel, day_of_night=t_now) # Intentional dome rotation to
+            # avoid technical pb on Callisto with dome
+
         name=scheduler_table['target']
         date_start=scheduler_table['start time (UTC)']
         date_end=scheduler_table['end time (UTC)']

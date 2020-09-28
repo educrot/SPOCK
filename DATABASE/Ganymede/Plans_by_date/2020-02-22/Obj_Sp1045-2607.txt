@@ -1,0 +1,22 @@
+;
+; Sp1045-2607
+;
+; 5469802724480366848
+;
+#waituntil 1, 00:26
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 80
+#TAG Donuts=on
+Sp1045-2607	10 45 17.15	-26 07 25.12
+;
+#quitat 01:48
+#chain Obj_EP249631677.txt
+;

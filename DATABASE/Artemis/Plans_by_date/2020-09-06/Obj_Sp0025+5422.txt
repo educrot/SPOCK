@@ -1,0 +1,22 @@
+;
+; Sp0025+5422
+;
+; 419624356438705152
+;
+#waituntil 1, 20:43
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 52
+#TAG Donuts=on
+Sp0025+5422	00 25 15.78	+54 22 54.91
+;
+#quitat 00:40
+#chain Obj_Trappist-1d.txt
+;

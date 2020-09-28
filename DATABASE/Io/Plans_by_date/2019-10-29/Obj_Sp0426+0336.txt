@@ -1,0 +1,22 @@
+;
+; Sp0426+0336
+;
+; 3280675417175220224
+;
+#waituntil 1, 03:22
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 25
+#TAG Donuts=on
+Sp0426+0336	04 26 19.94	+03 36 36.17
+;
+#quitat 09:04
+#chain Cal_flatdawn.txt
+;

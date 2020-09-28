@@ -1,0 +1,22 @@
+;
+; EP228740289
+;
+; 3581310689669470592
+;
+#waituntil 1, 22:26
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 40
+#TAG Donuts=on
+EP228740289	12 12 28.59	-09 22 06.80
+;
+#quitat 06:45
+#chain Cal_flatdawn.txt
+;

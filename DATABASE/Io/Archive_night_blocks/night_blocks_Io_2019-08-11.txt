@@ -1,0 +1,2 @@
+target "start time (UTC)" "end time (UTC)" "duration (minutes)" "ra (h)" "ra (m)" "ra (s)" "dec (d)" "dec (m)" "dec (s)" configuration
+Sp2247-7733 "2019-08-11 23:13:00.027" "2019-08-12 10:20:40.027" 609.6666666666667 22.0 47.0 43.500000000030354 -77.0 -33.0 -38.04000000002475 "{'texp=50', 'filt=I+z'}"

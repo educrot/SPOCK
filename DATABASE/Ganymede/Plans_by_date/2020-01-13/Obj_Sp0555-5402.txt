@@ -1,0 +1,22 @@
+;
+; Sp0555-5402
+;
+; 4767876769050721920
+;
+#waituntil 1, 2020/01/14 00:31:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 62
+#TAG Donuts=on
+Sp0555-5402	05 55 14.97	-54 02 52.05
+;
+#quitat 04:46
+#chain Obj_Sp1141-2232.txt
+;

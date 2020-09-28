@@ -254,10 +254,11 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     elif 'Sp' in name:
-        df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
-        #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
-        idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
-        gaia_id_target = df2['Gaia_ID'][int(idx_target)]
+        if name != 'Sp1837+2030':
+            df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
+            #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
+            idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
+            gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
         df2 = pd.read_csv('target_list_special.txt',delimiter=' ',index_col=None)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
@@ -317,6 +318,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write('#chill -70\n')
             else:
                 out.write('#chill -60\n')
+
             out.write(str2 + str(waitlimit) + '\n')
             out.write(str3)
             out.write(str33 + str(afinterval) + '\n')
@@ -386,21 +388,37 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             for i in range(1,2):
                 out.write(str00 + '\n')
             out.write(str1 + str(hour0) + ':' + str(minute0) + '\n')
-            out.write(str22)
+            if name == "dome_rot":
+                out.write(';#domeopen\n')
+            else:
+                out.write(str22)
             if telescope == 'Artemis':
                 out.write('#chill -60\n')
             else:
-                out.write('#chill -60\n')
+                if name == 'dome_rot':
+                    out.write(';#chill -60\n')
+                else:
+                    out.write('#chill -60\n')
+            if name == 'dome_rot':
+                out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Dome_rot" + '\n')
             out.write(str2 + str(waitlimit) + '\n')
+            if name == 'dome_rot':
+                out.write('#nopointing'+'\n')
             out.write(str3)
             out.write(str33 + str(afinterval) +'\n')
             if autofocus is None:
                 out.write(str00 + str4)
-            out.write(str5 + str(count) + '\n')
+            if name == 'dome_rot':
+                out.write('#count 1'  + '\n')
+            else:
+                out.write(str5 + str(count) + '\n')
             out.write(str6 + str(binning) + '\n')
             out.write(str7 + str(filt) + '\n')
             out.write(str8 + str(exptime) +'\n')
-            out.write('#TAG Donuts=on'+'\n')
+            if name == 'dome_rot':
+                out.write('#TAG Donuts=off' + '\n')
+            else:
+                out.write('#TAG Donuts=on'+'\n')
             if int(dec1)==-0:
                 #print('ici')
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
@@ -413,6 +431,8 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
             out.write(str00 + '\n')
+            if name == 'dome_rot':
+                out.write('#dir'+ '\n')
             out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
             if name_2 is None:
                 out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
@@ -617,10 +637,11 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     elif 'Sp' in name:
-        df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
-        #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
-        idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
-        gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
+        if name != 'Sp1837+2030':
+            df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
+            #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
+            idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
+            gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
     if idx_target is None:
         df2 = pd.read_csv('target_list_special.txt',delimiter=' ',index_col=None)
         try:

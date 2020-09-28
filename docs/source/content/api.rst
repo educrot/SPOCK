@@ -1,5 +1,3 @@
-.. _api:
-
 ***
 API
 ***
@@ -11,13 +9,13 @@ The SPOCK API reference
    :members:
 
 long_term_scheduler
------------------------
+------------------
 
 .. automodule:: SPOCK.long_term_scheduler
    :members:
 
 short_term_scheduler
------------------------
+------------------
 
 .. automodule:: SPOCK.short_term_scheduler
    :members:

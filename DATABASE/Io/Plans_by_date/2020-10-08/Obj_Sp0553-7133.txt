@@ -1,0 +1,22 @@
+;
+; Sp0553-7133
+;
+; 4656782698309778432
+;
+#waituntil 1, 04:25
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter i'
+#interval 16
+#TAG Donuts=on
+Sp0553-7133	05 53 26.48	-71 33 49.79
+;
+#quitat 09:23
+#chain Cal_flatdawn.txt
+;

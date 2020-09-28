@@ -1,0 +1,22 @@
+;
+; Sp0008+4918
+;
+; 393621524910343296
+;
+#waituntil 1, 09/10/2020 03:05:40
+#domeopen
+#chill -70
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 48
+#TAG Donuts=on
+Sp0008+4918	00 08 55.36	+49 18 56.32
+;
+#quitat 09/10/2020 12:30:40
+#chain Cal_flatdawn_09092020.txt
+;

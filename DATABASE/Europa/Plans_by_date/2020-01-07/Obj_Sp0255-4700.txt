@@ -1,0 +1,22 @@
+;
+; Sp0255-4700
+;
+; 4752399493622045696
+;
+#waituntil 1, 2020/01/08 00:31:40
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 80
+#TAG Donuts=on
+Sp0255-4700	02 55 04.18	-47 00 51.35
+;
+#quitat 04:43
+#chain Obj_Sp0853-2446.txt
+;

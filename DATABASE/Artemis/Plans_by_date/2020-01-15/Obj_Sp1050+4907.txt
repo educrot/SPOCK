@@ -1,0 +1,22 @@
+;
+; Sp1050+4907
+;
+; 832562475274342528
+;
+#waituntil 1, 01:12
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 95
+#TAG Donuts=on
+Sp1050+4907	10 50 32.04	+49 07 42.03
+;
+#quitat 07:05
+#chain Cal_flatdawn.txt
+;

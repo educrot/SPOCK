@@ -1,0 +1,22 @@
+;
+; Sp2354-3316
+;
+; 2313836153805786624
+;
+#waituntil 1, 23:47
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 80
+#TAG Donuts=on
+Sp2354-3316	23 54 09.22	-33 16 26.76
+;
+#quitat 04:21
+#chain Obj_Sp0451-5818.txt
+;

@@ -1,0 +1,22 @@
+;
+; Sp1824-0536
+;
+; 4161034758178900224
+;
+#waituntil 1, 07/29/2020 03:38:00
+#domeopen
+#chill -70
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 37
+#TAG Donuts=on
+Sp1824-0536	18 24 23.59	-05 36 49.25
+;
+#quitat 07/29/2020 07:44:20
+#chain Obj_Sp0036+1821_07282020.txt
+;

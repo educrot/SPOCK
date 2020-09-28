@@ -1,0 +1,22 @@
+;
+; Sp2213-6342
+;
+; 6405457982659103872
+;
+#waituntil 1, 23:30
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 10
+#TAG Donuts=on
+Sp2213-6342	22 13 50.62	-63 42 10.01
+;
+#quitat 03:57
+#chain Obj_dome_rot.txt
+;

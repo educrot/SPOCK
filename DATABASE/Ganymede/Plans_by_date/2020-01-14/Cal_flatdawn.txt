@@ -1,0 +1,4 @@
+#waituntil 1, 09:10
+#dawnflats Cal_flatexo.txt 
+#quitat 10:09
+#chain Cal_biasdark.txt 

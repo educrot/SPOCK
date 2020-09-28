@@ -1,0 +1,22 @@
+;
+; Sp0451-5818
+;
+; 4774420478143249536
+;
+#waituntil 1, 04:22
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 30
+#TAG Donuts=on
+Sp0451-5818	04 51 37.18	-58 18 52.04
+;
+#quitat 09:03
+#chain Cal_flatdawn.txt
+;

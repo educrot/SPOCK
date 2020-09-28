@@ -1,0 +1,22 @@
+;
+; Sp0829+2646
+;
+; 703790044252850688
+;
+#waituntil 1, 00:53
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter r
+#interval 15
+#TAG Donuts=on
+Sp0829+2646	08 29 49.21	+26 46 33.63
+;
+#quitat 06:49
+#chain Cal_flatdawn.txt
+;

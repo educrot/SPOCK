@@ -1,0 +1,22 @@
+;
+; Sp0544-2433
+;
+; 2915187925218983296
+;
+#waituntil 1, 04:28
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 63
+#TAG Donuts=on
+Sp0544-2433	05 44 11.54	-24 33 02.51
+;
+#quitat 08:49
+#chain Cal_flatdawn.txt
+;

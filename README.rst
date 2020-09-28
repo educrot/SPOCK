@@ -1,32 +1,20 @@
-.. image:: https://travis-ci.com/educrot/SPOCK.svg?token=JyPx6cqUzxMxHWAk8xyS&branch=master
-    :target: https://travis-ci.com/educrot/SPOCK
+**SPOCK** (Speculoos Observatory SChedule maKer) is a Python library for dealing with the planification of SPECULOOS targets observations
 
-.. image:: https://img.shields.io/badge/docs-dev-blue.svg
-    :target: https://educrot.github.io/SPOCK/index.html
+Schedule targets on several criteria:
 
-.. image:: figures/logo_SPOCK.png
-   :width: 600
+*  Visibility of the target
 
-**SPOCK** (Speculoos Observatory SChedule maKer) is a python package developed to handle
-the planification of observation of the SPECULOOS telescopes. The project SPECULOOS -Search for habitable Planets EClipsing ULtra-cOOl Stars –
-searches for potentially habitable exoplanets around the smallest and coolest stars
-of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4259452/fr/speculoos>`_.
-
-
-Targets are scheduled following several criteria:
-
-*  Observability
-
-*  Priority (calculated from stellar parameters)
+*  Priority
 
 *  Number of hours already performed
 
 Documentation SPOCK
---------------------
+---------------------
 
-You will find complete documentation for setting up your project at `SPOCK documentation site`_.
+You will find complete documentation for setting up your project at `SPOCK Read
+the Docs site`_.
 
-.. _SPOCK documentation site : https://educrot.github.io/SPOCK/index.html
+.. _SPOCK Read the Docs site: file:///Users/elsaducrot/spock_2/doc/build/index.html
 
 
 Installation
@@ -34,11 +22,9 @@ Installation
 
 Use the package manager [git clone]() to install SPOCK::
 
-    git clone https://github.com/educrot/SPOCK.git
+    git clone http://speculoos7.astro.ulg.ac.be/gitlab/eDucrot/spock.git
 
     cd spock
-
-    python setup.py install
 
 
 
@@ -103,8 +89,9 @@ For ``short_term_scheduler`` create your *'input_file.csv'* file in the followin
 
 Contributing
 ---------------------
-Suggestions are welcome and feel free to open an issue if you see a bug.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+Please make sure to update tests as appropriate.
 
 License
 ---------------------
