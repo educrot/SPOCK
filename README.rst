@@ -4,7 +4,8 @@
 .. image:: https://img.shields.io/badge/docs-dev-green.svg
     :target: https://educrot.github.io/SPOCK/index.html
 
-<img align="right" src="./SPOCK_Figures/logo_SPOCK_2.png" width="350" height="100">
+.. image:: ./SPOCK_Figures/logo_SPOCK_2.png
+   :width: 600
 
 **SPOCK** (Speculoos Observatory SChedule maKer) is a python package developed to handle the
 planification of observation of the SPECULOOS telescopes. The project SPECULOOS -Search for habitable Planets EClipsing ULtra-cOOl Stars –
@@ -110,5 +111,3 @@ Please make sure to update tests as appropriate.
 
 License
 ---------------------
-
-<span style=“color:red;”> text </span>
