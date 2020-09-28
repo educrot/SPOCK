@@ -1,8 +1,22 @@
+language: python
+
+sudo: false
 env:
-  - DOCS="true"
+  matrix:
+    - DOCS="true"
+
+python:
+  - 3.7
+
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
+      env:
+        - DOCS="true"
 
 install:
-  - pip install .
   - sudo apt-get install python3-pip
   - sudo pip3 install requests
   - pip install -U pip
