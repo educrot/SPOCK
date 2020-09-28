@@ -1,17 +1,21 @@
-import setuptools
+import os
+from setuptools import setup, find_packages
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+# Utility function to read the README file.
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-setuptools.setup(
-    name="SPOCK", # Replace with your own username
-    version="0.0.1",
-    author="Elsa Ducrot",
-    author_email="educrot@uliege.be",
-    long_description = read('README.rst'),
-    install_requires = ['pandas','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml','docx','plotly',
-                    'gspread, oauth2client, astroplan, alive_progress, paramiko , chart_studio, python-docs, markdown'],
+setup(
+    name = 'SPOCK',
+    version = '0.0.1',
+    author = 'Elsa Ducrot',
+    author_email = 'educrot@uliege.be',
+    description = ('Speculoos Observatory SChedule maKer for chilean night on SPECULOOS South Observatory'),
+    keywords = '',
     url = 'https://github.com/educrot/SPOCK/',
-    packages=setuptools.find_packages(),
+    packages = find_packages(),
+    long_description = read('README.rst'),
     python_requires='>=3.6',
+    install_requires =['pandas','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml','docx','plotly',
+                    'gspread, oauth2client, astroplan, alive_progress, paramiko , chart_studio, python-docs, markdown'],
 )
