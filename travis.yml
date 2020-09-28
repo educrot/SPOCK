@@ -12,4 +12,3 @@ script:
   - pip install travis-sphinx nbsphinx sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema
   - travis-sphinx build -n
   - travis-sphinx deploy
-  - if [[ "${DOCS}" == "true" ]]; then cd docs; make html; fi
