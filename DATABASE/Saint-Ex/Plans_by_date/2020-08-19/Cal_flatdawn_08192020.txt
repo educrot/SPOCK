@@ -1,4 +1,0 @@
-#waituntil 1, 12:16
-#dawnflats Cal_flatexo_08192020.txt
-#quitat 2020-08-20 12:31:16.315
-#chain Cal_biasdark_08192020.txt

@@ -1,2 +1,0 @@
-target "start time (UTC)" "end time (UTC)" "duration (minutes)" "ra (h)" "ra (m)" "ra (s)" "dec (d)" "dec (m)" "dec (s)" configuration
-TYC-7533-1169-1- "2020-10-07 23:34:20.019" "2020-10-08 09:24:11.848" 589.8638166666664 1.0 4.0 19.130760000000304 -38.0 -18.0 -30.69467999998892 "{'texp=10', 'filt=I+z'}"
