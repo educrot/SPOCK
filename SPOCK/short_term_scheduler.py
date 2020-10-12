@@ -12,7 +12,7 @@ from datetime import datetime
 import os
 import pandas as pd
 from astroplan.utils import time_grid_from_range
-from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
+import SPOCK.upload_night_plans as SPOCKunp #import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis,upload_np_ts,upload_np_tn
 from SPOCK.make_night_plans import make_np
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 import subprocess
@@ -730,16 +730,19 @@ def make_plans(day, nb_days, telescope):
 
 def upload_plans(day, nb_days, telescope):
     if telescope.find('Callisto') is not -1:
-        upload_np_calli(day, nb_days)
+        SPOCKunp.upload_np_calli(day, nb_days)
     if telescope.find('Ganymede') is not -1:
-        upload_np_gany(day, nb_days)
+        SPOCKunp.upload_np_gany(day, nb_days)
     if telescope.find('Io') is not -1:
-        upload_np_io(day, nb_days)
+        SPOCKunp.upload_np_io(day, nb_days)
     if telescope.find('Europa') is not -1:
-        upload_np_euro(day, nb_days)
+        SPOCKunp.upload_np_euro(day, nb_days)
     if telescope.find('Artemis') is not -1:
-        upload_np_artemis(day, nb_days)
-
+        SPOCKunp.upload_np_artemis(day, nb_days)
+    if telescope.find('TS_La_Silla') is not -1:
+        SPOCKunp.upload_np_ts(day, nb_days)
+    if telescope.find('TN_Oukaimeden') is not -1:
+        SPOCKunp.upload_np_tn(day, nb_days)
     # ------------------- update archive date by date plans folder  ------------------
 
     path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', telescope,'schedule')
@@ -748,10 +751,14 @@ def upload_plans(day, nb_days, telescope):
     print('INFO: Path local plans by day = ',path_plans)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_plans, path_database])
     path_gant_chart = os.path.join('./SPOCK_Figures/Preview_schedule.html')
-    path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/')
+    path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Preview_schedule.html')
     print('INFO: Path local \'Gant chart\' = ', path_gant_chart)
     print('INFO: Path database = \'Gant chart\' = ',  path_database_home)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_gant_chart, path_database_home ])
+    path_gant_chart_masterfile = os.path.join('/Users/elsaducrot/spock_2/SPOCK_Figures/spock_stats_masterfile.csv')
+    path_database_home_masterfile = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_stats_masterfile.csv')
+    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_gant_chart_masterfile, path_database_home_masterfile])
+
 
     # ------------------- update archive niht blocks ------------------
 

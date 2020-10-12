@@ -7,14 +7,16 @@ import subprocess
 from astropy.utils.data import clear_download_cache
 clear_download_cache()
 from SPOCK.make_night_plans import make_np
-from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis
+#from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis,upload_np_ts,upload_np_tn
+import SPOCK.upload_night_plans as SPOCKunp
 import shutil
 from alive_progress import alive_bar
 import gspread
 from tqdm.auto import tqdm
 from oauth2client.service_account import ServiceAccountCredentials
-#from astropy.utils import iers
-#iers.IERS_A_URL  ='ftp://cddis.gsfc.nasa.gov/pub/products/iers/finals2000A.all'
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from astropy.utils import iers
+iers.IERS_A_URL  = 'https://datacenter.iers.org/data/9/finals2000A.all' #'http://maia.usno.navy.mil/ser7/finals2000A.all'#'ftp://cddis.gsfc.nasa.gov/pub/products/iers/finals2000A.all'
 #from astroplan import download_IERS_A
 #download_IERS_A()
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,observability_table, is_observable, months_observable,time_grid_from_range,LocalTimeConstraint, is_always_observable
@@ -37,6 +39,8 @@ import paramiko
 from docx import Document
 from docx.shared import *
 from astropy.table import Table
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 portal_pwd = '9UCExnjwes'
 pwd_sno_reduc1 = 'SNO_Reduc_1'
@@ -66,9 +70,9 @@ def get_hours_files_SNO(username = 'speculoos',password = pwd_sno_reduc1):
     ftp_client.close()
 
     s.close()
-    df = pd.read_csv('ObservationHours.txt', delimiter=',',skipinitialspace=True)
+    df = pd.read_csv('./survey_hours/ObservationHours.txt', delimiter=',',skipinitialspace=True)
     df = df.sort_values(['Target'])
-    df.to_csv('ObservationHours.txt',sep=',',index=False)
+    df.to_csv('./survey_hours/ObservationHours.txt',sep=',',index=False)
 
 def max_unit_list(x):
     """ return max of list
@@ -698,15 +702,19 @@ def upload_plans(day, nb_days, telescope):
 
     """
     if telescope.find('Callisto') is not -1:
-        upload_np_calli(day, nb_days)
+        SPOCKunp.upload_np_calli(day, nb_days)
     if telescope.find('Ganymede') is not -1:
-        upload_np_gany(day, nb_days)
+        SPOCKunp.upload_np_gany(day, nb_days)
     if telescope.find('Io') is not -1:
-        upload_np_io(day, nb_days)
+        SPOCKunp.upload_np_io(day, nb_days)
     if telescope.find('Europa') is not -1:
-        upload_np_euro(day, nb_days)
+        SPOCKunp.upload_np_euro(day, nb_days)
     if telescope.find('Artemis') is not -1:
-        upload_np_artemis(day, nb_days)
+        SPOCKunp.upload_np_artemis(day, nb_days)
+    if telescope.find('TS_La_Silla') is not -1:
+        SPOCKunp.upload_np_ts(day, nb_days)
+    if telescope.find('TN_Oukaimeden') is not -1:
+        SPOCKunp.upload_np_tn(day, nb_days)
 
     # ------------------- update archive date by date plans folder  ------------------
 
@@ -716,10 +724,13 @@ def upload_plans(day, nb_days, telescope):
     print('INFO: Path local \'Plans_by_day\' = ',path_plans)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_plans, path_database])
     path_gant_chart = os.path.join('./SPOCK_Figures/Preview_schedule.html')
-    path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/')
+    path_gant_chart_masterfile = os.path.join('/Users/elsaducrot/spock_2/SPOCK_Files/spock_stats_masterfile.csv')
+    path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Preview_schedule.html')
+    path_database_home_masterfile = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_stats_masterfile.csv')
     print('INFO: Path local \'Gant chart\' = ', path_gant_chart)
-    print('INFO: Path database = \'Gant chart\' = ',  path_database_home)
+    print('INFO: Path database \'Gant chart\' = ',  path_database_home)
     subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_gant_chart, path_database_home])
+    subprocess.Popen(["sshpass", "-p", 'eij7iaXi', "scp", "-r", path_gant_chart_masterfile, path_database_home_masterfile])
 
     # ------------------- update archive niht blocks ------------------
 
@@ -943,7 +954,7 @@ class Schedules:
         return saintex_in_targetlist
 
     def idx_trappist_observed_targets(self):
-        df_trappist = pd.read_csv('ObservationHours_TRAPPIST.txt', delimiter=',')
+        df_trappist = pd.read_csv('./survey_hours/ObservationHours_TRAPPIST.txt', delimiter=',')
         trappist_in_targetlist, targetlist_in_trappist = index_list1_list2(df_trappist['Target'], self.target_table_spc['Sp_ID'])
         return trappist_in_targetlist
 
@@ -975,15 +986,16 @@ class Schedules:
             time_since_las_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
                                      Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
             #self.update_nb_hours_all()
-            if abs(time_since_las_update) > 1: # in hours
+            if abs(time_since_las_update) > 0: # in hours
                 print('INFO: Updating the number of hours observed')
                 self.update_nb_hours_all()
 
     def update_nb_hours_all(self,user ='educrot', password = portal_pwd):
-        get_hours_files_SNO() # get hours SNO
+        #get_hours_files_SNO() # get hours SNO
+
+        # Get  files
         self.get_hours_files_TRAPPIST()  # get hours TRAPPIST
-        # get hours SSO
-        self.update_telescope_from_server()
+        self.update_telescope_from_server() # get hours SSO
         TargetURL = "http://www.mrao.cam.ac.uk/SPECULOOS/reports/SurveyTotal"
         target_list = pd.read_csv(self.target_list, delimiter=' ')
         target_list['telescope'] =  ['None'] * len(target_list['telescope'])
@@ -996,10 +1008,11 @@ class Schedules:
         df_camserver = pd.read_csv('./survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         #df_camserver['Target'][9] = 'Sp0004-2058'
         df_camserver['Target'] = [x.strip().replace('SP', 'Sp') for x in df_camserver['Target']]
-        df_artemis = pd.read_csv('./survey_hours/ObservationHours.txt', delimiter=',')
         df = pd.read_csv('./survey_hours/ObservationHours_Saint-Ex.txt',delimiter=',')
         df = df.sort_values(['Target'])
         df.to_csv('./survey_hours/ObservationHours_Saint-Ex.txt',sep=',',index=False)
+
+        # Read files
         df_SaintEx = pd.read_csv('./survey_hours/ObservationHours_Saint-Ex.txt', delimiter=',')
         df_TRAPPIST = pd.read_csv('./survey_hours/ObservationHours_TRAPPIST.txt', delimiter=',')
         df_camserver_telescope = pd.read_csv('./survey_hours/SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
@@ -1008,7 +1021,6 @@ class Schedules:
             idxs = np.where((df_camserver_telescope['Target'] == target_list['Sp_ID'][i]))[0]
             target_list['telescope'][i] = list(df_camserver_telescope['Telescope'][idxs])
 
-        artemis_in_targetlist, targetlist_in_artemis = index_list1_list2(df_artemis['Target'], target_list['Sp_ID'])
         SaintEx_in_targetlist, targetlist_in_SaintEx = index_list1_list2(df_SaintEx['Target'], target_list['Sp_ID'])
         camserver_in_targetlist, targetlist_in_camserver = index_list1_list2(df_camserver['Target'], target_list['Sp_ID'])
         TRAPPIST_in_targetlist, targetlist_in_TRAPPIST = index_list1_list2(df_TRAPPIST['Target'],target_list['Sp_ID'])
@@ -1018,72 +1030,57 @@ class Schedules:
                 bar()
                 time.sleep(0.001)
 
-                if np.any((np.asarray(camserver_in_targetlist) == i)):
+                if np.any((np.asarray(camserver_in_targetlist) == i)): #SSO or SNO
                     idx_camserver = np.argwhere((np.asanyarray(camserver_in_targetlist) == i))[0][0]
                     target_list['nb_hours_surved'][i] = df_camserver['Hours'][targetlist_in_camserver[idx_camserver]]
-                    #target_list['telescope'][i] += ',SSO'
-                    if np.any((np.asarray(artemis_in_targetlist)== i)):
-                        idx_artemis = np.argwhere((np.asanyarray(artemis_in_targetlist) == i))[0][0]
-                        target_list['nb_hours_surved'][i] += df_artemis['Observation Hours '][targetlist_in_artemis[idx_artemis]]
-                        target_list['telescope'][i].append('Artemis')
-                        if np.any((np.asarray(SaintEx_in_targetlist) == i)):
-                            idx_SaintEx = np.argwhere((np.asanyarray(SaintEx_in_targetlist) == i))[0][0]
-                            target_list['nb_hours_surved'][i] += df_SaintEx[' Observation Hours '][targetlist_in_SaintEx[idx_SaintEx]]
-                            target_list['telescope'][i].append('Saint-Ex')
-                        if np.any((np.asarray(TRAPPIST_in_targetlist) == i)):
-                            idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
-                            target_list['nb_hours_surved'][i] += df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
-                            target_list['telescope'][i].append('TRAPPIST')
 
-                    if np.any((np.asarray(SaintEx_in_targetlist) == i)) and np.all((np.asarray(artemis_in_targetlist) != i)):
+                    if np.any((np.asarray(SaintEx_in_targetlist) == i)) \
+                            and np.any((np.asarray(TRAPPIST_in_targetlist) == i)): #Saint-Ex and TRAPPIST
                         idx_SaintEx = np.argwhere((np.asanyarray(SaintEx_in_targetlist) == i))[0][0]
                         target_list['nb_hours_surved'][i] += df_SaintEx[' Observation Hours '][targetlist_in_SaintEx[idx_SaintEx]]
                         target_list['telescope'][i].append('Saint-Ex')
-                        if np.any((np.asarray(TRAPPIST_in_targetlist) == i)):
-                            idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
-                            target_list['nb_hours_surved'][i] += df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
-                            target_list['telescope'][i].append('TRAPPIST')
-
-                    if np.any((np.asarray(TRAPPIST_in_targetlist) == i)) and np.all((np.asarray(artemis_in_targetlist) != i))\
-                            and np.all((np.asarray(SaintEx_in_targetlist) != i)):
+                        # if np.any((np.asarray(TRAPPIST_in_targetlist) == i)):
                         idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
                         target_list['nb_hours_surved'][i] += df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
                         target_list['telescope'][i].append('TRAPPIST')
 
-                if np.any((np.asarray(SaintEx_in_targetlist) == i)) and np.all((np.asarray(camserver_in_targetlist) != i)):
-                    idx_SaintEx = np.argwhere((np.asanyarray(SaintEx_in_targetlist) == i))[0][0]
-                    target_list['nb_hours_surved'][i] = df_SaintEx[' Observation Hours '][targetlist_in_SaintEx[idx_SaintEx]]
-                    target_list['telescope'][i].append('Saint-Ex')
-                    if np.any((np.asarray(artemis_in_targetlist)== i)):
-                        idx_artemis = np.argwhere((np.asanyarray(artemis_in_targetlist) == i))[0][0]
-                        target_list['nb_hours_surved'][i] += df_artemis['Observation Hours '][targetlist_in_artemis[idx_artemis]]
-                        target_list['telescope'][i].append('Artemis')
-                        if np.any((np.asarray(TRAPPIST_in_targetlist) == i)):
-                            idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
-                            target_list['nb_hours_surved'][i] += df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
-                            target_list['telescope'][i].append('TRAPPIST')
-                    if np.any((np.asarray(TRAPPIST_in_targetlist) == i)) and np.all((np.asarray(artemis_in_targetlist) != i)):
+                    if np.any((np.asarray(TRAPPIST_in_targetlist) == i)) \
+                            and np.all((np.asarray(SaintEx_in_targetlist) != i)): #TRAPPIST but not Saint-Ex
                         idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
                         target_list['nb_hours_surved'][i] += df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
                         target_list['telescope'][i].append('TRAPPIST')
 
-                if np.any((np.asarray(artemis_in_targetlist) == i)) and np.all((np.asarray(camserver_in_targetlist) != i)) \
-                        and np.all((np.asarray(SaintEx_in_targetlist) != i)):
-                    idx_artemis = np.argwhere((np.asanyarray(artemis_in_targetlist) == i))[0][0]
-                    target_list['nb_hours_surved'][i] = df_artemis['Observation Hours '][targetlist_in_artemis[idx_artemis]]
-                    target_list['telescope'][i].append('Artemis')
-                    if np.any((np.asarray(TRAPPIST_in_targetlist) == i)):
+                    if np.any((np.asarray(SaintEx_in_targetlist) == i)) \
+                            and np.all((np.asarray(TRAPPIST_in_targetlist) != i)): #Saint-Ex but not TRAPPIST
+                        idx_SaintEx = np.argwhere((np.asanyarray(SaintEx_in_targetlist) == i))[0][0]
+                        target_list['nb_hours_surved'][i] += df_SaintEx[' Observation Hours '][targetlist_in_SaintEx[idx_SaintEx]]
+                        target_list['telescope'][i].append('Saint-Ex')
+
+                if np.all((np.asarray(camserver_in_targetlist) != i)):  # Neither SSO nor SNO
+
+                    if np.any((np.asarray(SaintEx_in_targetlist) == i)) \
+                            and np.any((np.asarray(TRAPPIST_in_targetlist) == i)) : # Saint-Ex and TRAPPIST
+                        idx_SaintEx = np.argwhere((np.asanyarray(SaintEx_in_targetlist) == i))[0][0]
+                        target_list['nb_hours_surved'][i] = df_SaintEx[' Observation Hours '][targetlist_in_SaintEx[idx_SaintEx]]
+                        target_list['telescope'][i].append('Saint-Ex')
                         idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
                         target_list['nb_hours_surved'][i] += df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
                         target_list['telescope'][i].append('TRAPPIST')
 
-                if np.any((np.asarray(TRAPPIST_in_targetlist) == i)) and np.all((np.asarray(camserver_in_targetlist) != i))\
-                        and np.all((np.asarray(artemis_in_targetlist) != i)) and np.all((np.asarray(SaintEx_in_targetlist) != i)):
-                    idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
-                    target_list['nb_hours_surved'][i] = df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
-                    target_list['telescope'][i].append('TRAPPIST')
+                    if np.any((np.asarray(TRAPPIST_in_targetlist) == i)) \
+                            and np.all((np.asarray(SaintEx_in_targetlist) != i)): #TRAPPIST but not Saint-Ex
+                        idx_TRAPPIST = np.argwhere((np.asanyarray(TRAPPIST_in_targetlist) == i))[0][0]
+                        target_list['nb_hours_surved'][i] = df_TRAPPIST[' Observation Hours '][targetlist_in_TRAPPIST[idx_TRAPPIST]]
+                        target_list['telescope'][i].append('TRAPPIST')
+
+                    if np.any((np.asarray(SaintEx_in_targetlist) == i)) \
+                            and np.all((np.asarray(TRAPPIST_in_targetlist) != i)): #Saint-Ex but not TRAPPIST
+                        idx_SaintEx = np.argwhere((np.asanyarray(SaintEx_in_targetlist) == i))[0][0]
+                        target_list['nb_hours_surved'][i] = df_SaintEx[' Observation Hours '][targetlist_in_SaintEx[idx_SaintEx]]
+                        target_list['telescope'][i].append('Saint-Ex')
 
         target_list.to_csv(self.target_list, sep=' ', index=False)
+        target_list.to_csv('./speculoos_target_list_v6_coma.csv', sep=',')
 
     def get_hours_files_TRAPPIST(self):
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
@@ -1100,12 +1097,12 @@ class Schedules:
         hours_observed_TSTN = pd.Series(col5)
         telescopes = ['TRAPPIST'] * len(target_observed_TSTN)
         df_google_doc = pd.DataFrame({'Target': target_observed_TSTN, ' Observation Hours ': hours_observed_TSTN,'telescope':telescopes})
-        df_google_doc.to_csv('ObservationHours_TRAPPIST.txt',sep=',',index=False)
+        df_google_doc.to_csv('./survey_hours/ObservationHours_TRAPPIST.txt',sep=',',index=False)
 
     def update_nb_hours_SNO(self):
         get_hours_files_SNO()
         target_list = pd.read_csv(self.target_list, delimiter=' ')
-        df = pd.read_csv('ObservationHours.txt', delimiter=',')
+        df = pd.read_csv('./survey_hours/ObservationHours.txt', delimiter=',')
         SNO_in_targetlist, targetlist_in_SNO = index_list1_list2(df['Target'], target_list['Sp_ID'])
         target_list['nb_hours_surved'][SNO_in_targetlist] = df[' Observation Hours '][targetlist_in_SNO]
         #target_list.to_csv(self.target_list, sep=' ', index=False)
@@ -1116,7 +1113,7 @@ class Schedules:
         except TimeoutError:
             print('ERROR: Are on the Liege  VPN ?')
         target_list = pd.read_csv(self.target_list, delimiter=' ')
-        df = pd.read_csv('ObservationHours.txt', delimiter=',')
+        df = pd.read_csv('./survey_hours/ObservationHours.txt', delimiter=',')
         SNO_in_targetlist, targetlist_in_SNO = index_list1_list2(df['Target'], target_list['Sp_ID'])
         df_tel = ['Artemis'] * len(df['Target'][targetlist_in_SNO])
         target_list['telescope'][SNO_in_targetlist] = df_tel

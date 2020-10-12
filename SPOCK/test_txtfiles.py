@@ -216,7 +216,7 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
     hour3='{:02d}'.format(int(hour3))
     minute3=startup_time3.astype(object).minute
     minute3='{:02d}'.format(int(minute3))
-    with open(os.path.join(Path,str(t_now),'startup.txt'),'w') as out:
+    with open(os.path.join(Path,str(t_now),'default.txt'),'w') as out:
         str00=';\n'
         str0=' == Startup =='
         str1='#waituntil 1, '
