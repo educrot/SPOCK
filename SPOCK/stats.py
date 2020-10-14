@@ -59,6 +59,7 @@ def df_all_obs_scheduled(telescope):
 
 def date_night_start_func(df_speculoos,target):
     idx_target = np.where((df_speculoos['target'] == target))[0]
+    ici = np.where((target_list_v6['Sp_ID'] == target))[0]
     if len(idx_target) != 0:
         date_oldest = min(df_speculoos['start time (UTC)'][idx_target])
         date_most_recent = max(df_speculoos['start time (UTC)'][idx_target])
@@ -68,68 +69,60 @@ def date_night_start_func(df_speculoos,target):
             date_night_start.append(Time(df_speculoos['start time (UTC)'][idx_target[i]], out_subfmt='date').iso)
     else:
         date_night_start = []
-        date_oldest = ''
-        date_most_recent = ''
+        date_oldest = 'None'
+        date_most_recent = 'None'
         durations = []
+
+
 
     return date_night_start,date_oldest,date_most_recent,durations
 
 
-df_all_Io,date_night_plan_Io = df_all_obs_scheduled('Io')
-df_all_Europa,date_night_plan_Europa = df_all_obs_scheduled('Europa')
-df_all_Ganymede,date_night_plan_Ganymede = df_all_obs_scheduled('Ganymede')
-df_all_Callisto,date_night_plan_Callisto = df_all_obs_scheduled('Callisto')
-df_all_Artemis,date_night_plan_Artemis = df_all_obs_scheduled('Artemis')
-df_all_TS_La_Silla,date_night_plan_TS_La_Silla = df_all_obs_scheduled('TS_La_Silla')
-df_all_TN_Oukaimeden,date_night_plan_TN_Oukaimeden = df_all_obs_scheduled('TN_Oukaimeden')
+def run_masterfile():
+    df_all_Io,date_night_plan_Io = df_all_obs_scheduled('Io')
+    df_all_Europa,date_night_plan_Europa = df_all_obs_scheduled('Europa')
+    df_all_Ganymede,date_night_plan_Ganymede = df_all_obs_scheduled('Ganymede')
+    df_all_Callisto,date_night_plan_Callisto = df_all_obs_scheduled('Callisto')
+    df_all_Artemis,date_night_plan_Artemis = df_all_obs_scheduled('Artemis')
+    df_all_TS_La_Silla,date_night_plan_TS_La_Silla = df_all_obs_scheduled('TS_La_Silla')
+    df_all_TN_Oukaimeden,date_night_plan_TN_Oukaimeden = df_all_obs_scheduled('TN_Oukaimeden')
+    df_all_TN_Oukaimeden,date_night_plan_TN_Oukaimeden = df_all_obs_scheduled('Saint-Ex')
 
-# date_night_plan_Io = df_all_obs_scheduled('Io')[1]
-# date_night_plan_Europa = df_all_obs_scheduled('Europa')[1]
-# date_night_plan_Ganymede = df_all_obs_scheduled('Ganymede')[1]
-# date_night_plan_Callisto = df_all_obs_scheduled('Callisto')[1]
-# date_night_plan_Artemis = df_all_obs_scheduled('Artemis')[1]
-# date_night_plan_TS_La_Silla = df_all_obs_scheduled('TS_La_Silla')[1]
-# date_night_plan_TN_Oukaimeden = df_all_obs_scheduled('TN_Oukaimeden')[1]
+    frames = [df_all_Io,df_all_Europa,df_all_Ganymede,
+              df_all_Callisto,df_all_Artemis,df_all_TS_La_Silla,df_all_TN_Oukaimeden]
 
-# date_night_plan_speculoos = np.concatenate([date_night_plan_Io,date_night_plan_Europa,
-#                                             date_night_plan_Ganymede,date_night_plan_Callisto,date_night_plan_Artemis,
-#                                             date_night_plan_TS_La_Silla,date_night_plan_TN_Oukaimeden])
+    df_speculoos = pd.concat(frames)
+    df_speculoos = df_speculoos.sort_values('target').reset_index(drop=True)
+    df_speculoos.to_csv('/Users/elsaducrot/spock_2/SPOCK_files/all_schedules.csv',sep=',',index=None)
 
-frames = [df_all_Io,df_all_Europa,df_all_Ganymede,
-          df_all_Callisto,df_all_Artemis,df_all_TS_La_Silla,df_all_TN_Oukaimeden]
+    date_night_start_each_target = []
+    date_oldest_obs = []
+    date_most_recent_obs = []
+    durations_all_obs = []
 
-df_speculoos = pd.concat(frames)
-df_speculoos = df_speculoos.sort_values('target').reset_index(drop=True)
-df_speculoos.to_csv('/Users/elsaducrot/spock_2/SPOCK_files/all_schedules.csv',sep=',',index=None)
+    idx_all = np.where((np.array([target_list_v6['telescope'][i].find('[]')
+                                  for i in range(len(target_list_v6))]) == -1))[0]
 
-date_night_start_each_target = []
-date_oldest_obs = []
-date_most_recent_obs = []
-durations_all_obs = []
+    for target in target_list_v6['Sp_ID'][idx_all]:
+        try:
+            basic_info = date_night_start_func(df_speculoos,target)
+        except UnboundLocalError:
+            print('ERROR: solve')
+        date_night_start_each_target.append(basic_info[0])
+        date_oldest_obs.append(basic_info[1])
+        date_most_recent_obs.append(basic_info[2])
+        durations_all_obs.append(basic_info[3])
 
-idx_all = np.where((np.array([target_list_v6['telescope'][i].find('[]')
-                              for i in range(len(target_list_v6))]) == -1))[0]
+    df_masterfile = pd.DataFrame({'Sp_ID': target_list_v6['Sp_ID'][idx_all], 'RA': target_list_v6['RA'][idx_all],
+                       'DEC': target_list_v6['DEC'][idx_all], 'telescope': target_list_v6['telescope'][idx_all],
+                       'Program': target_list_v6['Program'][idx_all],
+                       'nb_hours_surved': target_list_v6['nb_hours_surved'][idx_all],
+                       'all_dates_scheduled':date_night_start_each_target,
+                       'all_durations_scheduled':durations_all_obs,
+                       'oldest_obs':date_oldest_obs,'most_recent_obs':date_most_recent_obs,
+                       'Filter_spc': target_list_v6['Filter_spc'][idx_all],
+                       'texp_spc': target_list_v6['texp_spc'][idx_all],
+                       'Ms': target_list_v6['Ms'][idx_all], 'Rs': target_list_v6['Rs'][idx_all],
+                       'SpT': target_list_v6['SpT'][idx_all]})
 
-for target in target_list_v6['Sp_ID'][idx_all]:
-    try:
-        basic_info = date_night_start_func(df_speculoos,target)
-    except UnboundLocalError:
-        print('ERROR: solve')
-    date_night_start_each_target.append(basic_info[0])
-    date_oldest_obs.append(basic_info[1])
-    date_most_recent_obs.append(basic_info[2])
-    durations_all_obs.append(basic_info[3])
-
-df_masterfile = pd.DataFrame({'Sp_ID': target_list_v6['Sp_ID'][idx_all], 'RA': target_list_v6['RA'][idx_all],
-                   'DEC': target_list_v6['DEC'][idx_all], 'telescope': target_list_v6['telescope'][idx_all],
-                   'Program': target_list_v6['Program'][idx_all],
-                   'nb_hours_surved': target_list_v6['nb_hours_surved'][idx_all],
-                   'all_dates_scheduled':date_night_start_each_target,
-                   'all_durations_scheduled':durations_all_obs,
-                   'oldest_obs':date_oldest_obs,'most_recent_obs':date_most_recent_obs,
-                   'Filter_spc': target_list_v6['Filter_spc'][idx_all],
-                   'texp_spc': target_list_v6['texp_spc'][idx_all],
-                   'Ms': target_list_v6['Ms'][idx_all], 'Rs': target_list_v6['Rs'][idx_all],
-                   'SpT': target_list_v6['SpT'][idx_all]})
-
-df_masterfile.to_csv('/Users/elsaducrot/spock_2/SPOCK_files/spock_stats_masterfile.csv',sep=',',index=None)
+    df_masterfile.to_csv('/Users/elsaducrot/spock_2/SPOCK_files/spock_stats_masterfile.csv',sep=',',index=None)

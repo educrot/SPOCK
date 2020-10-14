@@ -715,6 +715,9 @@ def upload_plans(day, nb_days, telescope):
         SPOCKunp.upload_np_ts(day, nb_days)
     if telescope.find('TN_Oukaimeden') is not -1:
         SPOCKunp.upload_np_tn(day, nb_days)
+    if telescope.find('Saint-Ex') is not -1:
+        SPOCKunp.upload_np_saint_ex(day, nb_days)
+
 
     # ------------------- update archive date by date plans folder  ------------------
 
@@ -986,7 +989,7 @@ class Schedules:
             time_since_las_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
                                      Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
             #self.update_nb_hours_all()
-            if abs(time_since_las_update) > 0: # in hours
+            if abs(time_since_las_update) > 10: # in hours
                 print('INFO: Updating the number of hours observed')
                 self.update_nb_hours_all()
 

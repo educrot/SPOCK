@@ -333,6 +333,6 @@ def make_np(t_now,nb_jours,tel):
             flatexo_saintex(Path,t_now,str(filt),nbu=3,nbz=3,nbr=3,nbi=3,nbg=3,nbIz=9,nbExo=3,nbClear=3)
 
         biasdark(t_now,Path,telescope)
-        p2=os.path.join('./DATABASE',str(telescope),str(t_now))
+        p2=os.path.join('./DATABASE',str(telescope),'Zip_files',str(t_now))
         shutil.make_archive(p2, 'zip', p)
 

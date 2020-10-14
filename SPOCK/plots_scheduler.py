@@ -17,6 +17,12 @@ from astroplan.utils import time_grid_from_range
 import os
 import requests
 import io
+from matplotlib.offsetbox import AnchoredText
+
+
+user_portal = 'educrot'
+
+pwd_portal = '9UCExnjwes'
 
 def charge_observatories(Name):
     """ charge the observatory
@@ -517,12 +523,38 @@ def coverage(t, p):
 
         return np.sum(spaces_in - spaces_out)/p
 
-def getSPClcV2(target, ap = '', pwvCorr = 0, user="educrot", password="58JMSGgdmzTB"):
-    urlGet = "http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_tls_prep_v2.php?date=*&id=" + target + "&filter=&telescope=&ap=" + str(ap) + "&pwvCorr=" + str(pwvCorr)
+def getSPClcV2(target, ap = '', pwvCorr = 0, user= user_portal, password= pwd_portal):
+    urlGet ="http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_tls_prep_v2.php?date=*&id=" + target + "&filter=&telescope=&ap=" + str(ap) + "&pwvCorr=" + str(pwvCorr)
     rGET = requests.get(urlGet, auth=(user, password))
-    names = ['TMID-2450000', 'BJDMID-2450000', 'DIFF_FLUX', 'ERROR', 'DIFF_FLUX_PWV', 'RA_MOVE', 'DEC_MOVE', 'FWHM', 'PSF_a_5', 'PSF_b_5', 'SKYLEVEL', 'AIRMASS', 'EXPOSURE']
-    lc = pd.read_csv(io.StringIO(rGET.text), header=None, names=names, delimiter='\s+')
+    names = ['TMID-2450000', 'BJDMID-2450000', 'DIFF_FLUX', 'ERROR', 'DIFF_FLUX_PWV',
+    'RA_MOVE', 'DEC_MOVE', 'FWHM', 'PSF_a_5', 'PSF_b_5', 'SKYLEVEL', 'AIRMASS',
+    'EXPOSURE']
+    lc = pd.read_csv(io.StringIO(rGET.text), header=None, names=names, delimiter='\s+',index_col=None)
+    lc.reset_index(drop=True)
     return lc
+
+def getSPCdata(target, date, telescope='any', ap=6, user= user_portal, password= pwd_portal):
+    if telescope == 'any':
+        urlGet = "http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_file.php?telescope=&date=" + date + "&id=" + target + "&filter=&file=MCMC_text_" + str(ap)
+    else:
+        urlGet = "http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_file.php?telescope=" + telescope + '&date=' + date + "&id=" + target + "&filter=&file=MCMC_text_" + str(ap)
+    rGET = requests.get(urlGet, auth=(user, password))
+    rFile = json.loads(rGET.text)
+    # retrieve available file
+    try:
+        urlMCMC = 'http://www.mrao.cam.ac.uk/SPECULOOS/portal/' + rFile[0]
+        rMCMC = requests.get(urlMCMC, auth=(user, password))
+        # read files
+        MCMC = pd.read_csv(io.StringIO(rMCMC.text), sep=' ')
+        MCMC['JD'] = MCMC['TMID-2450000'] + 2450000
+        targetdf = pd.DataFrame({'TMID-2450000':MCMC['JD'].values,'DIFF_FLUX': MCMC['DIFF_FLUX'].values, 'ERROR': MCMC['ERROR'].values,
+                 'dx_MOVE':MCMC['RA_MOVE'].values,'dy_MOVE':MCMC['DEC_MOVE'].values,'FWHM':MCMC['FWHM'].values,
+                   'FWHMx':MCMC['PSF_a_5'].values,'FWHMy':MCMC['PSF_b_5'].values,'SKYLEVEL':MCMC['SKYLEVEL'].values,
+                               'AIRMASS': MCMC['AIRMASS'].values,'EXPOSURE':MCMC['EXPOSURE'].values})
+        return targetdf
+    except TypeError:
+        targetdf = pd.DataFrame({'JD':[],'DIFF_FLUX': [], 'ERROR': [], 'AIRMASS': []})
+        return targetdf.reset_index(drop=True)
 
 def phase_coverage_given_target(name_observatory,target,path_target_list,pmin,pmax):
 
@@ -557,8 +589,13 @@ def phase_coverage_given_target(name_observatory,target,path_target_list,pmin,pm
         covs = [coverage(t, period) for period in periods]
         mean_cov = np.mean(covs)*100
         fig, ax = plt.subplots(1, figsize=(9, 7))
+        anchored_text = AnchoredText(r'$SNR_{JWST}$ = ' +  str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3))
+                                     + "\n" +
+                                     "Hours observed = " + str(round(target_list['nb_hours_surved'][idx_target_list],2)) + ' hours',
+                                     loc=3)
+
         plt.plot(periods, covs, c="silver",label='Effective cov = ' +  str(round(mean_cov,1)) + ' %')
-        plt.plot(periods, covs, ".", c="k",label=r'$SNR_{JWST}$ = ' +  str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3)))
+        plt.plot(periods, covs, ".", c="k",)
         # ax.annotate(r'$SNR_{JWST}$ = ' +  str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3)), (3,1),
         #             xytext=(0.8, 0.85), textcoords='axes fraction',
         #             fontsize=16,
@@ -567,6 +604,7 @@ def phase_coverage_given_target(name_observatory,target,path_target_list,pmin,pm
         #             xytext=(0.8, 0.8), textcoords='axes fraction',
         #             fontsize=16,
         #             horizontalalignment='right', verticalalignment='top')
+        ax.add_artist(anchored_text)
         plt.ylabel('Phase coverage in %')
         plt.xlabel('Period in days')
         plt.legend(fontsize=16)
