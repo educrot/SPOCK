@@ -17,5 +17,5 @@ setup(
     long_description = read('README.rst'),
     python_requires='>=3.6',
     install_requires =['pandas','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml','docx','plotly',
-                    'gspread, oauth2client, astroplan, alive_progress, paramiko , chart_studio, python-docs, markdown'],
+                    'gspread', 'oauth2client', 'astroplan', 'alive_progress', 'paramiko' , 'chart_studio', 'markdown'],
 )

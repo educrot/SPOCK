@@ -435,7 +435,10 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write('#dir'+ '\n')
             out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
             if name_2 is None:
-                out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
+                if telescope == 'Callisto':
+                    out.write(str10 + 'Cal_biasdark.txt' + '\n')
+                else:
+                    out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
             else:
                 out.write(str10 + 'Obj_' + name_2  +'.txt' + '\n')
             out.write(str00 + '\n')
