@@ -24,7 +24,7 @@ install:
 
 script:
   # Use Sphinx to make the html docs
-  - make html
+  - travis-sphinx build -n
 
 # Tell Travis CI to copy the documentation to the gh-pages branch of
 # your GitHub repository.
