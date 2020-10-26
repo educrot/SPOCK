@@ -24,7 +24,6 @@ script:
   - sudo apt-get install -y pandoc
   - pip install travis-sphinx nbsphinx sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema
   - travis-sphinx build -n
-  - travis-sphinx deploy
 
 # Tell Travis CI to copy the documentation to the gh-pages branch of
 # your GitHub repository.
