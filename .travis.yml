@@ -35,4 +35,4 @@ deploy:
   keep-history: true
   on:
     branch: master
-  local_dir: doc/build/
+  local_dir: docs/source/
