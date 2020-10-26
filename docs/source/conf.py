@@ -18,7 +18,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.githubpages',
     'jupyter_sphinx',
-    #'sphinxcontrib.video',
+    'sphinxcontrib.video',
     'sphinx-jsonschema',
     ]
 
