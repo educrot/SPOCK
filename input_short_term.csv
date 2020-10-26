@@ -21,4 +21,4 @@ observatories:
   5: 
     name: TN_Oukaimeden
     telescopes: [TN_Oukaimeden]
-target_list: target_list_special.txt
+target_list: ./target_lists/target_list_special.txt

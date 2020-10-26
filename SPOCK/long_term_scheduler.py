@@ -1436,7 +1436,7 @@ class Schedules:
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'Saint-Ex':
             texp = read_exposure_time_table['Saintex_texp']
-            idx_texp_too_long =  np.where((texp > 130))
+            idx_texp_too_long =  np.where((texp > 100))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'TS_La_Silla':
             texp = read_exposure_time_table['TS_texp']

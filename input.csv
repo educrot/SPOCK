@@ -21,4 +21,4 @@ observatories:
 strategy: "continuous"
 duration_segments: 20
 nb_segments: 3
-target_list: speculoos_target_list_v6.txt
+target_list: ./target_lists/speculoos_target_list_v6.txt
