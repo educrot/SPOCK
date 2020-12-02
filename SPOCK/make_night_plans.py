@@ -4,14 +4,13 @@ import shutil
 from astropy.table import Table
 from astroplan import Observer,FixedTarget
 from astropy.time import Time
-from SPOCK.test_txtfiles import startup, startup_no_flats, Path_txt_files, flatexo_gany, flatexo_io, flatexo_euro, first_target_offset, flatexo_artemis_morning, flatexo_artemis_evening, startup_artemis,flatexo_saintex
-from SPOCK.test_txtfiles import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis
+from SPOCK.txt_files import startup, startup_no_flats, Path_txt_files, flatexo_gany, flatexo_io, flatexo_euro, first_target_offset, flatexo_artemis_morning, flatexo_artemis_evening, startup_artemis,flatexo_saintex
+from SPOCK.txt_files import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy import units as u
 import pandas as pd
 pd.set_option('display.max_columns', 50)
-import numpy as np
-from astroplan.utils import time_grid_from_range
+
 
 #initialisation
 filt={}
@@ -30,14 +29,14 @@ def make_scheduled_table(telescope,day_of_night):
     scheduled_table = None
     day_of_night = Time(day_of_night)
     try:
-        os.path.exists(os.path.join(Path, telescope,
+        os.path.exists(os.path.join(Path, telescope, 'Archive_night_blocks',
                                     'night_blocks_' + telescope + '_' + day_of_night.tt.datetime[0].strftime(
                                         "%Y-%m-%d") + '.txt'))
         print('INFO: Path exists and is: ', os.path.join(Path, telescope, 'night_blocks_' + telescope + '_' +
                                                          day_of_night.tt.datetime[0].strftime(
                                                              "%Y-%m-%d") + '.txt'))
     except TypeError:
-        os.path.exists(os.path.join(Path, telescope,
+        os.path.exists(os.path.join(Path, telescope, 'Archive_night_blocks',
                                     'night_blocks_' + telescope + '_' + day_of_night.tt.datetime.strftime(
                                         "%Y-%m-%d") + '.txt'))
         print('INFO: Path exists and is: ', os.path.join(Path, telescope,
@@ -52,13 +51,13 @@ def make_scheduled_table(telescope,day_of_night):
         return scheduled_table
     else:
         try:
-            scheduled_table = Table.read(os.path.join(Path, telescope,
+            scheduled_table = Table.read(os.path.join(Path, telescope, 'Archive_night_blocks',
                                                            'night_blocks_' + telescope + '_' +
                                                            day_of_night.tt.datetime[0].strftime(
                                                                "%Y-%m-%d") + '.txt'), format='ascii')
             return scheduled_table
         except TypeError:
-            scheduled_table = Table.read(os.path.join(Path, telescope,
+            scheduled_table = Table.read(os.path.join(Path, telescope, 'Archive_night_blocks',
                                                            'night_blocks_' + telescope + '_' + day_of_night.tt.datetime.strftime(
                                                                "%Y-%m-%d") + '.txt'), format='ascii')
             return scheduled_table
@@ -270,7 +269,6 @@ def make_np(t_now,nb_jours,tel):
                         filt[i] = filt[i].replace('\'', '')
                         first_target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],Path,telescope='Saint-Ex')
 
-
                     if i==(len(name)-1) and telescope.find('Europa') is not -1:
                         target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],None,Path,telescope)
                         flatdawn(t_now,date_end[i],sun_rise.iso,Path,telescope)
@@ -332,7 +330,14 @@ def make_np(t_now,nb_jours,tel):
         if telescope.find('Saint-Ex') is not -1:
             flatexo_saintex(Path,t_now,str(filt),nbu=3,nbz=3,nbr=3,nbi=3,nbg=3,nbIz=9,nbExo=3,nbClear=3)
 
-        biasdark(t_now,Path,telescope)
+        if telescope.find('Saint-Ex') is not -1:
+            list_texps = [texp[i] for i in range(len(texp))]
+            list_texps = list(dict.fromkeys(list_texps))
+            biasdark(t_now,Path,telescope,texps=list_texps)
+        else:
+            biasdark(t_now, Path, telescope)
+
+
         p2=os.path.join('./DATABASE',str(telescope),'Zip_files',str(t_now))
         shutil.make_archive(p2, 'zip', p)
 

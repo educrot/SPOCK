@@ -9,7 +9,7 @@ Planification of SPECULOOS targets observations App
 Launch the App
 -------------------
 
-To launch the app open notebook `SPOCKapp.ipynb` and click on ``run all cells```. You get the following visual:
+To launch the app open notebook `SPOCKapp.ipynb` and click on ``run all cells``. You get the following visual:
 Then Follow the videos in :ref:`quick start video` to learn how to use **SPOCKapp**.
 
 .. _quick start video:

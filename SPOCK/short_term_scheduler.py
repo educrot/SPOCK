@@ -1,35 +1,28 @@
 #!/anaconda3/bin/python3.6
-from astropy import units as u
 from astropy.time import Time
-from astroplan.plots import dark_style_sheet
-from astroplan import Observer
+from astropy.table import unique,Table
+from astropy import units as u
+from astropy.coordinates import SkyCoord, EarthLocation, AltAz
+from astroplan.utils import time_grid_from_range
+from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint,TimeConstraint
+from astroplan.plots import dark_style_sheet,plot_airmass
+from astroplan import Observer,moon_illumination
 from astroplan.periodic import EclipsingSystem
 from astroplan.constraints import is_event_observable
 from docx import Document
 from docx.shared import *
-from astropy.table import Table
 from datetime import datetime
+from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock,Transitioner
+import matplotlib.pyplot as plt
+import numpy as np
 import os
 import pandas as pd
-from astroplan.utils import time_grid_from_range
 import SPOCK.upload_night_plans as SPOCKunp #import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis,upload_np_ts,upload_np_tn
 from SPOCK.make_night_plans import make_np
-from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 import subprocess
 import sys
-import yaml
 import shutil
 import SPOCK.ETC as ETC
-import numpy as np
-from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint
-from astroplan import TimeConstraint
-import astroplan
-import matplotlib.pyplot as plt
-from astropy.table import unique
-from astroplan.plots import plot_airmass
-from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock
-from eScheduler.spe_schedule import Transitioner
-
 import yaml
 
 with open('passwords.csv', "r") as f:
@@ -117,6 +110,7 @@ class Schedules:
         with open(input_file_short_term, "r") as f:
             Inputs = yaml.load(f, Loader=yaml.FullLoader)
             self.target_list = Inputs['target_list']
+            self.target_list_follow_up = Inputs['target_list_follow_up']
             self.use = Inputs['use']
             df = pd.DataFrame.from_dict(Inputs['observatories'])
             self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
@@ -132,7 +126,9 @@ class Schedules:
                 sys.exit('ERROR: end date inferior to start date')
             self.constraints = [AtNightConstraint.twilight_nautical()]
             df = pd.read_csv(self.target_list, delimiter=' ')
+            df_followup = pd.read_csv(self.target_list_follow_up, delimiter=' ')
             self.target_table_spc = Table.from_pandas(df)
+            self.target_table_spc_follow_up = Table.from_pandas(df_followup)
             self.targets = target_list_good_coord_format(self.target_list)
 
     def night_duration(self, day):
@@ -214,21 +210,6 @@ class Schedules:
         if dom_rot_possible == False:
             sys.exit('ERROR: No Dom rotation possible that night')
 
-        # blocks = []
-        # a = ObservingBlock(target, dur_dome_rotation, -1,constraints=constraints_dome_rotation,configuration={'filt=' + 'Clear','texp=' + '1'})
-        #
-        # blocks.append(a)
-        # import SPOCK.plots_scheduler as SPOCKplot
-        # SPOCKplot.constraints_scores(constraints_dome_rotation, target, self.observatory, start, start + dur_dome_rotation)
-        # transitioner = Transitioner(slew_rate=11 * u.deg / u.second)
-        # seq_schedule_SS1 = Schedule(self.day_of_night, self.day_of_night + 1)
-        # sequen_scheduler_SS1 = SPECULOOSScheduler(constraints=constraints_dome_rotation, observer=self.observatory,
-        #                                           transitioner=transitioner)
-        # sequen_scheduler_SS1(blocks, seq_schedule_SS1)
-        # self.SS1_night_blocks  = seq_schedule_SS1.to_table()
-
-          # Table.read(os.path.join(Path,tel,'special_target_test.txt'), format='ascii')#
-
     def special_target_with_start_end(self, input_name):
         start = self.start_end_range[0]
         end = self.start_end_range[1]
@@ -237,13 +218,17 @@ class Schedules:
             sys.exit('WARNING : Start time (or End time) is not on the same day.')
 
         dur_obs_both_target = (self.night_duration(self.day_of_night) / (2 * u.day)) * 2 * u.day
-        constraints_special_target = [AltitudeConstraint(min=25 * u.deg), MoonSeparationConstraint(min=25 * u.deg), \
+        constraints_special_target = [AltitudeConstraint(min=25 * u.deg), MoonSeparationConstraint(min=25 * u.deg),
                                       TimeConstraint(start, end)]
         idx_to_insert_target = int(np.where((self.target_table_spc['Sp_ID'] == input_name))[0])
-        if self.target_table_spc['texp_spc'][idx_to_insert_target] == 0:
-            self.target_table_spc['texp_spc'][idx_to_insert_target]= self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_to_insert_target])
+        if self.target_table_spc['texp_spc'][idx_to_insert_target] == 0 \
+                or self.target_table_spc['texp_spc'][idx_to_insert_target] == "00":
+            self.target_table_spc['texp_spc'][idx_to_insert_target] = \
+                int(self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_to_insert_target],
+                                       target_list=self.target_table_spc))
         blocks = []
-        a = ObservingBlock(self.targets[idx_to_insert_target], dur_obs_both_target, -1,constraints=constraints_special_target,
+        a = ObservingBlock(self.targets[idx_to_insert_target], dur_obs_both_target, -1,
+                           constraints=constraints_special_target,
                            configuration={'filt=' + str(self.target_table_spc['Filter_spc'][idx_to_insert_target]),
                                           'texp=' + str(self.target_table_spc['texp_spc'][idx_to_insert_target])})
         blocks.append(a)
@@ -262,10 +247,13 @@ class Schedules:
                        (Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,which='nearest'))))]
         idx_first_target = int(np.where((self.target_table_spc['Sp_ID']==input_name))[0])
         if int(self.target_table_spc['texp_spc'][idx_first_target]) == 0:
-            self.target_table_spc['texp_spc'][idx_first_target]= self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_first_target])
+            self.target_table_spc['texp_spc'][idx_first_target] = \
+                self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_first_target],
+                                   target_list=self.target_table_spc)
         blocks=[]
         a = ObservingBlock(self.targets[idx_first_target],dur_obs_both_target,-1,constraints= constraints_special_target,\
-                         configuration={'filt=' + str(self.target_table_spc['Filter_spc'][idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][idx_first_target])})
+                         configuration={'filt=' + str(self.target_table_spc['Filter_spc'][idx_first_target]),
+                                        'texp=' + str(self.target_table_spc['texp_spc'][idx_first_target])})
         blocks.append(a)
         transitioner = Transitioner(slew_rate= 11*u.deg/u.second)
         seq_schedule_SS1 = Schedule(self.day_of_night,self.day_of_night+1)
@@ -302,8 +290,10 @@ class Schedules:
 
             observable = is_event_observable(constraints,self.observatory, target, times_ingress_egress=ing_egr)
             if np.any(observable):
-                err_T0_neg = timing_to_obs_jd[0] - (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value,1) * (period.value - P_err_transit) + (epoch.jd - T0_err_transit ))
-                err_T0_pos = (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value,1) * (period.value + P_err_transit) + (epoch.jd + T0_err_transit )) - timing_to_obs_jd[0]
+                err_T0_neg = timing_to_obs_jd[0] - (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value,1) *
+                                                    (period.value - P_err_transit) + (epoch.jd - T0_err_transit ))
+                err_T0_pos = (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value,1) *
+                              (period.value + P_err_transit) + (epoch.jd + T0_err_transit )) - timing_to_obs_jd[0]
                 start_transit = Time(ing_egr[0][0].value - err_T0_neg - oot_time.value - W_err_transit,format='jd') #- T0_err_transit - W_err_transit  - oot_time.value/24 - (timing_to_obs_jd[0] - epoch.jd) / period.value * P_err_transit,format='jd')
                 #print('INFO: start_transit', start_transit.iso)
                 end_transit = Time(ing_egr[0][1].value + err_T0_pos + oot_time.value + W_err_transit,format='jd') #+ T0_err_transit + W_err_transit + oot_time.value/24 + (timing_to_obs_jd[0] - epoch.jd) / period.value * P_err_transit ,format='jd')
@@ -321,7 +311,7 @@ class Schedules:
                         idx_first_target = int(np.where((df['Sp_ID'] == df['Sp_ID'][i]))[0])
                         if df['texp_spc'][idx_first_target] == 0:
                             df['texp_spc'][idx_first_target] = self.exposure_time(
-                                input_name=df['Sp_ID'][idx_first_target])
+                                input_name=df['Sp_ID'][idx_first_target],target_list=self.target_table_spc_follow_up)
                         a = ObservingBlock(target[idx_first_target], dur_obs_transit_target, -1,
                                            constraints=constraints_transit_target,
                                            configuration={'filt=' + str(df['Filter_spc'][idx_first_target]),
@@ -345,7 +335,7 @@ class Schedules:
                         idx_first_target = int(np.where((df['Sp_ID'] == df['Sp_ID'][i]))[0])
                         if df['texp_spc'][idx_first_target] == 0:
                             df['texp_spc'][idx_first_target] = self.exposure_time(
-                                input_name=df['Sp_ID'][idx_first_target])
+                                input_name=df['Sp_ID'][idx_first_target],target_list=self.target_table_spc_follow_up)
                         a = ObservingBlock(target[idx_first_target], dur_obs_transit_target, -1,
                                            constraints=constraints_transit_target,
                                            configuration={'filt=' + str(df['Filter_spc'][idx_first_target]),
@@ -364,7 +354,8 @@ class Schedules:
                                                   TimeConstraint(start_transit, end_transit)]
                     idx_first_target = int(np.where((df['Sp_ID'] == df['Sp_ID'][i]))[0])
                     if df['texp_spc'][idx_first_target] == 0:
-                        df['texp_spc'][idx_first_target] = self.exposure_time(input_name=df['Sp_ID'][idx_first_target])
+                        df['texp_spc'][idx_first_target] = self.exposure_time(input_name=df['Sp_ID'][idx_first_target],
+                                                                              target_list=self.target_table_spc_follow_up)
                     a = ObservingBlock(target[idx_first_target], dur_obs_transit_target, -1,
                                        constraints=constraints_transit_target,
                                        configuration={'filt=' + str(df['Filter_spc'][idx_first_target]),
@@ -605,51 +596,60 @@ class Schedules:
                 except TypeError:
                     panda_table.to_csv(os.path.join(Path, 'night_blocks_' + self.telescope + '_' +self.day_of_night.tt.datetime.strftime("%Y-%m-%d") + '.txt'),sep=' ')
 
-    def exposure_time(self, input_name,day=None):
-        i = np.where((self.target_table_spc['Sp_ID'] == input_name))[0]
+    def exposure_time(self, input_name,target_list,day=None):
+        i = np.where((target_list['Sp_ID'] == input_name))[0]
         if day is None:
             print('INFO: Not using moon phase in ETC')
         # moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
-        if round(self.target_table_spc['SpT'][i]) <= 9:
-            spt_type = 'M' + str(round(self.target_table_spc['SpT'][i]))
+        try:
+            spectral_type = round(float(target_list['SpT'][i].data.data[0]))
+        except NotImplementedError:
+            spectral_type = round(float(target_list['SpT'][i]))
+        except ValueError:
+            spectral_type = target_list['SpT'][i].data.data[0]
+        if not isinstance(spectral_type, str):
+            if spectral_type <= 9:
+                spt_type = 'M' + str(spectral_type)
             if spt_type == 'M3':
-                spt_type = 'M2'
-        elif (round(self.target_table_spc['SpT'][i]) == 12) or (round(self.target_table_spc['SpT'][i]) == 15) or (
-                int(self.target_table_spc['SpT'][i]) == 18):
-            spt_type = 'M' + str(round(self.target_table_spc['SpT'][i]) - 10)
-        elif round(self.target_table_spc['SpT'][i]) == 10:
-            spt_type = 'M9'
-        elif round(self.target_table_spc['SpT'][i]) == 11:
-            spt_type = 'L2'
-        elif round(self.target_table_spc['SpT'][i]) == 13:
-            spt_type = 'L2'
-        elif round(self.target_table_spc['SpT'][i]) == 14:
-            spt_type = 'L5'
-        elif round(self.target_table_spc['SpT'][i]) > 14:
-            spt_type = 'L8'
-        filt_ = str(self.target_table_spc['Filter_spc'][i])
+                    spt_type = 'M2'
+            elif (spectral_type == 12) or (spectral_type == 15) or (
+                    int(spectral_type) == 18):
+                spt_type = 'M' + str(spectral_type - 10)
+            elif spectral_type == 10:
+                spt_type = 'M9'
+            elif spectral_type == 11:
+                spt_type = 'L2'
+            elif spectral_type == 13:
+                spt_type = 'L2'
+            elif spectral_type == 14:
+                spt_type = 'L5'
+            elif spectral_type > 14:
+                spt_type = 'L8'
+        else:
+            spt_type = spectral_type
+        filt_ = str(target_list['Filter_spc'][i])
         if (filt_ == 'z\'') or (filt_ == 'r\'') or (filt_ == 'i\'') or (filt_ == 'g\''):
             filt_ = filt_.replace('\'', '')
-        filters = ['I+z', 'z', 'i', 'r']
+        filters = ['I+z', 'z', 'i', 'r','g']
         filt_idx = 0
         filt_ = filters[filt_idx]
         if self.telescope == 'Saint-Ex':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
+            a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                          observatory_altitude=2780))
             texp = a.exp_time_calculator(ADUpeak=35000)[0]
         elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+            a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=50000)[0]
             print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif self.telescope == 'Artemis':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+            a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=45000)[0]
         elif self.telescope == 'Io' or self.telescope == 'Europa' \
                 or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
-            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+            a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
@@ -661,25 +661,25 @@ class Schedules:
                 texp = 10.0001
             filt_ = filters[filt_idx]
             if self.telescope == 'Saint-Ex':
-                self.target_table_spc['Filter_spc'][i] = filt_
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
+                target_list['Filter_spc'][i] = filt_
+                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48,temp_ccd=-70,
                              observatory_altitude=2780))
                 texp = a.exp_time_calculator(ADUpeak=35000)[0]
             elif self.telescope == 'Artemis':
-                self.target_table_spc['Filter_spc'][i] = filt_
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                target_list['Filter_spc'][i] = filt_
+                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=45000)[0]
             elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
-                self.target_table_spc['Filter_spc'][i] = filt_
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                target_list['Filter_spc'][i] = filt_
+                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=50000)[0]
                 print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
             elif self.telescope == 'Io' or self.telescope == 'Europa' or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
-                self.target_table_spc['Filter_spc'][i] = filt_
-                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                target_list['Filter_spc'][i] = filt_
+                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
@@ -848,7 +848,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
         table_schedule = read_night_block(telescope, date)
         sun_set = observatory.sun_set_time(date, which='next').iso
         sun_rise = observatory.sun_rise_time(date, which='next').iso
-        moon_illumination = int(round(astroplan.moon_illumination(date) * 100, 0)) * u.percent
+        moon_illum = int(round(moon_illumination(date) * 100, 0)) * u.percent
         civil_twilights = [Time(observatory.twilight_evening_civil(date, which='next')).iso,
                            Time(observatory.twilight_morning_civil(date + 1, which='nearest')).iso]
         nautic_twilights = [Time(observatory.twilight_evening_nautical(date, which='next')).iso,
@@ -869,7 +869,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
         par_format = par.paragraph_format
         par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
-        run = par.add_run('Moon illumination: ' + str(moon_illumination))
+        run = par.add_run('Moon illumination: ' + str(moon_illum))
         run.italic = True
         font = run.font
         font.size = Pt(12)

@@ -30,4 +30,4 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
     :maxdepth: 4
     :glob:
 
-    examples/SPOCKapp/SPOCKapp.ipynb
+    examples/SPOCKapp/examples_app.rst

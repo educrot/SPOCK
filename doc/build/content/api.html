@@ -94,9 +94,9 @@
 <li class="toctree-l1"><a class="reference internal" href="quick-ref.html">Quick reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-SPOCK">The SPOCK API reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#long-term-scheduler">long_term_scheduler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#short-term-scheduler">short_term_scheduler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-SPOCK.plots_scheduler">plots_scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-long_term_scheduler">long_term_scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-short_term_scheduler">short_term_scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-plots_scheduler">plots_scheduler</a></li>
 </ul>
 </li>
 </ul>
@@ -106,6 +106,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKLT/examples_spocklt.html">Long term  scheduling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKST/examples_spockst.html">Short term scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKapp/examples_app.html">SPOCKApp</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../examples/SPOCKapp/examples_app.html">SPOCKApp</a></li>
 </ul>
 
@@ -199,11 +202,11 @@
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-SPOCK">
 <span id="the-spock-api-reference"></span><h2>The SPOCK API reference<a class="headerlink" href="#module-SPOCK" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="long-term-scheduler">
-<h3>long_term_scheduler<a class="headerlink" href="#long-term-scheduler" title="Permalink to this headline">¶</a></h3>
-<span class="target" id="module-SPOCK.long_term_scheduler"></span><dl class="py function">
-<dt id="SPOCK.long_term_scheduler.Diff_list">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">Diff_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">li1</span></em>, <em class="sig-param"><span class="n">li2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Diff_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Diff_list" title="Permalink to this definition">¶</a></dt>
+<div class="section" id="module-long_term_scheduler">
+<span id="long-term-scheduler"></span><h3>long_term_scheduler<a class="headerlink" href="#module-long_term_scheduler" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="long_term_scheduler.Diff_list">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">Diff_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">li1</span></em>, <em class="sig-param"><span class="n">li2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Diff_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Diff_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inform on the difference between two lists</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -222,8 +225,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.Observability">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">Observability</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">j</span></em>, <em class="sig-param"><span class="n">time_range</span></em>, <em class="sig-param"><span class="n">observatory</span></em>, <em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">constraints</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Observability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Observability" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Observability">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">Observability</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">j</span></em>, <em class="sig-param"><span class="n">time_range</span></em>, <em class="sig-param"><span class="n">observatory</span></em>, <em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">constraints</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Observability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Observability" title="Permalink to this definition">¶</a></dt>
 <dd><p>Give a table with the observability score for each target of targets
 regarding the constraints given and for all ranges of time_range</p>
 <dl class="field-list simple">
@@ -247,8 +250,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.SNO_planned_targets">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">SNO_planned_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#SNO_planned_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.SNO_planned_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.SNO_planned_targets">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">SNO_planned_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#SNO_planned_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.SNO_planned_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>tell which target are scheduled on SNO on a given day</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -264,8 +267,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.SSO_planned_targets">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">SSO_planned_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#SSO_planned_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.SSO_planned_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.SSO_planned_targets">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">SSO_planned_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#SSO_planned_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.SSO_planned_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>tell which target are scheduled on SSO on a given day</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -284,12 +287,12 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="SPOCK.long_term_scheduler.Schedules">
-<em class="property">class </em><code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">Schedules</code><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules">
+<em class="property">class </em><code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">Schedules</code><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to Make schedules for the target list, observatory, date_range and startegy indicated</p>
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.date_range_in_days">
-<em class="property">property </em><code class="sig-name descname">date_range_in_days</code><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.date_range_in_days" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.date_range_in_days">
+<em class="property">property </em><code class="sig-name descname">date_range_in_days</code><a class="headerlink" href="#long_term_scheduler.Schedules.date_range_in_days" title="Permalink to this definition">¶</a></dt>
 <dd><p>number of days in date range</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -302,8 +305,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.date_ranges_day_by_day">
-<em class="property">property </em><code class="sig-name descname">date_ranges_day_by_day</code><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.date_ranges_day_by_day" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.date_ranges_day_by_day">
+<em class="property">property </em><code class="sig-name descname">date_ranges_day_by_day</code><a class="headerlink" href="#long_term_scheduler.Schedules.date_ranges_day_by_day" title="Permalink to this definition">¶</a></dt>
 <dd><p>date range day by day</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -316,8 +319,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.exposure_time">
-<code class="sig-name descname">exposure_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">i</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.exposure_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.exposure_time" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.exposure_time">
+<code class="sig-name descname">exposure_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">i</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.exposure_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.exposure_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>calculation of the exposure time for a given target</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -336,8 +339,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.exposure_time_for_table">
-<code class="sig-name descname">exposure_time_for_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em>, <em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">i</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.exposure_time_for_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.exposure_time_for_table" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.exposure_time_for_table">
+<code class="sig-name descname">exposure_time_for_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em>, <em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">i</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.exposure_time_for_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.exposure_time_for_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>calcul of exposure time to store in a table</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -357,8 +360,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.exposure_time_table">
-<code class="sig-name descname">exposure_time_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.exposure_time_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.exposure_time_table" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.exposure_time_table">
+<code class="sig-name descname">exposure_time_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.exposure_time_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.exposure_time_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>generate an exposure time table as the form of a file untitled</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -374,8 +377,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.idx_is_julien_criterion">
-<code class="sig-name descname">idx_is_julien_criterion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.idx_is_julien_criterion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.idx_is_julien_criterion" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.idx_is_julien_criterion">
+<code class="sig-name descname">idx_is_julien_criterion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.idx_is_julien_criterion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.idx_is_julien_criterion" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>day</strong> – day str format ‘%y%m%d HH:MM:SS.sss’</p>
@@ -387,8 +390,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.idx_rise_targets_sorted">
-<em class="property">property </em><code class="sig-name descname">idx_rise_targets_sorted</code><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.idx_rise_targets_sorted" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.idx_rise_targets_sorted">
+<em class="property">property </em><code class="sig-name descname">idx_rise_targets_sorted</code><a class="headerlink" href="#long_term_scheduler.Schedules.idx_rise_targets_sorted" title="Permalink to this definition">¶</a></dt>
 <dd><p>index for rise targets sorted</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -401,8 +404,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.idx_set_targets_sorted">
-<em class="property">property </em><code class="sig-name descname">idx_set_targets_sorted</code><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.idx_set_targets_sorted" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.idx_set_targets_sorted">
+<em class="property">property </em><code class="sig-name descname">idx_set_targets_sorted</code><a class="headerlink" href="#long_term_scheduler.Schedules.idx_set_targets_sorted" title="Permalink to this definition">¶</a></dt>
 <dd><p>index for set targets sorted</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -415,8 +418,8 @@ regarding the constraints given and for all ranges of time_range</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.idx_targets">
-<code class="sig-name descname">idx_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.idx_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.idx_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.idx_targets">
+<code class="sig-name descname">idx_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.idx_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.idx_targets" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Give the index of the first and second targets as well as the
 corresponding row in the priority table</p>
@@ -435,8 +438,8 @@ corresponding row in the priority table</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.info_obs_possible">
-<code class="sig-name descname">info_obs_possible</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.info_obs_possible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.info_obs_possible" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.info_obs_possible">
+<code class="sig-name descname">info_obs_possible</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.info_obs_possible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.info_obs_possible" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>day</strong> – day str format ‘%y%m%d HH:MM:SS.sss’</p>
@@ -448,8 +451,8 @@ corresponding row in the priority table</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.is_constraint_hours">
-<code class="sig-name descname">is_constraint_hours</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx_target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.is_constraint_hours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.is_constraint_hours" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.is_constraint_hours">
+<code class="sig-name descname">is_constraint_hours</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx_target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.is_constraint_hours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.is_constraint_hours" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Check if number of hours is ok</p>
 </div></blockquote>
@@ -467,8 +470,8 @@ corresponding row in the priority table</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.is_constraints_met_first_target">
-<code class="sig-name descname">is_constraints_met_first_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.is_constraints_met_first_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.is_constraints_met_first_target" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.is_constraints_met_first_target">
+<code class="sig-name descname">is_constraints_met_first_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.is_constraints_met_first_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.is_constraints_met_first_target" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Useful when the moon constrain (&lt; 30°) or the hours constraint (nb_hours_observed&gt;nb_hours_threshold)
 are not fullfilled anymore and the first target needs to be changed</p>
@@ -496,8 +499,8 @@ are not fullfilled anymore and the first target needs to be changed</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.is_constraints_met_second_target">
-<code class="sig-name descname">is_constraints_met_second_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.is_constraints_met_second_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.is_constraints_met_second_target" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.is_constraints_met_second_target">
+<code class="sig-name descname">is_constraints_met_second_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.is_constraints_met_second_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.is_constraints_met_second_target" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Useful when the moon constrain (&lt; 30°) or the hours constraint (nb_hours_observed&gt;nb_hours_threshold)
 are not fullfilled anymore and the second target needs to be changed</p>
@@ -526,8 +529,8 @@ are not fullfilled anymore and the second target needs to be changed</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.is_moon_and_visibility_constraint">
-<code class="sig-name descname">is_moon_and_visibility_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.is_moon_and_visibility_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.is_moon_and_visibility_constraint" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.is_moon_and_visibility_constraint">
+<code class="sig-name descname">is_moon_and_visibility_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.is_moon_and_visibility_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.is_moon_and_visibility_constraint" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Check if number of moon not too close and target is visible</p>
 </div></blockquote>
@@ -545,8 +548,8 @@ are not fullfilled anymore and the second target needs to be changed</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.months_obs">
-<em class="property">property </em><code class="sig-name descname">months_obs</code><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.months_obs" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.months_obs">
+<em class="property">property </em><code class="sig-name descname">months_obs</code><a class="headerlink" href="#long_term_scheduler.Schedules.months_obs" title="Permalink to this definition">¶</a></dt>
 <dd><p>month of obs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -559,8 +562,8 @@ are not fullfilled anymore and the second target needs to be changed</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.nb_hours_observed">
-<em class="property">property </em><code class="sig-name descname">nb_hours_observed</code><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.nb_hours_observed" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.nb_hours_observed">
+<em class="property">property </em><code class="sig-name descname">nb_hours_observed</code><a class="headerlink" href="#long_term_scheduler.Schedules.nb_hours_observed" title="Permalink to this definition">¶</a></dt>
 <dd><p>nb hours observed for each target</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -573,8 +576,8 @@ are not fullfilled anymore and the second target needs to be changed</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.nb_hours_threshold">
-<em class="property">property </em><code class="sig-name descname">nb_hours_threshold</code><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.nb_hours_threshold" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.nb_hours_threshold">
+<em class="property">property </em><code class="sig-name descname">nb_hours_threshold</code><a class="headerlink" href="#long_term_scheduler.Schedules.nb_hours_threshold" title="Permalink to this definition">¶</a></dt>
 <dd><p>number of hours to reach</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -587,8 +590,8 @@ are not fullfilled anymore and the second target needs to be changed</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.night_duration">
-<code class="sig-name descname">night_duration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.night_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.night_duration" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.night_duration">
+<code class="sig-name descname">night_duration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.night_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.night_duration" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>day</strong> – day str format ‘%y%m%d HH:MM:SS.sss’</p>
@@ -600,8 +603,8 @@ are not fullfilled anymore and the second target needs to be changed</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.no_obs_with_different_tel">
-<code class="sig-name descname">no_obs_with_different_tel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.no_obs_with_different_tel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.no_obs_with_different_tel" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.no_obs_with_different_tel">
+<code class="sig-name descname">no_obs_with_different_tel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.no_obs_with_different_tel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.no_obs_with_different_tel" title="Permalink to this definition">¶</a></dt>
 <dd><p>function to avoid observations of a similar target,
 expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 <dl class="field-list simple">
@@ -615,8 +618,8 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.rise_time_targets">
-<code class="sig-name descname">rise_time_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.rise_time_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.rise_time_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.rise_time_targets">
+<code class="sig-name descname">rise_time_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.rise_time_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.rise_time_targets" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>day</strong> – day str format ‘%y%m%d HH:MM:SS.sss’</p>
@@ -628,8 +631,8 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.schedule_blocks">
-<code class="sig-name descname">schedule_blocks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.schedule_blocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.schedule_blocks" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.schedule_blocks">
+<code class="sig-name descname">schedule_blocks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.schedule_blocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.schedule_blocks" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>schedule the lock thanks to astroplan tools</p>
 </div></blockquote>
@@ -651,8 +654,8 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.set_time_targets">
-<code class="sig-name descname">set_time_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.set_time_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.set_time_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.set_time_targets">
+<code class="sig-name descname">set_time_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.set_time_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.set_time_targets" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>day</strong> – day str format ‘%y%m%d HH:MM:SS.sss’</p>
@@ -664,8 +667,8 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.update_hours_observed_first">
-<code class="sig-name descname">update_hours_observed_first</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.update_hours_observed_first"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.update_hours_observed_first" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.update_hours_observed_first">
+<code class="sig-name descname">update_hours_observed_first</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.update_hours_observed_first"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.update_hours_observed_first" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>update number of hours observed for the corresponding first target</p>
 </div></blockquote>
@@ -688,8 +691,8 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="SPOCK.long_term_scheduler.Schedules.update_hours_observed_second">
-<code class="sig-name descname">update_hours_observed_second</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#Schedules.update_hours_observed_second"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.Schedules.update_hours_observed_second" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.Schedules.update_hours_observed_second">
+<code class="sig-name descname">update_hours_observed_second</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#Schedules.update_hours_observed_second"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.Schedules.update_hours_observed_second" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>update number of hours observed for the corresponding second target</p>
 </div></blockquote>
@@ -714,8 +717,8 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.TN_planned_targets">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">TN_planned_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#TN_planned_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.TN_planned_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.TN_planned_targets">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">TN_planned_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#TN_planned_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.TN_planned_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>tell which target are scheduled on TN on a given day</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -731,8 +734,8 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.TS_planned_targets">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">TS_planned_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#TS_planned_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.TS_planned_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.TS_planned_targets">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">TS_planned_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#TS_planned_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.TS_planned_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>tell which target are scheduled on TS on a given day</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -748,60 +751,32 @@ expect for SNO and SAINT-EX were similar target observations are encouraged.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.altaz">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">altaz</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obswl</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">grid_times_targets</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#altaz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.altaz" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.altaz">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">altaz</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">obswl</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">grid_times_targets</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#altaz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.altaz" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an <cite>~astropy.coordinates.AltAz</cite> frame or coordinate.
 If <code class="docutils literal notranslate"><span class="pre">target</span></code> is None, generates an altitude/azimuth frame. Otherwise,
-calculates the transformation to that frame for the requested <code class="docutils literal notranslate"><span class="pre">target</span></code>.
-:param time: The time at which the observation is taking place. Will be used as</p>
-<blockquote>
-<div><p>the <code class="docutils literal notranslate"><span class="pre">obstime</span></code> attribute in the resulting frame or coordinate. This
-will be passed in as the first argument to the <cite>~astropy.time.Time</cite>
-initializer, so it can be anything that <cite>~astropy.time.Time</cite> will
-accept (including a <cite>~astropy.time.Time</cite> object)</p>
-</div></blockquote>
+calculates the transformation to that frame for the requested <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>target</strong> (<cite>~astroplan.FixedTarget</cite>, <cite>~astropy.coordinates.SkyCoord</cite>, or list (optional)) – Celestial object(s) of interest. If <code class="docutils literal notranslate"><span class="pre">target</span></code> is <cite>None</cite>, returns
-the <cite>~astropy.coordinates.AltAz</cite> frame without coordinates.</p></li>
-<li><p><strong>obswl</strong> (<cite>~astropy.units.Quantity</cite> (optional)) – Wavelength of the observation used in the calculation.</p></li>
-<li><p><strong>grid_times_targets</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – If True, the target object will have extra dimensions packed
-onto the end, so that calculations with M targets and N times
-will return an (M, N) shaped result. Otherwise, we rely on
-broadcasting the shapes together using standard numpy
-rules. Useful for grid searches for rise/set times etc.</p></li>
+<li><p><strong>time</strong> (<em>astropy.time.Time</em>) – The time at which the observation is taking place.</p></li>
+<li><p><strong>target</strong> (<em>astroplan.FixedTarget</em>) – Celestial object(s) of interest.</p></li>
+<li><p><strong>obswl</strong> (<em>astropy.units.Quantity</em>) – Wavelength of the observation used in the calculation.</p></li>
+<li><p><strong>grid_times_targets</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – If True, the target object will have extra dimensions packed onto the end. Otherwise, we rely on broadcasting the shapes together using standard numpy rules. Useful for grid searches for rise/set times etc.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>If <code class="docutils literal notranslate"><span class="pre">target</span></code> is <cite>None</cite>, returns <cite>~astropy.coordinates.AltAz</cite> frame.
-If <code class="docutils literal notranslate"><span class="pre">target</span></code> is not <cite>None</cite>, returns the <code class="docutils literal notranslate"><span class="pre">target</span></code> transformed to
-the <cite>~astropy.coordinates.AltAz</cite> frame.</p>
+<dd class="field-even"><p></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><cite>~astropy.coordinates.AltAz</cite></p>
+<dd class="field-odd"><p>astropy.coordinates.AltAz</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<p>Create an instance of the <cite>~astropy.coordinates.AltAz</cite> frame for an
-observer at Apache Point Observatory at a particular time:
-&gt;&gt;&gt; from astroplan import Observer
-&gt;&gt;&gt; from astropy.time import Time
-&gt;&gt;&gt; from astropy.coordinates import SkyCoord
-&gt;&gt;&gt; apo = Observer.at_site(“APO”)
-&gt;&gt;&gt; time = Time(‘2001-02-03 04:05:06’)
-&gt;&gt;&gt; target = SkyCoord(0*u.deg, 0*u.deg)
-&gt;&gt;&gt; altaz_frame = apo.altaz(time)
-Now transform the target’s coordinates to the alt/az frame:
-&gt;&gt;&gt; target_altaz = target.transform_to(altaz_frame) # doctest: +SKIP
-Alternatively, construct an alt/az frame and transform the target to
-that frame all in one step:
-&gt;&gt;&gt; target_altaz = apo.altaz(time, target) # doctest: +SKIP</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.charge_observatories">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">charge_observatories</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#charge_observatories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.charge_observatories" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.charge_observatories">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">charge_observatories</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#charge_observatories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.charge_observatories" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>Name</strong> (<em>str</em>) – name of the observatory (ex: ‘SSO’)</p>
@@ -816,26 +791,8 @@ that frame all in one step:
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.compare_target_lists">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">compare_target_lists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_target_listuser</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">'educrot'</span></em>, <em class="sig-param"><span class="n">password</span><span class="o">=</span><span class="default_value">'9UCExnjwes'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#compare_target_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.compare_target_lists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compare the target list from the given folder to the one on STARGATE and Cambridge server
-If different trigger a warning a tell how many targets are actually different from the referenced target list</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path_target_list</strong> (<em>str</em>) – path on your computer toward the target list, by default take the one on the Cambridge server</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An idication about if the target list is the referenced one or not</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>print</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="SPOCK.long_term_scheduler.coord_transfotm_to_alt">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">coord_transfotm_to_alt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#coord_transfotm_to_alt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.coord_transfotm_to_alt" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.coord_transfotm_to_alt">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">coord_transfotm_to_alt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#coord_transfotm_to_alt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.coord_transfotm_to_alt" title="Permalink to this definition">¶</a></dt>
 <dd><p>transform astropy.coordinates to a given frame</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -855,8 +812,8 @@ If different trigger a warning a tell how many targets are actually different fr
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.first_elem_list">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">first_elem_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#first_elem_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.first_elem_list" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.first_elem_list">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">first_elem_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#first_elem_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.first_elem_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>first element of list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -872,22 +829,8 @@ If different trigger a warning a tell how many targets are actually different fr
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.get_hours_files_SNO">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">get_hours_files_SNO</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span><span class="o">=</span><span class="default_value">'speculoos'</span></em>, <em class="sig-param"><span class="n">password</span><span class="o">=</span><span class="default_value">'SNO_Reduc_1'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#get_hours_files_SNO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.get_hours_files_SNO" title="Permalink to this definition">¶</a></dt>
-<dd><p>get nb hours obs on SNO</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>file ObservationHours.txt</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>txt file</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="SPOCK.long_term_scheduler.index_list1_list2">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">index_list1_list2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list1</span></em>, <em class="sig-param"><span class="n">list2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#index_list1_list2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.index_list1_list2" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.index_list1_list2">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">index_list1_list2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list1</span></em>, <em class="sig-param"><span class="n">list2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#index_list1_list2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.index_list1_list2" title="Permalink to this definition">¶</a></dt>
 <dd><p>index of list1 in list2 and list2 in list1</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -906,8 +849,8 @@ If different trigger a warning a tell how many targets are actually different fr
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.last_elem_list">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">last_elem_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#last_elem_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.last_elem_list" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.last_elem_list">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">last_elem_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#last_elem_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.last_elem_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>last element of list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -923,8 +866,8 @@ If different trigger a warning a tell how many targets are actually different fr
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.make_plans">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">make_plans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">nb_days</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#make_plans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.make_plans" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.make_plans">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">make_plans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">nb_days</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#make_plans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.make_plans" title="Permalink to this definition">¶</a></dt>
 <dd><p>make plans for telescope for a certain number of day from a start day</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -938,8 +881,8 @@ If different trigger a warning a tell how many targets are actually different fr
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.max_unit_list">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">max_unit_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#max_unit_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.max_unit_list" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.max_unit_list">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">max_unit_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#max_unit_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.max_unit_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>return max of list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -955,15 +898,14 @@ If different trigger a warning a tell how many targets are actually different fr
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.month_option">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">month_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_name</span></em>, <em class="sig-param"><span class="n">reverse_df1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#month_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.month_option" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.month_option">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">month_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_name</span></em>, <em class="sig-param"><span class="n">reverse_df1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#month_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.month_option" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a list of the best month for oservation for each target</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>target_name</strong> (<em>str</em>) – name of the target</p></li>
-<li><p><strong>reverse_df1</strong> (<em>astropy.table</em>) – observability table with no NaN value (0 instead) inversed with targets as columns
-and elements of time_ranges (months) as rows</p></li>
+<li><p><strong>reverse_df1</strong> (<em>astropy.table</em>) – observability table with no NaN value (0 instead) inversed with targets as columns and elements of time_ranges (months) as rows</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -973,19 +915,19 @@ and elements of time_ranges (months) as rows</p></li>
 <li><p><strong>months_3rd_option</strong> (<em>list</em>) – same but for the third best month</p></li>
 <li><p><strong>months_4th_option</strong> (<em>list</em>) – same but for the fourth best month</p></li>
 <li><p><strong>months_5th_option</strong> (<em>list</em>) – same but for the fiveth best month</p></li>
+<li><p><em>Remarks</em></p></li>
+<li><p><em>——-</em></p></li>
+<li><p><em>the 2nd, 3rd etc choices are here in case the target list is not long enough to give</em></p></li>
+<li><p><em>solutions for all the telescopes each months, allows to avoid blancks in observations</em></p></li>
 </ul>
 </p>
 </dd>
 </dl>
-<blockquote>
-<div><p>the 2nd, 3rd etc choices are here in case the target list is not long enough to give
-solutions for all the telescopes each months, allows to avoid blancks in observations</p>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.read_night_block">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">read_night_block</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#read_night_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.read_night_block" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.read_night_block">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">read_night_block</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#read_night_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.read_night_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>[summary]</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1004,8 +946,8 @@ solutions for all the telescopes each months, allows to avoid blancks in observa
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.reverse_Observability">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">reverse_Observability</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">observatory</span></em>, <em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">constraints</span></em>, <em class="sig-param"><span class="n">time_ranges</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#reverse_Observability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.reverse_Observability" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.reverse_Observability">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">reverse_Observability</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">observatory</span></em>, <em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">constraints</span></em>, <em class="sig-param"><span class="n">time_ranges</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#reverse_Observability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.reverse_Observability" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reverse observability table, rows become columns
 :param observatory: observatory chosen
 :type observatory: str
@@ -1027,8 +969,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.save_schedule">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">save_schedule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_file</span></em>, <em class="sig-param"><span class="n">nb_observatory</span></em>, <em class="sig-param"><span class="n">save</span></em>, <em class="sig-param"><span class="n">over_write</span></em>, <em class="sig-param"><span class="n">date_range</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#save_schedule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.save_schedule" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.save_schedule">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">save_schedule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_file</span></em>, <em class="sig-param"><span class="n">nb_observatory</span></em>, <em class="sig-param"><span class="n">save</span></em>, <em class="sig-param"><span class="n">over_write</span></em>, <em class="sig-param"><span class="n">date_range</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#save_schedule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.save_schedule" title="Permalink to this definition">¶</a></dt>
 <dd><p>save schedules in destination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1051,8 +993,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.long_term_scheduler.target_list_good_coord_format">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">target_list_good_coord_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#target_list_good_coord_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.target_list_good_coord_format" title="Permalink to this definition">¶</a></dt>
+<dt id="long_term_scheduler.target_list_good_coord_format">
+<code class="sig-prename descclassname">long_term_scheduler.</code><code class="sig-name descname">target_list_good_coord_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/long_term_scheduler.html#target_list_good_coord_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#long_term_scheduler.target_list_good_coord_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Give target corrdinates in ICRS format (used for astropy.coordinates SkyCoord function)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1067,27 +1009,12 @@ and elements of time_ranges (months) as rows</p>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt id="SPOCK.long_term_scheduler.upload_plans">
-<code class="sig-prename descclassname">SPOCK.long_term_scheduler.</code><code class="sig-name descname">upload_plans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">nb_days</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/long_term_scheduler.html#upload_plans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.long_term_scheduler.upload_plans" title="Permalink to this definition">¶</a></dt>
-<dd><p>upload plans to DATABASE</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>day</strong> (<em>date</em>) – date in fmt ‘yyyy-mm-dd’</p></li>
-<li><p><strong>nb_days</strong> (<em>int</em>) – number of days</p></li>
-<li><p><strong>telescope</strong> (<em>str</em>) – name of telescope</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </div>
-<div class="section" id="short-term-scheduler">
-<h3>short_term_scheduler<a class="headerlink" href="#short-term-scheduler" title="Permalink to this headline">¶</a></h3>
-<span class="target" id="module-SPOCK.short_term_scheduler"></span><dl class="py function">
-<dt id="SPOCK.short_term_scheduler.target_list_good_coord_format">
-<code class="sig-prename descclassname">SPOCK.short_term_scheduler.</code><code class="sig-name descname">target_list_good_coord_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/short_term_scheduler.html#target_list_good_coord_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.short_term_scheduler.target_list_good_coord_format" title="Permalink to this definition">¶</a></dt>
+<div class="section" id="module-short_term_scheduler">
+<span id="short-term-scheduler"></span><h3>short_term_scheduler<a class="headerlink" href="#module-short_term_scheduler" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="short_term_scheduler.target_list_good_coord_format">
+<code class="sig-prename descclassname">short_term_scheduler.</code><code class="sig-name descname">target_list_good_coord_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/short_term_scheduler.html#target_list_good_coord_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#short_term_scheduler.target_list_good_coord_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Give target corrdinates in ICRS format (used for astropy.coordinates SkyCoord function)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1103,11 +1030,11 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-SPOCK.plots_scheduler">
-<span id="plots-scheduler"></span><h3>plots_scheduler<a class="headerlink" href="#module-SPOCK.plots_scheduler" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-plots_scheduler">
+<span id="plots-scheduler"></span><h3>plots_scheduler<a class="headerlink" href="#module-plots_scheduler" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.airmass_altitude_plot_given_target">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">airmass_altitude_plot_given_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#airmass_altitude_plot_given_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.airmass_altitude_plot_given_target" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.airmass_altitude_plot_given_target">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">airmass_altitude_plot_given_target</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">day</span></em>, <em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">path_target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#airmass_altitude_plot_given_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.airmass_altitude_plot_given_target" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1121,8 +1048,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.airmass_altitude_plot_proposition">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">airmass_altitude_plot_proposition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#airmass_altitude_plot_proposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.airmass_altitude_plot_proposition" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.airmass_altitude_plot_proposition">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">airmass_altitude_plot_proposition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#airmass_altitude_plot_proposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.airmass_altitude_plot_proposition" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1141,8 +1068,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.airmass_altitude_plot_saved">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">airmass_altitude_plot_saved</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#airmass_altitude_plot_saved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.airmass_altitude_plot_saved" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.airmass_altitude_plot_saved">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">airmass_altitude_plot_saved</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#airmass_altitude_plot_saved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.airmass_altitude_plot_saved" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1161,8 +1088,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.airmass_plot_proposition">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">airmass_plot_proposition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#airmass_plot_proposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.airmass_plot_proposition" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.airmass_plot_proposition">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">airmass_plot_proposition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#airmass_plot_proposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.airmass_plot_proposition" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1181,8 +1108,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.airmass_plot_saved">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">airmass_plot_saved</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#airmass_plot_saved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.airmass_plot_saved" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.airmass_plot_saved">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">airmass_plot_saved</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_observatory</span></em>, <em class="sig-param"><span class="n">telescope</span></em>, <em class="sig-param"><span class="n">day</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#airmass_plot_saved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.airmass_plot_saved" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1201,8 +1128,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.charge_observatories">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">charge_observatories</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#charge_observatories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.charge_observatories" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.charge_observatories">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">charge_observatories</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#charge_observatories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.charge_observatories" title="Permalink to this definition">¶</a></dt>
 <dd><p>charge the observatory</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1218,8 +1145,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.constraints_scores">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">constraints_scores</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraints</span></em>, <em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">observatory</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#constraints_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.constraints_scores" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.constraints_scores">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">constraints_scores</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraints</span></em>, <em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">observatory</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#constraints_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.constraints_scores" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1240,8 +1167,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.gantt_chart">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">gantt_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#gantt_chart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.gantt_chart" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.gantt_chart">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">gantt_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date_start</span></em>, <em class="sig-param"><span class="n">date_end</span></em>, <em class="sig-param"><span class="n">telescope</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#gantt_chart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.gantt_chart" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1260,8 +1187,8 @@ and elements of time_ranges (months) as rows</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="SPOCK.plots_scheduler.gantt_chart_all">
-<code class="sig-prename descclassname">SPOCK.plots_scheduler.</code><code class="sig-name descname">gantt_chart_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SPOCK/plots_scheduler.html#gantt_chart_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#SPOCK.plots_scheduler.gantt_chart_all" title="Permalink to this definition">¶</a></dt>
+<dt id="plots_scheduler.gantt_chart_all">
+<code class="sig-prename descclassname">plots_scheduler.</code><code class="sig-name descname">gantt_chart_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/plots_scheduler.html#gantt_chart_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plots_scheduler.gantt_chart_all" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>target_list</strong> (<em>path</em>) – path of the target list</p>

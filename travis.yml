@@ -1,0 +1,21 @@
+language: python
+
+python:
+  - 3.7
+
+install:
+  - pip install .
+
+script:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y pandoc
+  - pip install travis-sphinx nbsphinx sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: "$GITHUB_TOKEN"  # Set in travis-ci.org dashboard, marked secure
+  keep-history: true
+  on:
+    target_branch: gh-pages
+  local_dir: doc/build/

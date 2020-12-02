@@ -2,7 +2,6 @@
 
 import subprocess
 import os
-import glob
 from astropy.time import Time
 import yaml
 
@@ -28,17 +27,20 @@ def upload_np_euro(t_now,nb_jours):
 
         # upload on Cambridge server
         ## Plans by date
-        path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Europa',
-                                     'schedule')
+        path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Europa',
+                                     'schedule','Plans_by_date')
         path_plans = os.path.join('./DATABASE/', 'Europa',
-                                  'Plans_by_date/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database])
+                                  'Plans_by_date/',str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')
 
         ## Archive_night_blocks
+        path_database_nightb = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+                                           'Europa',
+                                           'schedule', 'Archive_night_blocks')
         path_night_blocks = os.path.join('./DATABASE/', 'Europa',
-                                         'Archive_night_blocks/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", "-r", path_night_blocks, path_database])
+                                         'Archive_night_blocks/','night_blocks_Europa_'+str(t_now)+'.txt')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", path_night_blocks, path_database_nightb])
         print('----->', t_now, 'Night plans uploaded on the Cambridge server')
 
         ## zip_files
@@ -74,17 +76,20 @@ def upload_np_calli(t_now,nb_jours):
 
         # upload on Cambridge server
         ## Plans by date
-        path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Callisto',
-                                     'schedule')
+        path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Callisto',
+                                     'schedule','Plans_by_date')
         path_plans = os.path.join('./DATABASE/', 'Callisto',
-                                  'Plans_by_date/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database])
+                                  'Plans_by_date/',str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')
 
         ## Archive_night_blocks
+        path_database_nightb = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+                                           'Callisto',
+                                           'schedule', 'Archive_night_blocks')
         path_night_blocks = os.path.join('./DATABASE/', 'Callisto',
-                                         'Archive_night_blocks/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", "-r", path_night_blocks, path_database])
+                                         'Archive_night_blocks/','night_blocks_Callisto_'+str(t_now)+'.txt')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", path_night_blocks, path_database_nightb])
         print('----->', t_now, 'Night plans uploaded on the Cambridge server')
 
         ## zip_files
@@ -116,17 +121,20 @@ def upload_np_io(t_now,nb_jours):
 
         # upload on Cambridge server
         ## Plans by date
-        path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Io',
-                                     'schedule')
+        path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Io',
+                                     'schedule','Plans_by_date')
         path_plans = os.path.join('./DATABASE/', 'Io',
-                                  'Plans_by_date/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database])
+                                  'Plans_by_date/',str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')
 
         ## Archive_night_blocks
+        path_database_nightb = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+                                           'Io',
+                                           'schedule', 'Archive_night_blocks')
         path_night_blocks = os.path.join('./DATABASE/', 'Io',
-                                         'Archive_night_blocks/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", "-r", path_night_blocks, path_database])
+                                         'Archive_night_blocks/','night_blocks_Io_'+str(t_now)+'.txt')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", path_night_blocks, path_database_nightb])
         print('----->', t_now, 'Night plans uploaded on the Cambridge server')
 
         ## zip_files
@@ -157,17 +165,20 @@ def upload_np_gany(t_now,nb_jours):
 
         # upload on Cambridge server
         ## Plans by date
-        path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Ganymede',
-                                     'schedule')
+        path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Ganymede',
+                                     'schedule','Plans_by_date')
         path_plans = os.path.join('./DATABASE/', 'Ganymede',
-                                  'Plans_by_date/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database])
+                                  'Plans_by_date/',str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')
 
         ## Archive_night_blocks
+        path_database_nightb = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+                                           'Ganymede',
+                                           'schedule', 'Archive_night_blocks')
         path_night_blocks = os.path.join('./DATABASE/', 'Ganymede',
-                                         'Archive_night_blocks/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", "-r", path_night_blocks, path_database])
+                                         'Archive_night_blocks/','night_blocks_Ganymede_'+str(t_now)+'.txt')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", path_night_blocks, path_database_nightb])
         print('----->', t_now, 'Night plans uploaded on the Cambridge server')
 
         ## zip_files
@@ -200,15 +211,20 @@ def upload_np_artemis(t_now,nb_jours):
         path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Artemis',
                                      'schedule')
         ##Plans
+        path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Artemis',
+                                     'schedule','Plans_by_date')
         path_plans = os.path.join('./DATABASE/', 'Artemis',
-                                  'Plans_by_date/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database])
+                                  'Plans_by_date/',str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')
 
         ## Archive night blocks
+        path_database_nightb = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+                                           'Artemis',
+                                           'schedule', 'Archive_night_blocks')
         path_night_blocks = os.path.join('./DATABASE/', 'Artemis',
-                                         'Archive_night_blocks/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", "-r", path_night_blocks, path_database])
+                                         'Archive_night_blocks/','night_blocks_Artemis_'+str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", path_night_blocks, path_database_nightb])
         print('----->', t_now, 'Night plans uploaded on the Cambridge server')
 
         ## zip_files
@@ -248,15 +264,20 @@ def upload_np_ts(t_now,nb_jours):
         path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'TS_La_Silla',
                                      'schedule')
         ## Plans
+        path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'TS_La_Silla',
+                                     'schedule','Plans_by_date')
         path_plans = os.path.join('./DATABASE/', 'TS_La_Silla',
-                                  'Plans_by_date/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database])
+                                  'Plans_by_date/',str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')
 
         ##Archive night blocks
+        path_database_nightb = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+                                           'TS_La_Silla',
+                                           'schedule', 'Archive_night_blocks')
         path_night_blocks = os.path.join('./DATABASE/', 'TS_La_Silla',
-                                         'Archive_night_blocks/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", "-r", path_night_blocks, path_database])
+                                         'Archive_night_blocks/','night_blocks_TS_La_Silla_'+str(t_now)+'.txt')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", path_night_blocks, path_database_nightb])
         print('----->', t_now, 'Night plans uploaded on the Cambridge server')
 
         # ## zip_files
@@ -277,15 +298,20 @@ def upload_np_tn(t_now,nb_jours):
         path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'TN_Oukaimeden',
                                      'schedule')
         ## Plans
+        path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'TN_Oukaimeden',
+                                     'schedule','Plans_by_date')
         path_plans = os.path.join('./DATABASE/', 'TN_Oukaimeden',
-                                  'Plans_by_date/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database])
+                                  'Plans_by_date/',str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')
 
         ##Archive night blocks
+        path_database_nightb = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+                                           'TN_Oukaimeden',
+                                           'schedule', 'Archive_night_blocks')
         path_night_blocks = os.path.join('./DATABASE/', 'TN_Oukaimeden',
-                                         'Archive_night_blocks/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", "-r", path_night_blocks, path_database])
+                                         'Archive_night_blocks/','night_blocks_TN_Oukaimeden_'+str(t_now)+'.txt')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", path_night_blocks, path_database_nightb])
         print('----->', t_now, 'Night plans uploaded on the Cambridge server')
 
         # ## zip_files
@@ -303,17 +329,20 @@ def upload_np_saint_ex(t_now,nb_jours):
 
         # upload on Cambridge server
         ## Plans by date
-        path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Saint-Ex',
-                                     'schedule')
+        path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', 'Saint-Ex',
+                                     'schedule','Plans_by_date')
         path_plans = os.path.join('./DATABASE/', 'Saint-Ex',
-                                  'Plans_by_date/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database])
+                                  'Plans_by_date/',str(t_now))
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp","-r",path_plans,path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')
 
         ## Archive_night_blocks
+        path_database_nightb = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+                                           'Saint-Ex',
+                                           'schedule', 'Archive_night_blocks')
         path_night_blocks = os.path.join('./DATABASE/', 'Saint-Ex',
-                                         'Archive_night_blocks/')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", "-r", path_night_blocks, path_database])
+                                         'Archive_night_blocks/','night_blocks_Saint-Ex_'+str(t_now) +'.txt')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs , "scp", path_night_blocks, path_database_nightb])
         print('----->', t_now, 'Night plans uploaded on the Cambridge server')
 
         ## zip_files

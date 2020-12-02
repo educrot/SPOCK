@@ -24,7 +24,7 @@ target_list_v6 = pd.read_csv('./target_lists/speculoos_target_list_v6.txt',sep='
 def read_night_plans_server(telescope,date):
     TargetURL = "http://www.mrao.cam.ac.uk/SPECULOOS/"+telescope+\
                 "/schedule/Archive_night_blocks/night_blocks_"+telescope+"_"+date+".txt"
-    resp = requests.get(TargetURL, auth=(user, portal_pwd))
+    resp = requests.get(TargetURL, auth=(user_portal, pwd_portal))
     content = resp.text.replace("\n", "")
     open('text_file.txt', 'wb').write(resp.content)
 
@@ -33,14 +33,14 @@ def read_night_plans_server(telescope,date):
 
 def read_all_night_plans_server(file):
     TargetURL = file
-    resp = requests.get(TargetURL, auth=(user, portal_pwd))
+    resp = requests.get(TargetURL, auth=(user_portal, pwd_portal))
     content = resp.text.replace("\n", "")
     open('text_file.txt', 'wb').write(resp.content)
     df = pd.read_csv('text_file.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
     return df
 
 def listFD(url, ext=''):
-    page = requests.get(url, auth=(user, portal_pwd)).text
+    page = requests.get(url, auth=(user_portal, pwd_portal)).text
     # print(page)
     soup = BeautifulSoup(page, 'html.parser')
     return [url + '/' + node.get('href') for node in soup.find_all('a') if node.get('href').endswith(ext)]

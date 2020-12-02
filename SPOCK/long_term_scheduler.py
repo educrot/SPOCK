@@ -1,46 +1,44 @@
 #code for long term scheduling for SPECULOOS
-import numpy as np
-from datetime import date , datetime , timedelta
+from alive_progress import alive_bar
+from astropy.table import Table
 from astropy import units as u
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
-import subprocess
-from astropy.utils.data import clear_download_cache
-clear_download_cache()
-from SPOCK.make_night_plans import make_np
-#from SPOCK.upload_night_plans import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis,upload_np_ts,upload_np_tn
-import SPOCK.upload_night_plans as SPOCKunp
-import shutil
-from alive_progress import alive_bar
-import gspread
-from tqdm.auto import tqdm
-from oauth2client.service_account import ServiceAccountCredentials
-from docx.enum.text import WD_ALIGN_PARAGRAPH
 from astropy.utils import iers
+from astropy.time import Time
+from astropy.utils.data import clear_download_cache
+from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,observability_table, is_observable, months_observable,time_grid_from_range,LocalTimeConstraint, is_always_observable
+from astroplan import TimeConstraint,Observer,moon_illumination
+from datetime import date , datetime , timedelta
+from docx import Document
+from docx.shared import *
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock, Transitioner
+import functools
+from functools import reduce
+import gspread
+import numpy as np
+from oauth2client.service_account import ServiceAccountCredentials
+import os
+import os.path, time
+import pandas as pd
+import paramiko
+import requests
+import shutil
+import SPOCK.ETC as ETC
+from SPOCK.make_night_plans import make_np
+import SPOCK.upload_night_plans as SPOCKunp
+import ssl
+import subprocess
+import sys
+from tqdm.auto import tqdm
+import yaml
+
 iers.IERS_A_URL  = 'https://datacenter.iers.org/data/9/finals2000A.all' #'http://maia.usno.navy.mil/ser7/finals2000A.all'#'ftp://cddis.gsfc.nasa.gov/pub/products/iers/finals2000A.all'
 #from astroplan import download_IERS_A
 #download_IERS_A()
-from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,observability_table, is_observable, months_observable,time_grid_from_range,LocalTimeConstraint, is_always_observable
-from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock, Transitioner
-from astroplan import TimeConstraint
-from astroplan import Observer
-import astroplan
-from astropy.time import Time
-import pandas as pd
-import functools
-from functools import reduce
-import os
-import requests
-import yaml
-import sys
-import os.path, time
-from datetime import datetime
-import SPOCK.ETC as ETC
-import paramiko
-from docx import Document
-from docx.shared import *
-from astropy.table import Table
-import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+clear_download_cache()
+
 
 with open('passwords.csv', "r") as f:
     Inputs = yaml.load(f, Loader=yaml.FullLoader)
@@ -1442,7 +1440,7 @@ class Schedules:
             read_exposure_time_table = pd.read_csv('./SPOCK_files/exposure_time_table.csv', sep=',')
         if self.observatory.name == 'SSO':
             texp = read_exposure_time_table['SSO_texp']
-            idx_texp_too_long = np.where((texp > 150))
+            idx_texp_too_long = np.where((texp > 100))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'SNO':
             texp = read_exposure_time_table['SNO_texp']
@@ -2127,7 +2125,7 @@ class Schedules:
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                          observatory_altitude=2780))
-            texp = a.exp_time_calculator(ADUpeak=35000)[0]
+            texp = a.exp_time_calculator(ADUpeak=30000)[0]
         elif obs == 'TS' or obs =='TN':
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
@@ -2191,7 +2189,7 @@ class Schedules:
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                          observatory_altitude=2780))
-            texp = a.exp_time_calculator(ADUpeak=35000)[0]
+            texp = a.exp_time_calculator(ADUpeak=30000)[0]
         elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
@@ -2219,7 +2217,7 @@ class Schedules:
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48,temp_ccd=-70,
                              observatory_altitude=2780))
-                texp = a.exp_time_calculator(ADUpeak=35000)[0]
+                texp = a.exp_time_calculator(ADUpeak=30000)[0]
             elif self.telescope == 'Artemis':
                 self.target_table_spc['Filter_spc'][i] = filt_
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
@@ -2296,7 +2294,7 @@ def read_night_block(telescope, day):
 
     day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
     scheduler_table = Table.read(
-        './DATABASE/' + str(telescope) + 'Archive_night_blocks' +  '/night_blocks_' + str(telescope) + '_' + str(day_fmt) + '.txt',
+        './DATABASE/' + str(telescope) + '/Archive_night_blocks' +  '/night_blocks_' + str(telescope) + '_' + str(day_fmt) + '.txt',
         format='ascii')
     return scheduler_table
 
@@ -2358,7 +2356,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
         table_schedule = read_night_block(telescope, date)
         sun_set = observatory.sun_set_time(date, which='next').iso
         sun_rise = observatory.sun_rise_time(date, which='next').iso
-        moon_illumination = int(round(astroplan.moon_illumination(date) * 100, 0)) * u.percent
+        moon_illum = int(round(moon_illumination(date) * 100, 0)) * u.percent
         civil_twilights = [Time(observatory.twilight_evening_civil(date, which='next')).iso,
                            Time(observatory.twilight_morning_civil(date + 1, which='nearest')).iso]
         nautic_twilights = [Time(observatory.twilight_evening_nautical(date, which='next')).iso,
@@ -2379,7 +2377,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
         par_format = par.paragraph_format
         par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
-        run = par.add_run('Moon illumination: ' + str(moon_illumination))
+        run = par.add_run('Moon illumination: ' + str(moon_illum))
         run.italic = True
         font = run.font
         font.size = Pt(12)

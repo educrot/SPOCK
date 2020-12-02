@@ -1,14 +1,14 @@
 --- 
 day_of_night: 
-  - "2020-09-02 15:00:00"
+  - "2020-12-14 15:00:00"
 start_end_range: 
-  - "2020-03-18 05:00:00"
-  - "2020-03-18 06:00:00"
-use: "follow_up"
+  - "2020-11-26 02:35:00"
+  - "2020-11-26 07:20:00"
+use: "special"
 observatories:
   1:
     name: SSO
-    telescopes: [Io,Callisto,Ganymede,Europa]
+    telescopes: [Ganymede,Io,Callisto,Europa]
   2:
     name: SNO
     telescopes: [Artemis]
@@ -22,3 +22,4 @@ observatories:
     name: TN_Oukaimeden
     telescopes: [TN_Oukaimeden]
 target_list: ./target_lists/target_list_special.txt
+target_list_follow_up: ./target_lists/target_transit_follow_up.txt
