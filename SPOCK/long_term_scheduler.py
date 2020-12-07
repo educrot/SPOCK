@@ -6,6 +6,7 @@ from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy.utils import iers
 from astropy.time import Time
 from astropy.utils.data import clear_download_cache
+clear_download_cache()
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,observability_table, is_observable, months_observable,time_grid_from_range,LocalTimeConstraint, is_always_observable
 from astroplan import TimeConstraint,Observer,moon_illumination
 from datetime import date , datetime , timedelta
@@ -37,7 +38,7 @@ iers.IERS_A_URL  = 'https://datacenter.iers.org/data/9/finals2000A.all' #'http:/
 #from astroplan import download_IERS_A
 #download_IERS_A()
 ssl._create_default_https_context = ssl._create_unverified_context
-clear_download_cache()
+
 
 
 with open('passwords.csv', "r") as f:
@@ -2291,16 +2292,52 @@ def read_night_block(telescope, day):
         [description]
     """
 
-
     day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
-    scheduler_table = Table.read(
-        './DATABASE/' + str(telescope) + '/Archive_night_blocks' +  '/night_blocks_' + str(telescope) + '_' + str(day_fmt) + '.txt',
-        format='ascii')
+    path_local = './DATABASE/' + telescope + '/Archive_night_blocks/night_blocks_' + \
+                 telescope + '_' + day_fmt + '.txt'
+
+    if os.path.exists(path_local):
+        day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
+        scheduler_table = Table.read(
+            './DATABASE/' + str(telescope) + '/Archive_night_blocks' + '/night_blocks_' + str(telescope) + '_' + str(
+                day_fmt) + '.txt',
+            format='ascii')
+    else:
+        nightb_url = "http://www.mrao.cam.ac.uk/SPECULOOS/" + telescope + '/schedule/Archive_night_blocks/night_blocks_' + \
+                     telescope + '_' + day_fmt + '.txt'
+        nightb = requests.get(nightb_url, auth=(user_portal, pwd_portal))
+
+        if nightb.status_code == 404:
+            sys.exit('ERROR: No plans on the server for this date')
+        else:
+            open(path_local, 'wb').write(nightb.content)
+            scheduler_table = pd.read_csv(path_local, delimiter=' ',
+                                          skipinitialspace=True, error_bad_lines=False)
+
     return scheduler_table
 
-def make_docx_schedule(observatory,telescope, date_range, name_operator,path_target_list):
-    df_pandas = pd.read_csv(path_target_list, delimiter=' ')
+
+def make_docx_schedule(observatory,telescope, date_range, name_operator):
+    df_speculoos = pd.read_csv('./target_lists/speculoos_target_list_v6.txt', delimiter=' ')
+    df_follow_up = pd.read_csv('./target_lists/target_transit_follow_up.txt', delimiter=' ')
+    df_special = pd.read_csv('./target_lists/target_list_special.txt', delimiter=' ')
+
+    df_follow_up['nb_hours_surved'] = [0]*len(df_follow_up)
+    df_follow_up['nb_hours_threshold'] = [0] * len(df_follow_up)
+    df_special['nb_hours_surved'] = [0] * len(df_special)
+    df_special['nb_hours_threshold'] = [0] * len(df_special)
+
+    df_pandas = pd.DataFrame({'Sp_ID':pd.concat([df_speculoos['Sp_ID'],df_follow_up['Sp_ID'],df_special['Sp_ID']]),
+        'RA': pd.concat([df_speculoos['RA'],df_follow_up['RA'],df_special['RA']]),
+        'DEC': pd.concat([df_speculoos['DEC'],df_follow_up['DEC'],df_special['DEC']]),
+        'J': pd.concat([df_speculoos['J'],df_follow_up['J'],df_special['J']]),
+        'SpT': pd.concat([df_speculoos['SpT'], df_follow_up['SpT'], df_special['SpT']]),
+        'nb_hours_surved': pd.concat([df_speculoos['nb_hours_surved'],df_follow_up['nb_hours_surved'],df_special['nb_hours_surved']]),
+        'nb_hours_threshold': pd.concat([df_speculoos['nb_hours_threshold'],df_follow_up['nb_hours_threshold'],df_special['nb_hours_threshold']])})
+    df_pandas = df_pandas.drop_duplicates()
     df = Table.from_pandas(df_pandas)
+    # df_pandas = pd.read_csv(path_target_list, delimiter=' ')
+    # df = Table.from_pandas(df_pandas)
     nb_day_date_range = date_range_in_days(date_range)
     doc = Document()
     par = doc.add_paragraph()
@@ -2352,7 +2389,6 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
     for i in range(nb_day_date_range):
 
         date = date_range[0] + i
-        read_night_block(telescope, date)
         table_schedule = read_night_block(telescope, date)
         sun_set = observatory.sun_set_time(date, which='next').iso
         sun_rise = observatory.sun_rise_time(date, which='next').iso
@@ -2434,9 +2470,9 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
                                 'Trappist-1f','Trappist-1g','Trappist-1h']
 
             if any(table_schedule['target'][i] == p for p in trappist_planets):
-                idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))
+                idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
             else:
-                idx_target = np.where((df['Sp_ID'] == table_schedule['target'][i]))
+                idx_target = np.where((df['Sp_ID'] == table_schedule['target'][i]))[0]
 
             start_time_target = table_schedule['start time (UTC)'][i]
             end_time_target = table_schedule['end time (UTC)'][i]
@@ -2482,7 +2518,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator,path_tar
             par_format.space_before = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run('Jmag= ' + str(df['J'][idx_target].data.data[0]) + ',  SpT= ' + str(
-                df['SpT'][idx_target].data.data[0]))  # + ', Moon at ' + str(dist_moon))
+                df['SpT'][idx_target].data[0]))  # + ', Moon at ' + str(dist_moon))
             font = run.font
             font.size = Pt(12)
             font.color.rgb = RGBColor(0, 0, 0)

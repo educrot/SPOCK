@@ -1,0 +1,22 @@
+;
+; Trappist-1
+;
+; 2635476908753563008
+;
+#waituntil 1, 00:24
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter r'
+#interval 30
+#TAG Donuts=on
+Trappist-1	23 06 29.37	-05 02 29.03
+;
+#quitat 02:24
+#chain Obj_dome_rot.txt
+;

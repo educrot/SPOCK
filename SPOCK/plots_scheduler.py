@@ -163,7 +163,7 @@ def airmass_plot_proposition(name_observatory,telescope,day):
         plt.vlines(sun_rise, 3, 1, linestyle=':', color='yellow', alpha=0.9)
         plt.grid(color='gainsboro', linestyle='-', linewidth=1,alpha=0.3)
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
-        plt.legend(loc=2)
+        plt.legend(shadow=True, loc=2)
 
 def airmass_altitude_plot_saved(name_observatory,telescope,day):
     """
@@ -425,7 +425,7 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
 
     """
     if path_target_list is None:
-        path_target_list = 'SPECULOOS_target_list_v6.txt'
+        path_target_list = './target_lists/speculoos_target_list_v6'
     observatory = charge_observatories(name_observatory)[0]
     delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day, which='next').jd - 0.07, \
                                       observatory.twilight_morning_nautical(day + 1, which='nearest').jd + 0.07, 100),
@@ -452,9 +452,11 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
                  style_kwargs=plot_styles)
     axs.vlines(sun_set, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
     axs.vlines(sun_rise, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
+
     plt.ylabel('Altitude (degrees)')
     plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
-    plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at ' + name_observatory)
+    plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at '
+              + name_observatory,y=-0.01)
     #plt.title('Visibility plot for target ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")))
     plt.show()
 

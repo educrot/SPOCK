@@ -1,0 +1,22 @@
+;
+; Sp0330+5413
+;
+; 445100418805396608
+;
+#waituntil 1, 18:25
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 11
+#TAG Donuts=on
+Sp0330+5413	03 30 48.78	+54 13 55.16
+;
+#quitat 18:51
+#chain Obj_Trappist-1e.txt
+;

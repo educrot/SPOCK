@@ -1,0 +1,22 @@
+;
+; Sp0314+1603
+;
+; 31235033696866688
+;
+#waituntil 1, 02:26
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 70
+#TAG Donuts=on
+Sp0314+1603	03 14 03.43	+16 03 05.48
+;
+#quitat 04:34
+#chain Obj_Sp0535-0931.txt
+;
