@@ -16,7 +16,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock, Transitioner
 import functools
 from functools import reduce
-import gspread
+#import gspread
 import numpy as np
 #from oauth2client.service_account import ServiceAccountCredentials
 import os
@@ -1097,7 +1097,7 @@ class Schedules:
     def get_hours_files_TRAPPIST(self):
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
         #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret2.json', scope)
-        client = gspread.authorize(creds)
+        #client = gspread.authorize(creds)
         sheet = client.open('Hours_observation_TS_TN').sheet1
         # Extract and print all of the values
         #list_of_hashes = sheet.get_all_records()
