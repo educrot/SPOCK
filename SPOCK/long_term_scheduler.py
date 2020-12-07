@@ -18,7 +18,7 @@ import functools
 from functools import reduce
 import gspread
 import numpy as np
-from oauth2client.service_account import ServiceAccountCredentials
+#from oauth2client.service_account import ServiceAccountCredentials
 import os
 import os.path, time
 import pandas as pd
@@ -1006,7 +1006,7 @@ class Schedules:
         #get_hours_files_SNO() # get hours SNO
 
         # Get  files
-        self.get_hours_files_TRAPPIST()  # get hours TRAPPIST
+        #self.get_hours_files_TRAPPIST()  # get hours TRAPPIST
         self.update_telescope_from_server() # get hours SSO
         TargetURL = "http://www.mrao.cam.ac.uk/SPECULOOS/reports/SurveyTotal"
         target_list = pd.read_csv(self.target_list, delimiter=' ')
@@ -1096,7 +1096,7 @@ class Schedules:
 
     def get_hours_files_TRAPPIST(self):
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret2.json', scope)
+        #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret2.json', scope)
         client = gspread.authorize(creds)
         sheet = client.open('Hours_observation_TS_TN').sheet1
         # Extract and print all of the values
