@@ -11,9 +11,9 @@ import datetime
 schedule = SPOCKLT.Schedules()
 schedule.observatory = 'TN_Oukaimeden'
 schedule.telescope = 'TN_Oukaimeden'
-schedule.date_range = Time(['2020-12-13 15:00:00','2020-12-15 15:00:00'])
+schedule.date_range = Time(['2020-12-02 15:00:00','2020-12-15 15:00:00'])
 SPOCKLT.make_docx_schedule(SPOCKLT.charge_observatories(schedule.observatory)[0],
-                           schedule.telescope,schedule.date_range,'Manu')
+                           schedule.telescope,schedule.date_range,'')
 
 print()
 
