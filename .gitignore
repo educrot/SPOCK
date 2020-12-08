@@ -6,8 +6,6 @@ survey_hours/
 
 SPOCK_files/
 
-DATABASE/
-
 *.DS_STORE
 
 *.ipynb_checkpoints
