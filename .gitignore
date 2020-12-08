@@ -25,3 +25,5 @@ plan.txt
 doc/build/
 
 SPOCK.egg-info/
+
+build/
