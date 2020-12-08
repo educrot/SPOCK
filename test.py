@@ -6,19 +6,21 @@ import SPOCK.stats as SPOCKstats
 from astropy import units as u
 from astropy.time import Time
 import SPOCK.ETC as ETC
+import datetime
 
-obs = 4
-schedule = SPOCKST.Schedules()
-schedule.load_parameters('./input.csv',obs)
-SPOCKST.make_docx_schedule(schedule.observatory, schedule.telescope, schedule.date_range,'Manu')
-
+schedule = SPOCKLT.Schedules()
+schedule.observatory = 'TN_Oukaimeden'
+schedule.telescope = 'TN_Oukaimeden'
+schedule.date_range = Time(['2020-12-13 15:00:00','2020-12-15 15:00:00'])
+SPOCKLT.make_docx_schedule(SPOCKLT.charge_observatories(schedule.observatory)[0],
+                           schedule.telescope,schedule.date_range,'Manu')
 
 print()
 
 obs = 1
 schedule = SPOCKST.Schedules()
 schedule.load_parameters('./input_short_term.csv',obs)
-schedule.use = 'special'
+schedule.use = 'special_start_end'
 # schedule.start_end_range = Time(['2020-12-13 15:00:00','2020-12-15 15:00:00'])
 schedule.day_of_night = Time('2020-12-12 15:00:00')
 schedule.telescope = 'Europa'

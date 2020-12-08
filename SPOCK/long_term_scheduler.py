@@ -2336,8 +2336,6 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         'nb_hours_threshold': pd.concat([df_speculoos['nb_hours_threshold'],df_follow_up['nb_hours_threshold'],df_special['nb_hours_threshold']])})
     df_pandas = df_pandas.drop_duplicates()
     df = Table.from_pandas(df_pandas)
-    # df_pandas = pd.read_csv(path_target_list, delimiter=' ')
-    # df = Table.from_pandas(df_pandas)
     nb_day_date_range = date_range_in_days(date_range)
     doc = Document()
     par = doc.add_paragraph()
