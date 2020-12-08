@@ -1,19 +1,23 @@
-**/TRAPPIST_schedules_docx
+TRAPPIST_schedules_docx
 
-**/night_blocks_propositions
+night_blocks_propositions
 
-**/survey_hours
+survey_hours
 
-**/SPOCK_files
+SPOCK_files
 
-**/DATABASE/Artemis/Archive_night_blocks
+DATABASE/Artemis/Archive_night_blocks
 
-**/DATABASE/Artemis/Plans_by_date
+DATABASE/Artemis/Plans_by_date
 
-**/DATABASE/Artemis/Zip_files
+DATABASE/Artemis/Zip_files
 
 .DS_STORE
 
 *.ipynb_checkpoints
 
 .idea
+
+docs/build
+
+docs/source/_build
