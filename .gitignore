@@ -11,3 +11,9 @@
 **/DATABASE/Artemis/Plans_by_date
 
 **/DATABASE/Artemis/Zip_files
+
+.DS_STORE
+
+*.ipynb_checkpoints
+
+.idea
