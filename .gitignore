@@ -27,3 +27,5 @@ doc/build/
 SPOCK.egg-info/
 
 build/
+
+test/
