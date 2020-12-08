@@ -20,7 +20,7 @@ Schedule targets on several criteria:
 
 *  Number of hours already performed
 
-*  Coordination between different site
+*  Coordination between different sites
 
 Documentation SPOCK
 ---------------------
