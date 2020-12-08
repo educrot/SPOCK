@@ -4,6 +4,8 @@ night_blocks_propositions/
 
 survey_hours/
 
+target_lists/
+
 SPOCK_files/
 
 DATABASE/
@@ -12,10 +14,14 @@ DATABASE/
 
 passwords.csv
 
+tutorials.ipynb
+
+plan.txt
+
 *.ipynb_checkpoints
 
 .idea
 
-docs/build/
+doc/build/
 
-docs/source/_build/
+SPOCK.egg-info/
