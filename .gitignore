@@ -6,6 +6,14 @@ survey_hours/
 
 SPOCK_files/
 
+DATABASE/Artemis/Archive_night_blocks/
+
+DATABASE/Artemis/Plans_by_date/
+
+DATABASE/Artemis/Zip_files/
+
+DATABASE/Europa/Zip_files/*.zip
+
 .DS_STORE
 
 *.ipynb_checkpoints
