@@ -480,51 +480,14 @@ def _generate_24hr_grid(t0, start, end, N, for_deriv=False):
     return t0 + time_grid
 
 def altaz(self, time, target=None, obswl=None, grid_times_targets=False):
-
-    """ Get an `~astropy.coordinates.AltAz` frame or coordinate.
-    If ``target`` is None, generates an altitude/azimuth frame. Otherwise,
-    calculates the transformation to that frame for the requested ``target``.
-    Parameters
-    ----------
-    time : `~astropy.time.Time` or other (see below)
-      The time at which the observation is taking place. Will be used as
-      the ``obstime`` attribute in the resulting frame or coordinate. This
-      will be passed in as the first argument to the `~astropy.time.Time`
-      initializer, so it can be anything that `~astropy.time.Time` will
-      accept (including a `~astropy.time.Time` object)
-    target : `~astroplan.FixedTarget`, `~astropy.coordinates.SkyCoord`, or list (optional)
-      Celestial object(s) of interest. If ``target`` is `None`, returns
-      the `~astropy.coordinates.AltAz` frame without coordinates.
-    obswl : `~astropy.units.Quantity` (optional)
-      Wavelength of the observation used in the calculation.
-    grid_times_targets: bool (optional)
-      If True, the target object will have extra dimensions packed
-      onto the end, so that calculations with M targets and N times
-      will return an (M, N) shaped result. Otherwise, we rely on
-      broadcasting the shapes together using standard numpy
-      rules. Useful for grid searches for rise/set times etc.
-    Returns
-    -------
-    `~astropy.coordinates.AltAz`
-      If ``target`` is `None`, returns `~astropy.coordinates.AltAz` frame.
-      If ``target`` is not `None`, returns the ``target`` transformed to
-      the `~astropy.coordinates.AltAz` frame.
-    Examples
-    --------
-    Create an instance of the `~astropy.coordinates.AltAz` frame for an
-    observer at Apache Point Observatory at a particular time:
-    >>> from astroplan import Observer
-    >>> from astropy.time import Time
-    >>> from astropy.coordinates import SkyCoord
-    >>> apo = Observer.at_site("APO")
-    >>> time = Time('2001-02-03 04:05:06')
-    >>> target = SkyCoord(0*u.deg, 0*u.deg)
-    >>> altaz_frame = apo.altaz(time)
-    Now transform the target's coordinates to the alt/az frame:
-    >>> target_altaz = target.transform_to(altaz_frame) # doctest: +SKIP
-    Alternatively, construct an alt/az frame and transform the target to
-    that frame all in one step:
-    >>> target_altaz = apo.altaz(time, target) # doctest: +SKIP
+    """
+    
+    :param self:
+    :param time:
+    :param target:
+    :param obswl:
+    :param grid_times_targets:
+    :return:
     """
     if target is not None:
         time, target = self._preprocess_inputs(time, target, grid_times_targets)
