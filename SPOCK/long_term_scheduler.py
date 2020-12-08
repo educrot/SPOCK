@@ -1015,37 +1015,45 @@ class Schedules:
         trappist_in_targetlist, targetlist_in_trappist = index_list1_list2(df_trappist['Target'], self.target_table_spc['Sp_ID'])
         return trappist_in_targetlist
 
-    def load_parameters(self,input_file,nb_observatory):
-        with open(input_file, "r") as f:
-            Inputs = yaml.load(f, Loader=yaml.FullLoader)
-            self.target_list = Inputs['target_list']
-            df = pd.DataFrame.from_dict(Inputs['observatories'])
-            self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
-            self.telescopes = df[nb_observatory]['telescopes']
-            self.telescope = self.telescopes[0]
-            try:
-                self.date_range = Time(Inputs['date_range']) #,Time(Inputs['date_range'][1])]
-            except ValueError:
-                sys.exit('ERROR: Wrong date format, date must be %y-%m-%d HH:MM:SS.sss')
-            if self.date_range[1] <= self.date_range[0]:
-                sys.exit('ERROR: end date inferior to start date')
-            self.strategy = Inputs['strategy']
-            self.duration_segments = Inputs['duration_segments']
-            self.nb_segments = Inputs['nb_segments']
+    def load_parameters(self,nb_observatory=None,input_file=None):
+        if input_file == None:
+            self.target_list = './target_lists/speculoos_target_list_v6.txt'
             self.constraints = [AtNightConstraint.twilight_nautical()]
             df = pd.read_csv(self.target_list, delimiter=' ')
             self.target_table_spc = Table.from_pandas(df)
-            self.targets = target_list_good_coord_format(self.target_list)
+        else:
+            with open(input_file, "r") as f:
+                Inputs = yaml.load(f, Loader=yaml.FullLoader)
+                self.target_list = Inputs['target_list']
+                df = pd.read_csv(self.target_list, delimiter=' ')
+                self.target_table_spc = Table.from_pandas(df)
+                df = pd.DataFrame.from_dict(Inputs['observatories'])
+                self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
+                self.telescopes = df[nb_observatory]['telescopes']
+                self.telescope = self.telescopes[0]
+                try:
+                    self.date_range = Time(Inputs['date_range']) #,Time(Inputs['date_range'][1])]
+                except ValueError:
+                    sys.exit('ERROR: Wrong date format, date must be %y-%m-%d HH:MM:SS.sss')
+                if self.date_range[1] <= self.date_range[0]:
+                    sys.exit('ERROR: end date inferior to start date')
+                self.strategy = Inputs['strategy']
+                self.duration_segments = Inputs['duration_segments']
+                self.nb_segments = Inputs['nb_segments']
+                self.constraints = [AtNightConstraint.twilight_nautical()]
+                df = pd.read_csv(self.target_list, delimiter=' ')
+                self.target_table_spc = Table.from_pandas(df)
+                self.targets = target_list_good_coord_format(self.target_list)
 
-            last_mod = time.ctime(os.path.getmtime(self.target_list))
-            now = datetime.now()
-            current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-            time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
-                                     Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
-            #self.update_nb_hours_all()
-            if abs(time_since_last_update) > 24: # in hours
-                print('INFO: Updating the number of hours observed')
-                self.update_nb_hours_all()
+                last_mod = time.ctime(os.path.getmtime(self.target_list))
+                now = datetime.now()
+                current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+                time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
+                                         Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
+                #self.update_nb_hours_all()
+                if abs(time_since_last_update) > 24: # in hours
+                    print('INFO: Updating the number of hours observed')
+                    self.update_nb_hours_all()
 
     def update_nb_hours_all(self,user =user_portal, password = pwd_portal):
         # *********** TRAPPIST ***********
@@ -1770,7 +1778,8 @@ class Schedules:
                                                                        Time(self.night_duration(day)).value * 24
 
         is_visible_mid_night = is_observable(constraints, self.observatory, self.targets, \
-            times= Time(self.observatory.twilight_evening_nautical(Time(day),which='next') + self.night_duration(day)/2))
+            times= Time(self.observatory.twilight_evening_nautical(Time(day),which='next') +
+                        self.night_duration(day).value/2))
 
         idx_not_visible_mid_night = np.where((is_visible_mid_night == False))
 
