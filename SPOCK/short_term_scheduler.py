@@ -712,6 +712,12 @@ class Schedules:
                 end_scheduled_table.remove_row(i)
 
         self.scheduled_table_sorted = end_scheduled_table
+        # ***** Update target lists on server *****
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", './target_lists/target_list_special.txt',
+                          'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/target_lists/'])
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", './target_lists/target_transit_follow_up.txt',
+                          'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/target_lists/'])
+
         return self.scheduled_table_sorted
 
     def make_scheduled_table(self):

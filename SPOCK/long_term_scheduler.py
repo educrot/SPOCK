@@ -830,7 +830,20 @@ class Schedules:
         self.target_table_spc = []
         self.telescopes = []
         self.telescope =  []
-        self.time_ranges = [Time(['2020-01-01 12:00:00', '2020-01-31 12:00:00']),Time(['2020-02-01 12:00:00', '2020-02-28 12:00:00']),Time(['2020-03-01 15:00:00', '2020-03-31 15:00:00']),Time(['2020-04-01 15:00:00', '2020-04-30 15:00:00']),Time(['2020-05-01 15:00:00', '2020-05-31 15:00:00']),Time(['2020-06-01 15:00:00', '2020-06-30 15:00:00']),Time(['2020-07-01 12:00:00', '2020-07-31 12:00:00']),Time(['2020-08-01 12:00:00', '2020-08-31 12:00:00']),Time(['2020-09-01 12:00:00', '2020-09-30 12:00:00']),Time(['2020-10-01 12:00:00', '2020-10-31 12:00:00']),Time(['2020-11-01 12:00:00', '2020-11-30 12:00:00']),Time(['2020-12-01 12:00:00', '2020-12-31 12:00:00'])]
+        today = date.today()
+        year = '2021'#today.strftime("%Y")
+        self.time_ranges = [Time([year + '-01-01 12:00:00', year + '-01-31 12:00:00']),
+                            Time([year + '-02-01 12:00:00', year + '-02-28 12:00:00']),
+                            Time([year + '-03-01 15:00:00', year + '-03-31 15:00:00']),
+                            Time([year + '-04-01 15:00:00', year + '-04-30 15:00:00']),
+                            Time([year + '-05-01 15:00:00', year + '-05-31 15:00:00']),
+                            Time([year + '-06-01 15:00:00', year + '-06-30 15:00:00']),
+                            Time([year + '-07-01 12:00:00', year + '-07-31 12:00:00']),
+                            Time([year + '-08-01 12:00:00', year + '-08-31 12:00:00']),
+                            Time([year + '-09-01 12:00:00', year + '-09-30 12:00:00']),
+                            Time([year + '-10-01 12:00:00', year + '-10-31 12:00:00']),
+                            Time([year + '-11-01 12:00:00', year + '-11-30 12:00:00']),
+                            Time([year + '-12-01 12:00:00', year + '-12-31 12:00:00'])]
 
 
     @property
@@ -1027,10 +1040,10 @@ class Schedules:
             last_mod = time.ctime(os.path.getmtime(self.target_list))
             now = datetime.now()
             current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-            time_since_las_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
+            time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
                                      Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
             #self.update_nb_hours_all()
-            if abs(time_since_las_update) > 10: # in hours
+            if abs(time_since_last_update) > 24: # in hours
                 print('INFO: Updating the number of hours observed')
                 self.update_nb_hours_all()
 
@@ -1127,6 +1140,8 @@ class Schedules:
 
         target_list.to_csv(self.target_list, sep=' ', index=False)
         target_list.to_csv('./target_lists/speculoos_target_list_v6_sep_coma.csv', sep=',')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", './target_lists/speculoos_target_list_v6.txt',
+                          'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/target_lists/'])
 
     def get_hours_files_TRAPPIST(self):
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
@@ -1144,6 +1159,8 @@ class Schedules:
         telescopes = ['TRAPPIST'] * len(target_observed_TSTN)
         df_google_doc = pd.DataFrame({'Target': target_observed_TSTN, ' Observation Hours ': hours_observed_TSTN,'telescope':telescopes})
         df_google_doc.to_csv('./survey_hours/ObservationHours_TRAPPIST.txt',sep=',',index=False)
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", './survey_hours/ObservationHours_TRAPPIST.txt',
+                          'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/survey_hours/'])
 
     def update_nb_hours_SNO(self):
         get_hours_files_SNO()
@@ -1685,7 +1702,9 @@ class Schedules:
         :return:
         '''
         dt_1day=Time('2018-01-02 00:00:00',scale='tt')-Time('2018-01-01 00:00:00',scale='tt')
-        return Time(self.observatory.twilight_morning_nautical(day + dt_1day ,which='nearest')-self.observatory.twilight_evening_nautical(day ,which='next'),scale='tt')
+        dura = Time(Time(self.observatory.twilight_morning_nautical(day + dt_1day ,which='nearest')).jd - \
+               Time(self.observatory.twilight_evening_nautical(day ,which='next')).jd,format='jd')
+        return dura
 
     def info_obs_possible(self,day):
         '''
@@ -1742,9 +1761,13 @@ class Schedules:
 
         dt_1day=Time('2018-01-02 00:00:00',scale='utc')-Time('2018-01-01 00:00:00',scale='utc')
 
-        self.observability_table_day = observability_table(self.constraints, self.observatory, self.targets, time_range = Time([Time(self.observatory.twilight_evening_nautical(Time(day,format='jd'), which='next')).iso, Time(self.observatory.twilight_morning_nautical(Time(day + dt_1day,format='jd'), which='nearest')).iso])) # + nd/2
+        self.observability_table_day = observability_table(self.constraints, self.observatory, self.targets,
+         time_range = Time([Time(self.observatory.twilight_evening_nautical(Time(day,format='jd'), which='next')).iso,
+                            Time(self.observatory.twilight_morning_nautical(Time(day + dt_1day,format='jd'),
+                                                                            which='nearest')).iso])) # + nd/2
 
-        self.observability_table_day['fraction of time observable'] =  self.observability_table_day['fraction of time observable'] * Time(self.night_duration(day)).value * 24
+        self.observability_table_day['fraction of time observable'] =  self.observability_table_day['fraction of time observable'] * \
+                                                                       Time(self.night_duration(day)).value * 24
 
         is_visible_mid_night = is_observable(constraints, self.observatory, self.targets, \
             times= Time(self.observatory.twilight_evening_nautical(Time(day),which='next') + self.night_duration(day)/2))

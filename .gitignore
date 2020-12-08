@@ -10,6 +10,8 @@ DATABASE/
 
 .DS_STORE
 
+passwords.csv
+
 *.ipynb_checkpoints
 
 .idea

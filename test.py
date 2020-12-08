@@ -8,13 +8,28 @@ from astropy.time import Time
 import SPOCK.ETC as ETC
 import datetime
 
-schedule = SPOCKST.Schedules()
-schedule.date_range = Time(['2020-12-02 15:00:00','2020-12-05 15:00:00'])
-SPOCKLT.make_docx_schedule(SPOCKLT.charge_observatories('TN_Oukaimeden')[0],'TN_Oukaimeden',
-                           schedule.date_range,'Manu')
+# ---------------------- LONG TERM SCHEDULER ---------------------
+
+obs = 1
+schedule = SPOCKLT.Schedules()
+schedule.load_parameters('./input.csv',obs)
+
+
+#SPOCKLT.make_np(schedule.date_range[0], schedule.date_range_in_days, schedule.telescope)
+#SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days, telescope=schedule.telescope)
+
+#schedule.exposure_time_table(day=None)
+
+schedule.make_schedule(Altitude_constraint = 28, Moon_constraint = 30)
+
+#SPOCKLT.make_docx_schedule(schedule.observatory, schedule.telescope, schedule.date_range,'Manu',
+    #                       schedule.target_list)
+
+
+#SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
+#SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
 
 print()
-
 
 obs = 1
 schedule = SPOCKST.Schedules()
@@ -61,28 +76,7 @@ print()
 
 
 
-# ---------------------- LONG TERM SCHEDULER ---------------------
 
-obs = 5
-schedule = SPOCKLT.Schedules()
-schedule.load_parameters('./input.csv',obs)
-
-
-#SPOCKLT.make_np(schedule.date_range[0], schedule.date_range_in_days, schedule.telescope)
-#SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days, telescope=schedule.telescope)
-
-#schedule.exposure_time_table(day=None)
-
-schedule.make_schedule(Altitude_constraint = 28, Moon_constraint = 30)
-
-#SPOCKLT.make_docx_schedule(schedule.observatory, schedule.telescope, schedule.date_range,'Manu',
-    #                       schedule.target_list)
-
-
-#SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
-#SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
-
-print()
 
 # ---------------------- Short scripts ---------------------
 

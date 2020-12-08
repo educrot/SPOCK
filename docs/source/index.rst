@@ -23,11 +23,12 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
 
    examples/SPOCKLT/examples_spocklt.rst
    examples/SPOCKST/examples_spockst.rst
-   examples/SPOCKapp/examples_app.rst
+    examples/SPOCKapp/examples_app.rst
+
 
 
 .. toctree::
-    :maxdepth: 4
-    :glob:
+   :caption: Examples & Tutorials
+   :maxdepth: 1
 
-    examples/SPOCKapp/examples_app.rst
+   examples/tutorials/tuto.rst
