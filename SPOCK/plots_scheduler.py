@@ -18,6 +18,34 @@ import yaml
 import io
 from matplotlib.offsetbox import AnchoredText
 
+# ************************ Create database ************************
+
+telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
+if not os.path.exists('./target_lists'):
+    os.makedirs('./target_lists')
+if not os.path.exists('./survey_hours'):
+    os.makedirs('./survey_hours')
+if not os.path.exists('./DATABASE'):
+    os.makedirs('./DATABASE')
+if not os.path.exists('./night_blocks_propositions'):
+    os.makedirs('./night_blocks_propositions')
+if not os.path.exists('./SPOCK_files'):
+    os.makedirs('./SPOCK_files')
+for tel in telescopes_names:
+    if not os.path.exists('./DATABASE/' + tel):
+        os.makedirs('./DATABASE/' + tel)
+for tel in telescopes_names:
+    if not os.path.exists('./DATABASE/' + tel + '/Archive_night_blocks'):
+        os.makedirs('./DATABASE/' + tel + '/Archive_night_blocks')
+for tel in telescopes_names:
+    if not os.path.exists('./DATABASE/' + tel + '/Plans_by_date'):
+        os.makedirs('./DATABASE/' + tel + '/Plans_by_date')
+for tel in telescopes_names:
+    if not os.path.exists('./DATABASE/' + tel + '/Zip_files'):
+        os.makedirs('./DATABASE/' + tel + '/Zip_files')
+
+# ************************ Read passwords ************************
+
 with open('passwords.csv', "r") as f:
     Inputs = yaml.load(f, Loader=yaml.FullLoader)
     pwd_appcs = Inputs['pwd_appcs'][0]
@@ -30,7 +58,22 @@ with open('passwords.csv', "r") as f:
     user_chart_studio = Inputs['user_chart_studio'][0]
     pwd_chart_studio = Inputs['pwd_chart_studio'][0]
 
+# ************************ Read target lists from server ************************
+target_lists = ['speculoos_target_list_v6.txt', 'target_list_special.txt', 'target_transit_follow_up.txt']
+for t_list in target_lists:
+    target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/target_lists/" + t_list
+    resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
+    content = resp.text.replace("\n", "")
+    open('./target_lists/' + t_list, 'wb').write(resp.content)
 
+survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt', 'ObservationHours.txt']
+for file in survey_hours:
+    target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/survey_hours/" + file
+    resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
+    content = resp.text.replace("\n", "")
+    open('./survey_hours/' + file, 'wb').write(resp.content)
+
+# **********************************************************************************************************
 chart_studio.tools.set_credentials_file(username=user_chart_studio, api_key=pwd_chart_studio)
 chart_studio.tools.set_config_file(world_readable=True,sharing='public')
 

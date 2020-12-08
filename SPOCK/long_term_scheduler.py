@@ -39,7 +39,33 @@ iers.IERS_A_URL  = 'https://datacenter.iers.org/data/9/finals2000A.all' #'http:/
 #download_IERS_A()
 ssl._create_default_https_context = ssl._create_unverified_context
 
+# ************************ Create database ************************
 
+telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
+if not os.path.exists('./target_lists'):
+    os.makedirs('./target_lists')
+if not os.path.exists('./survey_hours'):
+    os.makedirs('./survey_hours')
+if not os.path.exists('./DATABASE'):
+    os.makedirs('./DATABASE')
+if not os.path.exists('./night_blocks_propositions'):
+    os.makedirs('./night_blocks_propositions')
+if not os.path.exists('./SPOCK_files'):
+    os.makedirs('./SPOCK_files')
+for tel in telescopes_names:
+    if not os.path.exists('./DATABASE/' + tel):
+        os.makedirs('./DATABASE/' + tel)
+for tel in telescopes_names:
+    if not os.path.exists('./DATABASE/' + tel + '/Archive_night_blocks'):
+        os.makedirs('./DATABASE/' + tel + '/Archive_night_blocks')
+for tel in telescopes_names:
+    if not os.path.exists('./DATABASE/' + tel + '/Plans_by_date'):
+        os.makedirs('./DATABASE/' + tel + '/Plans_by_date')
+for tel in telescopes_names:
+    if not os.path.exists('./DATABASE/' + tel + '/Zip_files'):
+        os.makedirs('./DATABASE/' + tel + '/Zip_files')
+
+# ************************ Read passwords ************************
 
 with open('passwords.csv', "r") as f:
     Inputs = yaml.load(f, Loader=yaml.FullLoader)
@@ -53,6 +79,22 @@ with open('passwords.csv', "r") as f:
     user_chart_studio = Inputs['user_chart_studio'][0]
     pwd_chart_studio = Inputs['pwd_chart_studio'][0]
 
+# ************************ Read target lists from server ************************
+target_lists = ['speculoos_target_list_v6.txt', 'target_list_special.txt', 'target_transit_follow_up.txt']
+for t_list in target_lists:
+    target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/target_lists/" + t_list
+    resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
+    content = resp.text.replace("\n", "")
+    open('./target_lists/' + t_list, 'wb').write(resp.content)
+
+survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt', 'ObservationHours.txt']
+for file in survey_hours:
+    target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/survey_hours/" + file
+    resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
+    content = resp.text.replace("\n", "")
+    open('./survey_hours/' + file, 'wb').write(resp.content)
+
+# **********************************************************************************************************
 
 def get_hours_files_SNO(username = 'speculoos',password = pwd_SNO_Reduc1):
     """ get nb hours obs on SNO
@@ -731,24 +773,14 @@ def upload_plans(day, nb_days, telescope):
     # ------------------- update archive date by date plans folder  ------------------
 
     path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', telescope,'schedule')
-    print('INFO: Path database = ',path_database)
-    path_plans = os.path.join('./DATABASE/', telescope,'Plans_by_date/')
-    print('INFO: Path local \'Plans_by_day\' = ',path_plans)
-    subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", "-r", path_plans, path_database])
     path_gant_chart = os.path.join('./SPOCK_Figures/Preview_schedule.html')
     path_gant_chart_masterfile = os.path.join('/Users/elsaducrot/spock_2/SPOCK_Files/spock_stats_masterfile.csv')
-    path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Preview_schedule.html')
-    path_database_home_masterfile = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_stats_masterfile.csv')
+    path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/Preview_schedule.html')
+    path_database_home_masterfile = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/spock_stats_masterfile.csv')
     print('INFO: Path local \'Gant chart\' = ', path_gant_chart)
     print('INFO: Path database \'Gant chart\' = ',  path_database_home)
     subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", "-r", path_gant_chart, path_database_home])
     subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", "-r", path_gant_chart_masterfile, path_database_home_masterfile])
-
-    # ------------------- update archive niht blocks ------------------
-
-    path_night_blocks = os.path.join('./DATABASE/', telescope,'Archive_night_blocks/')
-    print('INFO: Path local \'Archive_night_blocks\' = ',path_night_blocks)
-    subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", "-r", path_night_blocks, path_database])
 
 
 class Schedules:
@@ -1002,11 +1034,11 @@ class Schedules:
                 print('INFO: Updating the number of hours observed')
                 self.update_nb_hours_all()
 
-    def update_nb_hours_all(self,user ='educrot', password = pwd_portal):
-        #get_hours_files_SNO() # get hours SNO
+    def update_nb_hours_all(self,user =user_portal, password = pwd_portal):
+        # *********** TRAPPIST ***********
+        #self.get_hours_files_TRAPPIST()
 
-        # Get  files
-        #self.get_hours_files_TRAPPIST()  # get hours TRAPPIST
+        # *********** SSO & SNO ***********
         self.update_telescope_from_server() # get hours SSO
         TargetURL = "http://www.mrao.cam.ac.uk/SPECULOOS/reports/SurveyTotal"
         target_list = pd.read_csv(self.target_list, delimiter=' ')
@@ -1020,6 +1052,8 @@ class Schedules:
         df_camserver = pd.read_csv('./survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         #df_camserver['Target'][9] = 'Sp0004-2058'
         df_camserver['Target'] = [x.strip().replace('SP', 'Sp') for x in df_camserver['Target']]
+
+        # *********** Saint-Ex ***********
         df = pd.read_csv('./survey_hours/ObservationHours_Saint-Ex.txt',delimiter=',')
         df = df.sort_values(['Target'])
         df.to_csv('./survey_hours/ObservationHours_Saint-Ex.txt',sep=',',index=False)
@@ -1092,7 +1126,7 @@ class Schedules:
                         target_list['telescope'][i].append('Saint-Ex')
 
         target_list.to_csv(self.target_list, sep=' ', index=False)
-        target_list.to_csv('./speculoos_target_list_v6_coma.csv', sep=',')
+        target_list.to_csv('./target_lists/speculoos_target_list_v6_sep_coma.csv', sep=',')
 
     def get_hours_files_TRAPPIST(self):
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
@@ -2318,6 +2352,8 @@ def read_night_block(telescope, day):
 
 
 def make_docx_schedule(observatory,telescope, date_range, name_operator):
+    if not os.path.exists('./TRAPPIST_schedules_docx'):
+        os.makedirs('./TRAPPIST_schedules_docx')
     df_speculoos = pd.read_csv('./target_lists/speculoos_target_list_v6.txt', delimiter=' ')
     df_follow_up = pd.read_csv('./target_lists/target_transit_follow_up.txt', delimiter=' ')
     df_special = pd.read_csv('./target_lists/target_list_special.txt', delimiter=' ')
@@ -2398,7 +2434,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         astro_twilights = [Time(observatory.twilight_evening_astronomical(date, which='next')).iso,
                            Time(observatory.twilight_morning_astronomical(date + 1, which='nearest')).iso]
         start_night = table_schedule['start time (UTC)'][0]
-        end_night = table_schedule['end time (UTC)'][-1]
+        end_night = np.array(table_schedule['end time (UTC)'])[-1]
         night_duration = round((Time(nautic_twilights[1]) - Time(nautic_twilights[0])).jd * 24, 3) * u.hour
 
         run = par.add_run('Night starting on the ' + Time(date, out_subfmt='date').value)
@@ -2463,18 +2499,20 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.size = Pt(12)
         font.color.rgb = RGBColor(0, 0, 0)
 
-        for i in range(len(table_schedule)):
-            trappist_planets = ['Trappist-1b','Trappist-1c','Trappist-1d','Trappist-1e',
-                                'Trappist-1f','Trappist-1g','Trappist-1h']
+        for j in range(len(table_schedule)):
+            # trappist_planets = ['Trappist-1b','Trappist-1c','Trappist-1d','Trappist-1e',
+            #                     'Trappist-1f','Trappist-1g','Trappist-1h']
+            #
+            # if any(table_schedule['target'][j] == p for p in trappist_planets):
+            #     idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
+            # else:
+            if table_schedule['target'][j][-2:] == '_2':
+                table_schedule['target'][j] = table_schedule['target'][j][:-2]
+            idx_target = np.where((df['Sp_ID'] == table_schedule['target'][j]))[0]
 
-            if any(table_schedule['target'][i] == p for p in trappist_planets):
-                idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
-            else:
-                idx_target = np.where((df['Sp_ID'] == table_schedule['target'][i]))[0]
-
-            start_time_target = table_schedule['start time (UTC)'][i]
-            end_time_target = table_schedule['end time (UTC)'][i]
-            config = table_schedule['configuration'][i]
+            start_time_target = table_schedule['start time (UTC)'][j]
+            end_time_target = table_schedule['end time (UTC)'][j]
+            config = table_schedule['configuration'][j]
             try:
                 coords = SkyCoord(ra=df['RA'][idx_target].data.data[0] * u.deg, dec=df['DEC'][idx_target].data.data[0] * u.deg)
             except IndexError:
@@ -2488,7 +2526,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             run = par.add_run(
                 'From ' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.minute) +\
                 ' to ' + '{:02d}'.format(Time(end_time_target, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(end_time_target, out_subfmt='date_hm').datetime.minute) +\
-                ' : ' + str(table_schedule['target'][i]))
+                ' : ' + str(table_schedule['target'][j]))
             run.bold = True
             font = run.font
             font.size = Pt(12)

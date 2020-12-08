@@ -8,14 +8,13 @@ from astropy.time import Time
 import SPOCK.ETC as ETC
 import datetime
 
-schedule = SPOCKLT.Schedules()
-schedule.observatory = 'TN_Oukaimeden'
-schedule.telescope = 'TN_Oukaimeden'
-schedule.date_range = Time(['2020-12-02 15:00:00','2020-12-15 15:00:00'])
-SPOCKLT.make_docx_schedule(SPOCKLT.charge_observatories(schedule.observatory)[0],
-                           schedule.telescope,schedule.date_range,'')
+schedule = SPOCKST.Schedules()
+schedule.date_range = Time(['2020-12-02 15:00:00','2020-12-05 15:00:00'])
+SPOCKLT.make_docx_schedule(SPOCKLT.charge_observatories('TN_Oukaimeden')[0],'TN_Oukaimeden',
+                           schedule.date_range,'Manu')
 
 print()
+
 
 obs = 1
 schedule = SPOCKST.Schedules()
