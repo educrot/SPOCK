@@ -739,10 +739,7 @@ class Schedules:
         self.target_list = None
         self.target_table_spc = []
         self.telescopes = []
-        self.telescope =  []
-        today = date.today()
-        year = '2021'#today.strftime("%Y")
-        self.time_ranges = None
+        self.telescope = []
 
 
     @property
@@ -859,6 +856,23 @@ class Schedules:
         nb_hours_observed = self.target_table_spc['nb_hours_surved']
         return nb_hours_observed
 
+    @property
+    def time_ranges(self):
+        year = self.date_range[0].tt.datetime.strftime("%Y")
+        time_ranges = [Time([year + '-01-01 12:00:00', year + '-01-31 12:00:00']),
+                            Time([year + '-02-01 12:00:00', year + '-02-28 12:00:00']),
+                            Time([year + '-03-01 15:00:00', year + '-03-31 15:00:00']),
+                            Time([year + '-04-01 15:00:00', year + '-04-30 15:00:00']),
+                            Time([year + '-05-01 15:00:00', year + '-05-31 15:00:00']),
+                            Time([year + '-06-01 15:00:00', year + '-06-30 15:00:00']),
+                            Time([year + '-07-01 12:00:00', year + '-07-31 12:00:00']),
+                            Time([year + '-08-01 12:00:00', year + '-08-31 12:00:00']),
+                            Time([year + '-09-01 12:00:00', year + '-09-30 12:00:00']),
+                            Time([year + '-10-01 12:00:00', year + '-10-31 12:00:00']),
+                            Time([year + '-11-01 12:00:00', year + '-11-30 12:00:00']),
+                            Time([year + '-12-01 12:00:00', year + '-12-31 12:00:00'])]
+        return time_ranges
+
     def exposure_time_table(self,day):
         """ generate an exposure time table as the form of a file untitled
 
@@ -953,19 +967,6 @@ class Schedules:
                 if abs(time_since_last_update) > 24: # in hours
                     print('INFO: Updating the number of hours observed')
                     self.update_nb_hours_all()
-        year = self.date_range[0].tt.datetime.strftime("%Y")
-        self.time_ranges = [Time([year + '-01-01 12:00:00', year + '-01-31 12:00:00']),
-                            Time([year + '-02-01 12:00:00', year + '-02-28 12:00:00']),
-                            Time([year + '-03-01 15:00:00', year + '-03-31 15:00:00']),
-                            Time([year + '-04-01 15:00:00', year + '-04-30 15:00:00']),
-                            Time([year + '-05-01 15:00:00', year + '-05-31 15:00:00']),
-                            Time([year + '-06-01 15:00:00', year + '-06-30 15:00:00']),
-                            Time([year + '-07-01 12:00:00', year + '-07-31 12:00:00']),
-                            Time([year + '-08-01 12:00:00', year + '-08-31 12:00:00']),
-                            Time([year + '-09-01 12:00:00', year + '-09-30 12:00:00']),
-                            Time([year + '-10-01 12:00:00', year + '-10-31 12:00:00']),
-                            Time([year + '-11-01 12:00:00', year + '-11-30 12:00:00']),
-                            Time([year + '-12-01 12:00:00', year + '-12-31 12:00:00'])]
 
     def update_nb_hours_all(self,user =user_portal, password = pwd_portal):
         # *********** TRAPPIST ***********

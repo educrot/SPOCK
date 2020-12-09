@@ -6,6 +6,7 @@ from astropy.time import Time
 from astropy.io import ascii
 from astropy.table import Table,Column, MaskedColumn
 import SPOCK.long_term_scheduler as SPOCKLT
+from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
 import pkg_resources
 from scipy.interpolate import interp1d
 import yaml

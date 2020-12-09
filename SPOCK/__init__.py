@@ -12,7 +12,7 @@ import yaml
 def _get_files():
     data_path = pkg_resources.resource_filename('SPOCK', 'credentials/')
     filename_pwd = os.path.join(data_path, 'passwords.csv')
-    print('INFO: Please add password.csv file in :' + data_path)
+    print('INFO: Please add password.csv file in: ' + data_path)
     if os.path.exists(filename_pwd):
         print('INFO: OK Password file exists')
         # ************************ Read passwords ************************
