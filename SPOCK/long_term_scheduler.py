@@ -1295,7 +1295,7 @@ class Schedules:
                 self.first_target = self.priority[self.idx_first_target]
 
         for i in range(1,abs(idx_init_first)+len(self.index_prio)):
-            print(i, self.targets[self.index_prio[-(i)]])
+            # print(i, self.targets[self.index_prio[-(i)]])
             rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
             set_first_target = self.observatory.target_set_time(self.date_range[0]+t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
             if self.observatory.target_set_time(self.date_range[0] + t, self.targets[self.idx_first_target], which='next',
@@ -1360,7 +1360,7 @@ class Schedules:
             if self.first_target['set or rise'] == 'both':
                 self.idx_second_target = self.idx_first_target
                 self.second_target = self.first_target
-                print( self.first_target)
+                #print( self.first_target)
                 break
 
         if self.idx_second_target is None:
@@ -1453,7 +1453,7 @@ class Schedules:
 
         self.index_prio = np.argsort(self.priority['priority'])
         self.priority_ranked = self.priority[self.index_prio]
-        print(self.priority_ranked)
+        # print(self.priority_ranked)
 
         return self.index_prio, self.priority, self.priority_ranked
 
@@ -2139,7 +2139,7 @@ class Schedules:
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
-        print('texp is : ',texp)
+        print('INFO: texp is : ',texp)
         return texp
 
     def exposure_time(self, day, i):
