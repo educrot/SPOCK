@@ -39,6 +39,7 @@ iers.IERS_A_URL  = 'https://datacenter.iers.org/data/9/finals2000A.all' #'http:/
 #download_IERS_A()
 ssl._create_default_https_context = ssl._create_unverified_context
 
+
 # ************************ Read passwords ************************
 
 with open('passwords.csv', "r") as f:

@@ -8,7 +8,10 @@ from astropy.time import Time
 import SPOCK.ETC as ETC
 import datetime
 
+import SPOCK
+SPOCK.__file__
 
+print()
 
 obs = 5
 schedule = SPOCKST.Schedules()
