@@ -7,11 +7,28 @@ from datetime import datetime
 from astroplan import Observer,FixedTarget
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy.time import Time
+import yaml
+
+# ************************ Read passwords ************************
+
+with open('passwords.csv', "r") as f:
+    Inputs = yaml.load(f, Loader=yaml.FullLoader)
+    pwd_appcs = Inputs['pwd_appcs'][0]
+    pwd_HUB = Inputs['pwd_HUB'][0]
+    user_portal = Inputs['user_portal'][0]
+    pwd_portal = Inputs['pwd_portal'][0]
+    pwd_appcs = Inputs['pwd_appcs'][0]
+    pwd_appcs = Inputs['pwd_appcs'][0]
+    pwd_SNO_Reduc1 = Inputs['pwd_SNO_Reduc1'][0]
+    user_chart_studio = Inputs['user_chart_studio'][0]
+    pwd_chart_studio = Inputs['pwd_chart_studio'][0]
+    path_spock = Inputs['path_spock'][0]
+
 
 startup_time=[]
 hour=[]
 minute=[]
-target_list_path = './target_lists/speculoos_target_list_v6.txt'
+target_list_path = path_spock + '/target_lists/speculoos_target_list_v6.txt'
 
 def charge_observatory(Name):
     observatories = []
@@ -38,7 +55,7 @@ def charge_observatory(Name):
     return observatories
 
 def Path_txt_files(telescope):
-    Path=os.path.join('./DATABASE',telescope,'Plans_by_date')
+    Path=os.path.join(path_spock + '/DATABASE',telescope,'Plans_by_date')
     return Path
 
 def startup_no_flats(t_now,name,sun_set,date_start,Path):
@@ -296,7 +313,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
-        df2 = pd.read_csv('./target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df2 = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         try:
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
@@ -491,7 +508,7 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
     if idx_target is None:
-        df2 = pd.read_csv('./target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df2 = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)]
 
@@ -682,7 +699,7 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
     if idx_target is None:
-        df2 = pd.read_csv('./target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df2 = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
         try:
             idx_target = np.where((df2['Sp_ID'] == name))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]

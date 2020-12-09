@@ -39,32 +39,6 @@ iers.IERS_A_URL  = 'https://datacenter.iers.org/data/9/finals2000A.all' #'http:/
 #download_IERS_A()
 ssl._create_default_https_context = ssl._create_unverified_context
 
-# ************************ Create database ************************
-
-telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
-if not os.path.exists('./target_lists'):
-    os.makedirs('./target_lists')
-if not os.path.exists('./survey_hours'):
-    os.makedirs('./survey_hours')
-if not os.path.exists('./DATABASE'):
-    os.makedirs('./DATABASE')
-if not os.path.exists('./night_blocks_propositions'):
-    os.makedirs('./night_blocks_propositions')
-if not os.path.exists('./SPOCK_files'):
-    os.makedirs('./SPOCK_files')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel):
-        os.makedirs('./DATABASE/' + tel)
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Archive_night_blocks'):
-        os.makedirs('./DATABASE/' + tel + '/Archive_night_blocks')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Plans_by_date'):
-        os.makedirs('./DATABASE/' + tel + '/Plans_by_date')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Zip_files'):
-        os.makedirs('./DATABASE/' + tel + '/Zip_files')
-
 # ************************ Read passwords ************************
 
 with open('passwords.csv', "r") as f:
@@ -78,6 +52,33 @@ with open('passwords.csv', "r") as f:
     pwd_SNO_Reduc1 = Inputs['pwd_SNO_Reduc1'][0]
     user_chart_studio = Inputs['user_chart_studio'][0]
     pwd_chart_studio = Inputs['pwd_chart_studio'][0]
+    path_spock = Inputs['path_spock'][0]
+
+# ************************ Create database ************************
+
+telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
+if not os.path.exists(path_spock + '/target_lists'):
+    os.makedirs(path_spock + '/target_lists')
+if not os.path.exists(path_spock + '/survey_hours'):
+    os.makedirs(path_spock + '/survey_hours')
+if not os.path.exists(path_spock + '/DATABASE'):
+    os.makedirs(path_spock + '/DATABASE')
+if not os.path.exists(path_spock + '/night_blocks_propositions'):
+    os.makedirs(path_spock + '/night_blocks_propositions')
+if not os.path.exists(path_spock + '/SPOCK_files'):
+    os.makedirs(path_spock + '/SPOCK_files')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel):
+        os.makedirs(path_spock + '/DATABASE/' + tel)
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Archive_night_blocks'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Archive_night_blocks')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Plans_by_date'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Plans_by_date')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Zip_files'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Zip_files')
 
 # ************************ Read target lists from server ************************
 target_lists = ['speculoos_target_list_v6.txt', 'target_list_special.txt', 'target_transit_follow_up.txt']
@@ -85,14 +86,14 @@ for t_list in target_lists:
     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/target_lists/" + t_list
     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
     content = resp.text.replace("\n", "")
-    open('./target_lists/' + t_list, 'wb').write(resp.content)
+    open(path_spock + '/target_lists/' + t_list, 'wb').write(resp.content)
 
 survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt', 'ObservationHours.txt']
 for file in survey_hours:
     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/survey_hours/" + file
     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
     content = resp.text.replace("\n", "")
-    open('./survey_hours/' + file, 'wb').write(resp.content)
+    open(path_spock + '/survey_hours/' + file, 'wb').write(resp.content)
 
 # **********************************************************************************************************
 
@@ -117,13 +118,13 @@ def get_hours_files_SNO(username = 'speculoos',password = pwd_SNO_Reduc1):
         sys.exit('ERROR: Make sure the VPN is connected')
 
     ftp_client=s.open_sftp()
-    ftp_client.get('/home/speculoos/SNO/ObservationHours/ObservationHours.txt','./ObservationHours.txt')
+    ftp_client.get('/home/speculoos/SNO/ObservationHours/ObservationHours.txt',path_spock + '/survey_hours/ObservationHours.txt')
     ftp_client.close()
 
     s.close()
-    df = pd.read_csv('./survey_hours/ObservationHours.txt', delimiter=',',skipinitialspace=True)
+    df = pd.read_csv(path_spock + '/survey_hours/ObservationHours.txt', delimiter=',',skipinitialspace=True)
     df = df.sort_values(['Target'])
-    df.to_csv('./survey_hours/ObservationHours.txt',sep=',',index=False)
+    df.to_csv(path_spock + '/survey_hours/ObservationHours.txt',sep=',',index=False)
 
 def max_unit_list(x):
     """ return max of list
@@ -284,7 +285,7 @@ def SSO_planned_targets(date,telescope):
     targets_on_SSO_telescopes = []
     for i in range(len(telescopes)):
         night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
-        path = './DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
+        path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
             for tar in c['target']:
@@ -312,7 +313,7 @@ def SNO_planned_targets(date):
     targets_on_SNO_telescopes = []
     for i in range(len(telescopes)):
         night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
-        path = './DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
+        path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
             for tar in c['target']:
@@ -340,7 +341,7 @@ def TS_planned_targets(date):
     targets_on_TS_telescopes = []
     for i in range(len(telescopes)):
         night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
-        path = './DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
+        path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
             for tar in c['target']:
@@ -367,7 +368,7 @@ def TN_planned_targets(date):
     targets_on_TN_telescopes = []
     for i in range(len(telescopes)):
         night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
-        path = './DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
+        path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
             for tar in c['target']:
@@ -660,9 +661,9 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
     for i in range(0,date_range_in_days):
         day = date_range[0] + i
         if save:
-            source = './' + 'night_blocks_propositions/' +'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
-            destination = './DATABASE/' + telescope + '/'
-            destination_2 = './DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
+            source = path_spock + '/' + 'night_blocks_propositions/' +'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
+            destination = path_spock + '/DATABASE/' + telescope + '/'
+            destination_2 = path_spock + '/DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
             if over_write:
                 dest = shutil.copy(source, destination)
                 dest2 = shutil.copy(source, destination_2)
@@ -736,7 +737,7 @@ def upload_plans(day, nb_days, telescope):
     # ------------------- update archive date by date plans folder  ------------------
 
     path_database = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/', telescope,'schedule')
-    path_gant_chart = os.path.join('./SPOCK_Figures/Preview_schedule.html')
+    path_gant_chart = os.path.join(path_spock + '/SPOCK_Figures/Preview_schedule.html')
     path_gant_chart_masterfile = os.path.join('/Users/elsaducrot/spock_2/SPOCK_Files/spock_stats_masterfile.csv')
     path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/Preview_schedule.html')
     path_database_home_masterfile = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/spock_stats_masterfile.csv')
@@ -795,18 +796,7 @@ class Schedules:
         self.telescope =  []
         today = date.today()
         year = '2021'#today.strftime("%Y")
-        self.time_ranges = [Time([year + '-01-01 12:00:00', year + '-01-31 12:00:00']),
-                            Time([year + '-02-01 12:00:00', year + '-02-28 12:00:00']),
-                            Time([year + '-03-01 15:00:00', year + '-03-31 15:00:00']),
-                            Time([year + '-04-01 15:00:00', year + '-04-30 15:00:00']),
-                            Time([year + '-05-01 15:00:00', year + '-05-31 15:00:00']),
-                            Time([year + '-06-01 15:00:00', year + '-06-30 15:00:00']),
-                            Time([year + '-07-01 12:00:00', year + '-07-31 12:00:00']),
-                            Time([year + '-08-01 12:00:00', year + '-08-31 12:00:00']),
-                            Time([year + '-09-01 12:00:00', year + '-09-30 12:00:00']),
-                            Time([year + '-10-01 12:00:00', year + '-10-31 12:00:00']),
-                            Time([year + '-11-01 12:00:00', year + '-11-30 12:00:00']),
-                            Time([year + '-12-01 12:00:00', year + '-12-31 12:00:00'])]
+        self.time_ranges = None
 
 
     @property
@@ -955,39 +945,39 @@ class Schedules:
             df = pd.DataFrame({'Sp_ID':self.target_table_spc['Sp_ID'],\
                                'SSO_texp':sso_texp,'SNO_texp':sno_texp,'Saintex_texp':saintex_texp,\
                                'TS_texp':ts_texp,'TN_texp':tn_texp,})
-            df.to_csv('./SPOCK_files/exposure_time_table.csv',sep=',',index=False)
+            df.to_csv(path_spock + '/SPOCK_files/exposure_time_table.csv',sep=',',index=False)
 
     def idx_SSO_observed_targets(self):
-        df_cambridge = pd.read_csv('./survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        df_cambridge = pd.read_csv(path_spock + '/survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         df_cambridge['Target'] = [x.strip().replace('SP', 'Sp') for x in df_cambridge['Target']]
         server_in_targetlist, targetlist_in_server = index_list1_list2(df_cambridge['Target'], self.target_table_spc['Sp_ID'])
         return server_in_targetlist
 
     def idx_SNO_observed_targets(self):
-        df_artemis = pd.read_csv('./survey_hours/ObservationHours.txt', delimiter=',')
+        df_artemis = pd.read_csv(path_spock + '/survey_hours/ObservationHours.txt', delimiter=',')
         artemis_in_targetlist, targetlist_in_artemis = index_list1_list2(df_artemis['Target'], self.target_table_spc['Sp_ID'])
         return artemis_in_targetlist
 
     def idx_SaintEx_observed_targets(self):
-        df_saintex = pd.read_csv('./survey_hours/ObservationHours_Saint-Ex.txt', delimiter=',')
+        df_saintex = pd.read_csv(path_spock + '/survey_hours/ObservationHours_Saint-Ex.txt', delimiter=',')
         saintex_in_targetlist, targetlist_in_saintex = index_list1_list2(df_saintex['Target'], self.target_table_spc['Sp_ID'])
         return saintex_in_targetlist
 
     def idx_trappist_observed_targets(self):
-        df_trappist = pd.read_csv('./survey_hours/ObservationHours_TRAPPIST.txt', delimiter=',')
+        df_trappist = pd.read_csv(path_spock + '/survey_hours/ObservationHours_TRAPPIST.txt', delimiter=',')
         trappist_in_targetlist, targetlist_in_trappist = index_list1_list2(df_trappist['Target'], self.target_table_spc['Sp_ID'])
         return trappist_in_targetlist
 
     def load_parameters(self,nb_observatory=None,input_file=None):
         if input_file == None:
-            self.target_list = './target_lists/speculoos_target_list_v6.txt'
+            self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
             self.constraints = [AtNightConstraint.twilight_nautical()]
             df = pd.read_csv(self.target_list, delimiter=' ')
             self.target_table_spc = Table.from_pandas(df)
         else:
             with open(input_file, "r") as f:
                 Inputs = yaml.load(f, Loader=yaml.FullLoader)
-                self.target_list = Inputs['target_list']
+                self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
                 df = pd.read_csv(self.target_list, delimiter=' ')
                 self.target_table_spc = Table.from_pandas(df)
                 df = pd.DataFrame.from_dict(Inputs['observatories'])
@@ -1017,6 +1007,19 @@ class Schedules:
                 if abs(time_since_last_update) > 24: # in hours
                     print('INFO: Updating the number of hours observed')
                     self.update_nb_hours_all()
+        year = self.date_range[0].tt.datetime.strftime("%Y")
+        self.time_ranges = [Time([year + '-01-01 12:00:00', year + '-01-31 12:00:00']),
+                            Time([year + '-02-01 12:00:00', year + '-02-28 12:00:00']),
+                            Time([year + '-03-01 15:00:00', year + '-03-31 15:00:00']),
+                            Time([year + '-04-01 15:00:00', year + '-04-30 15:00:00']),
+                            Time([year + '-05-01 15:00:00', year + '-05-31 15:00:00']),
+                            Time([year + '-06-01 15:00:00', year + '-06-30 15:00:00']),
+                            Time([year + '-07-01 12:00:00', year + '-07-31 12:00:00']),
+                            Time([year + '-08-01 12:00:00', year + '-08-31 12:00:00']),
+                            Time([year + '-09-01 12:00:00', year + '-09-30 12:00:00']),
+                            Time([year + '-10-01 12:00:00', year + '-10-31 12:00:00']),
+                            Time([year + '-11-01 12:00:00', year + '-11-30 12:00:00']),
+                            Time([year + '-12-01 12:00:00', year + '-12-31 12:00:00'])]
 
     def update_nb_hours_all(self,user =user_portal, password = pwd_portal):
         # *********** TRAPPIST ***********
@@ -1029,23 +1032,23 @@ class Schedules:
         target_list['telescope'] =  ['None'] * len(target_list['telescope'])
         resp = requests.get(TargetURL, auth=(user, password))
         content = resp.text.replace("\n", "")
-        open('./survey_hours/SurveyTotal.txt', 'wb').write(resp.content)
-        df =  pd.read_csv('./survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        open(path_spock + '/survey_hours/SurveyTotal.txt', 'wb').write(resp.content)
+        df =  pd.read_csv(path_spock + '/survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         df = df.sort_values(['Target'])
-        df.to_csv('./survey_hours/SurveyTotal.txt',sep=' ',index=False)
-        df_camserver = pd.read_csv('./survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        df.to_csv(path_spock + '/survey_hours/SurveyTotal.txt',sep=' ',index=False)
+        df_camserver = pd.read_csv(path_spock + '/survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         #df_camserver['Target'][9] = 'Sp0004-2058'
         df_camserver['Target'] = [x.strip().replace('SP', 'Sp') for x in df_camserver['Target']]
 
         # *********** Saint-Ex ***********
-        df = pd.read_csv('./survey_hours/ObservationHours_Saint-Ex.txt',delimiter=',')
+        df = pd.read_csv(path_spock + '/survey_hours/ObservationHours_Saint-Ex.txt',delimiter=',')
         df = df.sort_values(['Target'])
-        df.to_csv('./survey_hours/ObservationHours_Saint-Ex.txt',sep=',',index=False)
+        df.to_csv(path_spock + '/survey_hours/ObservationHours_Saint-Ex.txt',sep=',',index=False)
 
         # Read files
-        df_SaintEx = pd.read_csv('./survey_hours/ObservationHours_Saint-Ex.txt', delimiter=',')
-        df_TRAPPIST = pd.read_csv('./survey_hours/ObservationHours_TRAPPIST.txt', delimiter=',')
-        df_camserver_telescope = pd.read_csv('./survey_hours/SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        df_SaintEx = pd.read_csv(path_spock + '/survey_hours/ObservationHours_Saint-Ex.txt', delimiter=',')
+        df_TRAPPIST = pd.read_csv(path_spock + '/survey_hours/ObservationHours_TRAPPIST.txt', delimiter=',')
+        df_camserver_telescope = pd.read_csv(path_spock + '/survey_hours/SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         df_camserver_telescope['Target'] = [x.strip().replace('SP', 'Sp') for x in df_camserver_telescope['Target']]
         for i in range(len(target_list)):
             idxs = np.where((df_camserver_telescope['Target'] == target_list['Sp_ID'][i]))[0]
@@ -1110,8 +1113,8 @@ class Schedules:
                         target_list['telescope'][i].append('Saint-Ex')
 
         target_list.to_csv(self.target_list, sep=' ', index=False)
-        target_list.to_csv('./target_lists/speculoos_target_list_v6_sep_coma.csv', sep=',')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", './target_lists/speculoos_target_list_v6.txt',
+        target_list.to_csv(path_spock + '/target_lists/speculoos_target_list_v6_sep_coma.csv', sep=',')
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", path_spock + '/target_lists/speculoos_target_list_v6.txt',
                           'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/target_lists/'])
 
     def get_hours_files_TRAPPIST(self):
@@ -1129,14 +1132,14 @@ class Schedules:
         hours_observed_TSTN = pd.Series(col5)
         telescopes = ['TRAPPIST'] * len(target_observed_TSTN)
         df_google_doc = pd.DataFrame({'Target': target_observed_TSTN, ' Observation Hours ': hours_observed_TSTN,'telescope':telescopes})
-        df_google_doc.to_csv('./survey_hours/ObservationHours_TRAPPIST.txt',sep=',',index=False)
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", './survey_hours/ObservationHours_TRAPPIST.txt',
+        df_google_doc.to_csv(path_spock + '/survey_hours/ObservationHours_TRAPPIST.txt',sep=',',index=False)
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", path_spock + '/survey_hours/ObservationHours_TRAPPIST.txt',
                           'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/survey_hours/'])
 
     def update_nb_hours_SNO(self):
         get_hours_files_SNO()
         target_list = pd.read_csv(self.target_list, delimiter=' ')
-        df = pd.read_csv('./survey_hours/ObservationHours.txt', delimiter=',')
+        df = pd.read_csv(path_spock + '/survey_hours/ObservationHours.txt', delimiter=',')
         SNO_in_targetlist, targetlist_in_SNO = index_list1_list2(df['Target'], target_list['Sp_ID'])
         target_list['nb_hours_surved'][SNO_in_targetlist] = df[' Observation Hours '][targetlist_in_SNO]
         #target_list.to_csv(self.target_list, sep=' ', index=False)
@@ -1147,7 +1150,7 @@ class Schedules:
         except TimeoutError:
             print('ERROR: Are on the Liege  VPN ?')
         target_list = pd.read_csv(self.target_list, delimiter=' ')
-        df = pd.read_csv('./survey_hours/ObservationHours.txt', delimiter=',')
+        df = pd.read_csv(path_spock + '/survey_hours/ObservationHours.txt', delimiter=',')
         SNO_in_targetlist, targetlist_in_SNO = index_list1_list2(df['Target'], target_list['Sp_ID'])
         df_tel = ['Artemis'] * len(df['Target'][targetlist_in_SNO])
         target_list['telescope'][SNO_in_targetlist] = df_tel
@@ -1158,8 +1161,8 @@ class Schedules:
         target_list = pd.read_csv(self.target_list, delimiter=' ')
         resp = requests.get(TargetURL, auth=(user, password))
         content = resp.text.replace("\n", "")
-        open('./survey_hours/SurveyTotal.txt', 'wb').write(resp.content)
-        df = pd.read_csv('./survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        open(path_spock + '/survey_hours/SurveyTotal.txt', 'wb').write(resp.content)
+        df = pd.read_csv(path_spock + '/survey_hours/SurveyTotal.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         df['Target'][9] = 'Sp0004-2058'
         df['Target'] = [x.strip().replace('SP', 'Sp') for x in df['Target']]
         server_in_targetlist, targetlist_in_server = index_list1_list2(df['Target'], target_list['Sp_ID'])
@@ -1171,10 +1174,10 @@ class Schedules:
         target_list = pd.read_csv(self.target_list, delimiter=' ')
         resp = requests.get(TargetURL, auth=(user, password))
         content = resp.text.replace("\n", "")
-        open('./survey_hours/SurveyByTelescope.txt', 'wb').write(resp.content)
-        df = pd.read_csv('./survey_hours/SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        open(path_spock + '/survey_hours/SurveyByTelescope.txt', 'wb').write(resp.content)
+        df = pd.read_csv(path_spock + '/survey_hours/SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         df = df.sort_values(['Target'])
-        df.to_csv('./survey_hours/SurveyByTelescope.txt',sep=' ',index=False)
+        df.to_csv(path_spock + '/survey_hours/SurveyByTelescope.txt',sep=' ',index=False)
         #
         #df = pd.read_csv('SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
         #df['Target'] = [x.strip().replace('SP', 'Sp') for x in df['Target']]
@@ -1424,11 +1427,11 @@ class Schedules:
             self.priority['priority'][idx_to_be_done] *= 10 ** (1 / (1 + 200 - self.target_table_spc['nb_hours_surved'][idx_to_be_done]))
             self.priority['priority'][idx_done] = -1
 
-        set_targets_index = (self.priority['alt set start']>20) & (self.priority['alt set end']>20)
+        set_targets_index = (self.priority['alt set start']>self.Altitude_constraint) & (self.priority['alt set end']>self.Altitude_constraint)
         self.priority['set or rise'][set_targets_index] = 'set'
-        rise_targets_index = (self.priority['alt rise start']>20) & (self.priority['alt rise end']>20)
+        rise_targets_index = (self.priority['alt rise start']>20) & (self.priority['alt rise end']>self.Altitude_constraint)
         self.priority['set or rise'][rise_targets_index]='rise'
-        both_targets_index=(self.priority['alt rise start']>20) & (self.priority['alt set start']>20) #& (self.priority['alt rise end']>20) & (self.priority['alt set end']>20)
+        both_targets_index=(self.priority['alt rise start']>self.Altitude_constraint) & (self.priority['alt set start']>self.Altitude_constraint) #& (self.priority['alt rise end']>20) & (self.priority['alt set end']>20)
         self.priority['set or rise'][both_targets_index] = 'both'
         self.priority['priority'][both_targets_index] = self.priority['priority'][both_targets_index]*10
         priority_non_observable_idx = (self.priority['set or rise']=='None')
@@ -1457,10 +1460,10 @@ class Schedules:
 
         self.no_obs_with_different_tel()
         try:
-            read_exposure_time_table = pd.read_csv('./SPOCK_files/exposure_time_table.csv',sep=',')
+            read_exposure_time_table = pd.read_csv(path_spock + '/SPOCK_files/exposure_time_table.csv',sep=',')
         except FileNotFoundError:
             self.exposure_time_table(day)
-            read_exposure_time_table = pd.read_csv('./SPOCK_files/exposure_time_table.csv', sep=',')
+            read_exposure_time_table = pd.read_csv(path_spock + '/SPOCK_files/exposure_time_table.csv', sep=',')
         if self.observatory.name == 'SSO':
             texp = read_exposure_time_table['SSO_texp']
             idx_texp_too_long = np.where((texp > 100))
@@ -2322,13 +2325,13 @@ def read_night_block(telescope, day):
     """
 
     day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
-    path_local = './DATABASE/' + telescope + '/Archive_night_blocks/night_blocks_' + \
+    path_local = path_spock + '/DATABASE/' + telescope + '/Archive_night_blocks/night_blocks_' + \
                  telescope + '_' + day_fmt + '.txt'
 
     if os.path.exists(path_local):
         day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
         scheduler_table = Table.read(
-            './DATABASE/' + str(telescope) + '/Archive_night_blocks' + '/night_blocks_' + str(telescope) + '_' + str(
+            path_spock + '/DATABASE/' + str(telescope) + '/Archive_night_blocks' + '/night_blocks_' + str(telescope) + '_' + str(
                 day_fmt) + '.txt',
             format='ascii')
     else:
@@ -2347,11 +2350,11 @@ def read_night_block(telescope, day):
 
 
 def make_docx_schedule(observatory,telescope, date_range, name_operator):
-    if not os.path.exists('./TRAPPIST_schedules_docx'):
-        os.makedirs('./TRAPPIST_schedules_docx')
-    df_speculoos = pd.read_csv('./target_lists/speculoos_target_list_v6.txt', delimiter=' ')
-    df_follow_up = pd.read_csv('./target_lists/target_transit_follow_up.txt', delimiter=' ')
-    df_special = pd.read_csv('./target_lists/target_list_special.txt', delimiter=' ')
+    if not os.path.exists(path_spock + '/TRAPPIST_schedules_docx'):
+        os.makedirs(path_spock + '/TRAPPIST_schedules_docx')
+    df_speculoos = pd.read_csv(path_spock + '/target_lists/speculoos_target_list_v6.txt', delimiter=' ')
+    df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ')
+    df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt', delimiter=' ')
 
     df_follow_up['nb_hours_surved'] = [0]*len(df_follow_up)
     df_follow_up['nb_hours_threshold'] = [0] * len(df_follow_up)
@@ -2571,10 +2574,10 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     font.size = Pt(12)
     font.color.rgb = RGBColor(0, 0, 0)
     if telescope == 'TS_La_Silla':
-        doc.save('./TRAPPIST_schedules_docx/TS_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
+        doc.save(path_spock + '/TRAPPIST_schedules_docx/TS_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
                  Time(date_range[1],out_subfmt='date').value .replace('-','')  +'.docx')
     if telescope == 'TN_Oukaimeden':
-        doc.save('./TRAPPIST_schedules_docx/TN_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
+        doc.save(path_spock + '/TRAPPIST_schedules_docx/TN_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
                  Time(date_range[1],out_subfmt='date').value .replace('-','')  +'.docx')
 
 def date_range_in_days(date_range):

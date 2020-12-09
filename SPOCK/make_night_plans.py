@@ -9,7 +9,23 @@ from SPOCK.txt_files import first_target,target, flatdawn, biasdark, shutdown, f
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy import units as u
 import pandas as pd
+import yaml
 pd.set_option('display.max_columns', 50)
+
+# ************************ Read passwords ************************
+
+with open('passwords.csv', "r") as f:
+    Inputs = yaml.load(f, Loader=yaml.FullLoader)
+    pwd_appcs = Inputs['pwd_appcs'][0]
+    pwd_HUB = Inputs['pwd_HUB'][0]
+    user_portal = Inputs['user_portal'][0]
+    pwd_portal = Inputs['pwd_portal'][0]
+    pwd_appcs = Inputs['pwd_appcs'][0]
+    pwd_appcs = Inputs['pwd_appcs'][0]
+    pwd_SNO_Reduc1 = Inputs['pwd_SNO_Reduc1'][0]
+    user_chart_studio = Inputs['user_chart_studio'][0]
+    pwd_chart_studio = Inputs['pwd_chart_studio'][0]
+    path_spock = Inputs['path_spock'][0]
 
 
 #initialisation
@@ -25,7 +41,7 @@ dec3={}
 
 
 def make_scheduled_table(telescope,day_of_night):
-    Path = './DATABASE'
+    Path = path_spock + '/DATABASE'
     scheduled_table = None
     day_of_night = Time(day_of_night)
     try:
@@ -168,12 +184,12 @@ def make_np(t_now,nb_jours,tel):
 
     for nb_day in range(0,nb_jours):
         t_now=Time(t0+ nb_day*dt, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
-        Path='./DATABASE'
+        Path=path_spock + '/DATABASE'
         p=os.path.join(Path,str(telescope),'Plans_by_date',str(t_now))
         if not os.path.exists(p):
             os.makedirs(p)
 
-        scheduler_table = Table.read('./DATABASE/' + str(telescope) + '/Archive_night_blocks' + '/night_blocks_'+ str(telescope) +'_' + str(t_now)+'.txt', format='ascii')
+        scheduler_table = Table.read(path_spock + '/DATABASE/' + str(telescope) + '/Archive_night_blocks' + '/night_blocks_'+ str(telescope) +'_' + str(t_now)+'.txt', format='ascii')
 
         if (tel == 'Io') or tel == ('Europa') or (tel == 'Ganymede') or (tel == 'Callisto'):
             scheduler_table = dome_rotation(telescope=tel, day_of_night=t_now) # Intentional dome rotation to
@@ -338,6 +354,6 @@ def make_np(t_now,nb_jours,tel):
             biasdark(t_now, Path, telescope)
 
 
-        p2=os.path.join('./DATABASE',str(telescope),'Zip_files',str(t_now))
+        p2=os.path.join(path_spock + '/DATABASE',str(telescope),'Zip_files',str(t_now))
         shutil.make_archive(p2, 'zip', p)
 

@@ -26,32 +26,6 @@ import shutil
 import SPOCK.ETC as ETC
 import yaml
 
-# ************************ Create database ************************
-
-telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
-if not os.path.exists('./target_lists'):
-    os.makedirs('./target_lists')
-if not os.path.exists('./survey_hours'):
-    os.makedirs('./survey_hours')
-if not os.path.exists('./DATABASE'):
-    os.makedirs('./DATABASE')
-if not os.path.exists('./night_blocks_propositions'):
-    os.makedirs('./night_blocks_propositions')
-if not os.path.exists('./SPOCK_files'):
-    os.makedirs('./SPOCK_files')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel):
-        os.makedirs('./DATABASE/' + tel)
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Archive_night_blocks'):
-        os.makedirs('./DATABASE/' + tel + '/Archive_night_blocks')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Plans_by_date'):
-        os.makedirs('./DATABASE/' + tel + '/Plans_by_date')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Zip_files'):
-        os.makedirs('./DATABASE/' + tel + '/Zip_files')
-
 # ************************ Read passwords ************************
 
 with open('passwords.csv', "r") as f:
@@ -65,6 +39,33 @@ with open('passwords.csv', "r") as f:
     pwd_SNO_Reduc1 = Inputs['pwd_SNO_Reduc1'][0]
     user_chart_studio = Inputs['user_chart_studio'][0]
     pwd_chart_studio = Inputs['pwd_chart_studio'][0]
+    path_spock = Inputs['path_spock'][0]
+
+# ************************ Create database ************************
+
+telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
+if not os.path.exists(path_spock + '/target_lists'):
+    os.makedirs(path_spock + '/target_lists')
+if not os.path.exists(path_spock + '/survey_hours'):
+    os.makedirs(path_spock + '/survey_hours')
+if not os.path.exists(path_spock + '/DATABASE'):
+    os.makedirs(path_spock + '/DATABASE')
+if not os.path.exists(path_spock + '/night_blocks_propositions'):
+    os.makedirs(path_spock + '/night_blocks_propositions')
+if not os.path.exists(path_spock + '/SPOCK_files'):
+    os.makedirs(path_spock + '/SPOCK_files')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel):
+        os.makedirs(path_spock + '/DATABASE/' + tel)
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Archive_night_blocks'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Archive_night_blocks')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Plans_by_date'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Plans_by_date')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Zip_files'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Zip_files')
 
 # ************************ Read target lists from server ************************
 target_lists = ['speculoos_target_list_v6.txt', 'target_list_special.txt', 'target_transit_follow_up.txt']
@@ -72,14 +73,14 @@ for t_list in target_lists:
     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/target_lists/" + t_list
     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
     content = resp.text.replace("\n", "")
-    open('./target_lists/' + t_list, 'wb').write(resp.content)
+    open(path_spock + '/target_lists/' + t_list, 'wb').write(resp.content)
 
 survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt', 'ObservationHours.txt']
 for file in survey_hours:
     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/survey_hours/" + file
     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
     content = resp.text.replace("\n", "")
-    open('./survey_hours/' + file, 'wb').write(resp.content)
+    open(path_spock + '/survey_hours/' + file, 'wb').write(resp.content)
 
 # **********************************************************************************************************
 
@@ -155,8 +156,8 @@ class Schedules:
     def load_parameters(self, input_file_short_term, nb_observatory):
         with open(input_file_short_term, "r") as f:
             Inputs = yaml.load(f, Loader=yaml.FullLoader)
-            self.target_list = Inputs['target_list']
-            self.target_list_follow_up = Inputs['target_list_follow_up']
+            self.target_list = path_spock + '/target_lists/target_list_special.txt'
+            self.target_list_follow_up = path_spock + '/target_lists/target_transit_follow_up.txt'
             self.use = Inputs['use']
             df = pd.DataFrame.from_dict(Inputs['observatories'])
             self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
@@ -713,15 +714,15 @@ class Schedules:
 
         self.scheduled_table_sorted = end_scheduled_table
         # ***** Update target lists on server *****
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", './target_lists/target_list_special.txt',
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", path_spock + '/target_lists/target_list_special.txt',
                           'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/target_lists/'])
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", './target_lists/target_transit_follow_up.txt',
+        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", path_spock + '/target_lists/target_transit_follow_up.txt',
                           'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/target_lists/'])
 
         return self.scheduled_table_sorted
 
     def make_scheduled_table(self):
-        Path='./DATABASE'
+        Path=path_spock + '/DATABASE'
         try:
             os.path.exists(os.path.join(Path,self.telescope,'night_blocks_' + self.telescope + '_' +
                                         self.day_of_night.tt.datetime[0].strftime("%Y-%m-%d")+ '.txt'))
@@ -901,9 +902,9 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
             telescope = df[nb_observatory]['telescopes'][0]
             day = date_range[0]
     if save:
-        source = './night_blocks_propositions/' + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
-        destination = './DATABASE/' + telescope + '/'
-        destination_2 = './DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
+        source = path_spock + '/night_blocks_propositions/' + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
+        destination = path_spock + '/DATABASE/' + telescope + '/'
+        destination_2 = path_spock + '/DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
         if over_write:
             dest = shutil.copy(source, destination)
             dest2 = shutil.copy(source, destination_2)
@@ -940,7 +941,7 @@ def upload_plans(day, nb_days, telescope):
         SPOCKunp.upload_np_tn(day, nb_days)
     # ------------------- update archive date by date plans folder  ------------------
 
-    path_gant_chart = os.path.join('./SPOCK_Figures/Preview_schedule.html')
+    path_gant_chart = os.path.join(path_spock + '/SPOCK_Figures/Preview_schedule.html')
     path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Preview_schedule.html')
     print('INFO: Path local \'Gant chart\' = ', path_gant_chart)
     print('INFO: Path database = \'Gant chart\' = ',  path_database_home)
@@ -952,13 +953,13 @@ def upload_plans(day, nb_days, telescope):
 
 def read_night_block(telescope, day):
     day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
-    path_local = './DATABASE/' + telescope+'/Archive_night_blocks/night_blocks_'+\
+    path_local = path_spock + '/DATABASE/' + telescope+'/Archive_night_blocks/night_blocks_'+\
                  telescope+'_'+day_fmt+'.txt'
 
     if os.path.exists(path_local):
         day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
         scheduler_table = Table.read(
-            './DATABASE/' + str(telescope) + '/Archive_night_blocks' + '/night_blocks_' + str(telescope) + '_' + str(day_fmt) + '.txt',
+            path_spock + '/DATABASE/' + str(telescope) + '/Archive_night_blocks' + '/night_blocks_' + str(telescope) + '_' + str(day_fmt) + '.txt',
             format='ascii')
     else:
         nightb_url = "http://www.mrao.cam.ac.uk/SPECULOOS/"+telescope+'/schedule/Archive_night_blocks/night_blocks_'+\
@@ -976,11 +977,11 @@ def read_night_block(telescope, day):
     return scheduler_table
 
 def make_docx_schedule(observatory,telescope, date_range, name_operator):
-    if not os.path.exists('./TRAPPIST_schedules_docx'):
-        os.makedirs('./TRAPPIST_schedules_docx')
-    df_speculoos = pd.read_csv('./target_lists/speculoos_target_list_v6.txt', delimiter=' ')
-    df_follow_up = pd.read_csv('./target_lists/target_transit_follow_up.txt', delimiter=' ')
-    df_special = pd.read_csv('./target_lists/target_list_special.txt', delimiter=' ')
+    if not os.path.exists(path_spock + '/TRAPPIST_schedules_docx'):
+        os.makedirs(path_spock + '/TRAPPIST_schedules_docx')
+    df_speculoos = pd.read_csv(path_spock + '/target_lists/speculoos_target_list_v6.txt', delimiter=' ')
+    df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ')
+    df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt', delimiter=' ')
 
     df_follow_up['nb_hours_surved'] = [0]*len(df_follow_up)
     df_follow_up['nb_hours_threshold'] = [0] * len(df_follow_up)
@@ -1198,10 +1199,10 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     font.size = Pt(12)
     font.color.rgb = RGBColor(0, 0, 0)
     if telescope == 'TS_La_Silla':
-        doc.save('./TRAPPIST_schedules_docx/TS_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
+        doc.save(path_spock + '/TRAPPIST_schedules_docx/TS_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
                  Time(date_range[1],out_subfmt='date').value .replace('-','')  +'.docx')
     if telescope == 'TN_Oukaimeden':
-        doc.save('./TRAPPIST_schedules_docx/TN_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
+        doc.save(path_spock + '/TRAPPIST_schedules_docx/TN_' + Time(date_range[0],out_subfmt='date').value.replace('-','') + '_to_' +\
                  Time(date_range[1],out_subfmt='date').value .replace('-','')  +'.docx')
 
 def date_range_in_days(date_range):

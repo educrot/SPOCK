@@ -18,32 +18,6 @@ import yaml
 import io
 from matplotlib.offsetbox import AnchoredText
 
-# ************************ Create database ************************
-
-telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
-if not os.path.exists('./target_lists'):
-    os.makedirs('./target_lists')
-if not os.path.exists('./survey_hours'):
-    os.makedirs('./survey_hours')
-if not os.path.exists('./DATABASE'):
-    os.makedirs('./DATABASE')
-if not os.path.exists('./night_blocks_propositions'):
-    os.makedirs('./night_blocks_propositions')
-if not os.path.exists('./SPOCK_files'):
-    os.makedirs('./SPOCK_files')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel):
-        os.makedirs('./DATABASE/' + tel)
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Archive_night_blocks'):
-        os.makedirs('./DATABASE/' + tel + '/Archive_night_blocks')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Plans_by_date'):
-        os.makedirs('./DATABASE/' + tel + '/Plans_by_date')
-for tel in telescopes_names:
-    if not os.path.exists('./DATABASE/' + tel + '/Zip_files'):
-        os.makedirs('./DATABASE/' + tel + '/Zip_files')
-
 # ************************ Read passwords ************************
 
 with open('passwords.csv', "r") as f:
@@ -57,6 +31,33 @@ with open('passwords.csv', "r") as f:
     pwd_SNO_Reduc1 = Inputs['pwd_SNO_Reduc1'][0]
     user_chart_studio = Inputs['user_chart_studio'][0]
     pwd_chart_studio = Inputs['pwd_chart_studio'][0]
+    path_spock = Inputs['path_spock'][0]
+
+# ************************ Create database ************************
+
+telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
+if not os.path.exists(path_spock + '/target_lists'):
+    os.makedirs(path_spock + '/target_lists')
+if not os.path.exists(path_spock + '/survey_hours'):
+    os.makedirs(path_spock + '/survey_hours')
+if not os.path.exists(path_spock + '/DATABASE'):
+    os.makedirs(path_spock + '/DATABASE')
+if not os.path.exists(path_spock + '/night_blocks_propositions'):
+    os.makedirs(path_spock + '/night_blocks_propositions')
+if not os.path.exists(path_spock + '/SPOCK_files'):
+    os.makedirs(path_spock + '/SPOCK_files')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel):
+        os.makedirs(path_spock + '/DATABASE/' + tel)
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Archive_night_blocks'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Archive_night_blocks')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Plans_by_date'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Plans_by_date')
+for tel in telescopes_names:
+    if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Zip_files'):
+        os.makedirs(path_spock + '/DATABASE/' + tel + '/Zip_files')
 
 # ************************ Read target lists from server ************************
 target_lists = ['speculoos_target_list_v6.txt', 'target_list_special.txt', 'target_transit_follow_up.txt']
@@ -64,16 +65,17 @@ for t_list in target_lists:
     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/target_lists/" + t_list
     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
     content = resp.text.replace("\n", "")
-    open('./target_lists/' + t_list, 'wb').write(resp.content)
+    open(path_spock + '/target_lists/' + t_list, 'wb').write(resp.content)
 
 survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt', 'ObservationHours.txt']
 for file in survey_hours:
     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/survey_hours/" + file
     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
     content = resp.text.replace("\n", "")
-    open('./survey_hours/' + file, 'wb').write(resp.content)
+    open(path_spock + '/survey_hours/' + file, 'wb').write(resp.content)
 
 # **********************************************************************************************************
+
 chart_studio.tools.set_credentials_file(username=user_chart_studio, api_key=pwd_chart_studio)
 chart_studio.tools.set_config_file(world_readable=True,sharing='public')
 
@@ -138,7 +140,7 @@ def airmass_plot_saved(name_observatory,telescope,day):
          visibility plot on telescope at a given day
 
     """
-    night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
+    night_block = pd.read_csv(os.path.join(path_spock + '/DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
@@ -183,7 +185,7 @@ def airmass_plot_proposition(name_observatory,telescope,day):
          visibility plot on telescope at a given day
 
     """
-    night_block = pd.read_csv(os.path.join('./night_blocks_propositions/','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
+    night_block = pd.read_csv(os.path.join(path_spock + 'night_blocks_propositions/','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
     day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
@@ -227,7 +229,7 @@ def airmass_altitude_plot_saved(name_observatory,telescope,day):
          visibility plot on telescope at a given day
 
     """
-    night_block = pd.read_csv(os.path.join('./DATABASE/', telescope,
+    night_block = pd.read_csv(os.path.join(path_spock + '/DATABASE/', telescope,
                                               'Archive_night_blocks','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
@@ -273,7 +275,7 @@ def airmass_altitude_plot_proposition(name_observatory,telescope,day):
          visibility plot on telescope at a given day
 
     """
-    night_block = pd.read_csv(os.path.join('./night_blocks_propositions/','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
+    night_block = pd.read_csv(os.path.join(path_spock + '/night_blocks_propositions/','night_blocks_' + telescope + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt'),\
                               sep=' ', skipinitialspace=True)
     observatory = charge_observatories(name_observatory)[0]
     day = Time(night_block['start time (UTC)'][0]) - 5 *u.hour
@@ -325,10 +327,10 @@ def gantt_chart_all(target_list):
                                            2635.0000000009704 * u.m)
     telescopes = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex','TS_La_Silla','TN_Oukaimeden']
     for tel in telescopes:
-        for i in os.listdir(os.path.join('./DATABASE/', tel,
+        for i in os.listdir(os.path.join(path_spock + '/DATABASE/', tel,
                                          'Archive_night_blocks')):
             if i.endswith('.txt'):
-                df = pd.read_csv(os.path.join('./DATABASE/', tel,
+                df = pd.read_csv(os.path.join(path_spock + '/DATABASE/', tel,
                                               'Archive_night_blocks', i), sep=' ', skipinitialspace=True)
                 start.append(list(df["start time (UTC)"]))
                 finish.append(list(df["end time (UTC)"]))
@@ -368,7 +370,7 @@ def gantt_chart_all(target_list):
     config = {
         'scrollZoom': True
     }
-    offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
+    offline.plot(fig,auto_open=True,filename=path_spock + '/SPOCK_Figures/Preview_schedule.html',config=config)
 
 def gantt_chart(date_start,date_end,telescope):
     """
@@ -402,11 +404,11 @@ def gantt_chart(date_start,date_end,telescope):
         for i in range(0, date_range_in_days):
             day = date_start + i
             list_night_blocks.append('night_blocks_' + tel + '_' + day.tt.datetime.strftime("%Y-%m-%d") + '.txt')
-        for i in os.listdir(os.path.join('./DATABASE/', tel,
+        for i in os.listdir(os.path.join(path_spock + '/DATABASE/', tel,
                                          'Archive_night_blocks')):
             if i.endswith('.txt'):
                 if any(i in s for s in list_night_blocks):
-                    df = pd.read_csv(os.path.join('./DATABASE/', tel,
+                    df = pd.read_csv(os.path.join(path_spock + '/DATABASE/', tel,
                                                   'Archive_night_blocks', i), sep=' ', skipinitialspace=True)
                     start.append(list(df["start time (UTC)"]))
                     finish.append(list(df["end time (UTC)"]))
@@ -447,7 +449,7 @@ def gantt_chart(date_start,date_end,telescope):
     config = {
         'scrollZoom': True
     }
-    offline.plot(fig,auto_open=True,filename='./SPOCK_Figures/Preview_schedule.html',config=config)
+    offline.plot(fig,auto_open=True,filename=path_spock + '/SPOCK_Figures/Preview_schedule.html',config=config)
 
 def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_list):
     """
@@ -468,7 +470,7 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
 
     """
     if path_target_list is None:
-        path_target_list = './target_lists/speculoos_target_list_v6'
+        path_target_list = path_spock + 'target_lists/speculoos_target_list_v6'
     observatory = charge_observatories(name_observatory)[0]
     delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day, which='next').jd - 0.07, \
                                       observatory.twilight_morning_nautical(day + 1, which='nearest').jd + 0.07, 100),
