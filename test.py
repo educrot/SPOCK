@@ -12,7 +12,7 @@ import datetime
 
 obs = 1
 schedule = SPOCKLT.Schedules()
-schedule.load_parameters('./input.csv',obs)
+schedule.load_parameters(input_file='./input.csv',nb_observatory= obs)
 
 
 #SPOCKLT.make_np(schedule.date_range[0], schedule.date_range_in_days, schedule.telescope)
