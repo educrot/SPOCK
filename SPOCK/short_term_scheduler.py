@@ -75,7 +75,7 @@ for t_list in target_lists:
     content = resp.text.replace("\n", "")
     open(path_spock + '/target_lists/' + t_list, 'wb').write(resp.content)
 
-survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt', 'ObservationHours.txt']
+survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt', 'ObservationHours.txt','SurveyTotal.txt']
 for file in survey_hours:
     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/survey_hours/" + file
     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
