@@ -154,29 +154,35 @@ class Schedules:
         self.scheduled_table_sorted = None
 
     def load_parameters(self, input_file_short_term, nb_observatory):
-        with open(input_file_short_term, "r") as f:
-            Inputs = yaml.load(f, Loader=yaml.FullLoader)
-            self.target_list = path_spock + '/target_lists/target_list_special.txt'
-            self.target_list_follow_up = path_spock + '/target_lists/target_transit_follow_up.txt'
-            self.use = Inputs['use']
-            df = pd.DataFrame.from_dict(Inputs['observatories'])
-            self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
-            self.telescopes = df[nb_observatory]['telescopes']
-            self.telescope = self.telescopes[0]
-            self.day_of_night = Time(Inputs['day_of_night'])  # ,Time(Inputs['date_range'][1])]
-            try:
-                self.day_of_night = self.day_of_night[0]
-            except TypeError:
-                self.day_of_night = self.day_of_night
-            self.start_end_range = Time(Inputs['start_end_range'])
-            if self.start_end_range[1] <= self.start_end_range[0]:
-                sys.exit('ERROR: end date inferior to start date')
+        if input_file_short_term == None:
+            self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
             self.constraints = [AtNightConstraint.twilight_nautical()]
             df = pd.read_csv(self.target_list, delimiter=' ')
-            df_followup = pd.read_csv(self.target_list_follow_up, delimiter=' ')
             self.target_table_spc = Table.from_pandas(df)
-            self.target_table_spc_follow_up = Table.from_pandas(df_followup)
-            self.targets = target_list_good_coord_format(self.target_list)
+        else:
+            with open(input_file_short_term, "r") as f:
+                Inputs = yaml.load(f, Loader=yaml.FullLoader)
+                self.target_list = path_spock + '/target_lists/target_list_special.txt'
+                self.target_list_follow_up = path_spock + '/target_lists/target_transit_follow_up.txt'
+                self.use = Inputs['use']
+                df = pd.DataFrame.from_dict(Inputs['observatories'])
+                self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
+                self.telescopes = df[nb_observatory]['telescopes']
+                self.telescope = self.telescopes[0]
+                self.day_of_night = Time(Inputs['day_of_night'])  # ,Time(Inputs['date_range'][1])]
+                try:
+                    self.day_of_night = self.day_of_night[0]
+                except TypeError:
+                    self.day_of_night = self.day_of_night
+                self.start_end_range = Time(Inputs['start_end_range'])
+                if self.start_end_range[1] <= self.start_end_range[0]:
+                    sys.exit('ERROR: end date inferior to start date')
+                self.constraints = [AtNightConstraint.twilight_nautical()]
+                df = pd.read_csv(self.target_list, delimiter=' ')
+                df_followup = pd.read_csv(self.target_list_follow_up, delimiter=' ')
+                self.target_table_spc = Table.from_pandas(df)
+                self.target_table_spc_follow_up = Table.from_pandas(df_followup)
+                self.targets = target_list_good_coord_format(self.target_list)
 
     def night_duration(self, day):
         '''
