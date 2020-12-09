@@ -18,6 +18,8 @@ tutorials.ipynb
 
 plan.txt
 
+dist/
+
 *.ipynb_checkpoints
 
 .idea
