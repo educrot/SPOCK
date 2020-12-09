@@ -8,6 +8,22 @@ from astropy.time import Time
 import SPOCK.ETC as ETC
 import datetime
 
+
+
+obs = 5
+schedule = SPOCKST.Schedules()
+schedule.load_parameters('./input_short_term.csv',obs)
+schedule.use = 'special'
+# schedule.start_end_range = Time(['2020-12-13 15:00:00','2020-12-15 15:00:00'])
+schedule.day_of_night = Time('2020-12-08 15:00:00')
+schedule.telescope = 'TN_Oukaimeden'
+schedule.special_target(input_name="Sp0439-3235")
+schedule.make_scheduled_table()
+schedule.planification()
+schedule.make_night_block()
+
+print()
+
 # ---------------------- LONG TERM SCHEDULER ---------------------
 
 obs = 1
@@ -28,20 +44,6 @@ schedule.make_schedule(Altitude_constraint = 28, Moon_constraint = 30)
 
 #SPOCKLT.make_np(schedule.date_range[0],schedule.date_range_in_days,schedule.telescope)
 #SPOCKLT.upload_plans(schedule.date_range[0], nb_days=schedule.date_range_in_days,telescope = schedule.telescope)
-
-print()
-
-obs = 1
-schedule = SPOCKST.Schedules()
-schedule.load_parameters('./input_short_term.csv',obs)
-schedule.use = 'special_start_end'
-# schedule.start_end_range = Time(['2020-12-13 15:00:00','2020-12-15 15:00:00'])
-schedule.day_of_night = Time('2020-12-12 15:00:00')
-schedule.telescope = 'Europa'
-schedule.special_target(input_name="Trappist-1")
-schedule.make_scheduled_table()
-schedule.planification()
-schedule.make_night_block()
 
 print()
 

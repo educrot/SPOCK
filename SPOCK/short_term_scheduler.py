@@ -155,7 +155,8 @@ class Schedules:
 
     def load_parameters(self, input_file_short_term, nb_observatory):
         if input_file_short_term == None:
-            self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
+            self.target_list = path_spock + '/target_lists/target_list_special.txt'
+            self.target_list_follow_up = path_spock + '/target_lists/target_transit_follow_up.txt'
             self.constraints = [AtNightConstraint.twilight_nautical()]
             df = pd.read_csv(self.target_list, delimiter=' ')
             self.target_table_spc = Table.from_pandas(df)
@@ -715,7 +716,6 @@ class Schedules:
             list_too_short_reverse = list(idx_too_short_block[0])
             list_too_short_reverse.reverse() # important to reverse if you want to delete lines correctly
             for i in list_too_short_reverse:
-                print(i)
                 end_scheduled_table.remove_row(i)
 
         self.scheduled_table_sorted = end_scheduled_table
