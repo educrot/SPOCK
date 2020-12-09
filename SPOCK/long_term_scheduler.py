@@ -230,7 +230,7 @@ def SSO_planned_targets(date,telescope):
         telescopes = np.delete(telescopes, telescopes.index(telescope))
     targets_on_SSO_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = path_spock + '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
@@ -258,7 +258,7 @@ def SNO_planned_targets(date):
     telescopes = ['Artemis', 'Saint-Ex']
     targets_on_SNO_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = path_spock + '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
@@ -286,7 +286,7 @@ def TS_planned_targets(date):
     telescopes = ['TS_La_Silla']
     targets_on_TS_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = path_spock + '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
@@ -313,7 +313,7 @@ def TN_planned_targets(date):
     telescopes = ['TN_Oukaimeden']
     targets_on_TN_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = 'night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = path_spock + '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
@@ -508,8 +508,8 @@ def reverse_Observability(observatory,targets,constraints,time_ranges):
     start_fmt = Time(time_ranges[0][0].iso , out_subfmt = 'date').iso
     end_fmt =  Time(time_ranges[len(time_ranges)-1][1].iso , out_subfmt = 'date').iso
 
-    if os.path.exists('SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) + '.csv'):
-        name_file = 'SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) +  '.csv'
+    if os.path.exists(path_spock + '/SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) + '.csv'):
+        name_file = path_spock + '/SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) +  '.csv'
         reverse_df1 = pd.read_csv(name_file, delimiter = ',')
         return reverse_df1
 
@@ -520,7 +520,7 @@ def reverse_Observability(observatory,targets,constraints,time_ranges):
         df = a.replace(to_replace=float('NaN'), value=0.0)
         df1 = df.set_index('target name')
         reverse_df1 = df1.T
-        reverse_df1.to_csv('SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) + '.csv', sep= ',')
+        reverse_df1.to_csv(path_spock + '/SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + end_fmt + '_'  + str(len(targets)) + '.csv', sep= ',')
         return reverse_df1
 
 def month_option(target_name,reverse_df1):
@@ -928,12 +928,31 @@ class Schedules:
         trappist_in_targetlist, targetlist_in_trappist = index_list1_list2(df_trappist['Target'], self.target_table_spc['Sp_ID'])
         return trappist_in_targetlist
 
-    def load_parameters(self,nb_observatory=None,input_file=None):
+    def load_parameters(self,nb_observatory=None,input_file=None,date_range=None,obs_name=None):
         if input_file == None:
+            self.telescopes = ['Io','Europa','Ganymede','Callisto']
+            self.strategy = 'continuous'
             self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
             self.constraints = [AtNightConstraint.twilight_nautical()]
             df = pd.read_csv(self.target_list, delimiter=' ')
+            self.observatory = charge_observatories(obs_name)[0]
             self.target_table_spc = Table.from_pandas(df)
+            self.targets = target_list_good_coord_format(self.target_list)
+
+            last_mod = time.ctime(os.path.getmtime(self.target_list))
+            now = datetime.now()
+            current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+            time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"), format='datetime') - \
+                                      Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"),
+                                           format='datetime')).value * 24
+            # self.update_nb_hours_all()
+            if abs(time_since_last_update) > 24:  # in hours
+                print('INFO: Updating the number of hours observed')
+                self.update_nb_hours_all()
+            self.date_range = Time(date_range)
+            if self.date_range[1] <= self.date_range[0]:
+                sys.exit('ERROR: end date inferior to start date')
+
         else:
             with open(input_file, "r") as f:
                 Inputs = yaml.load(f, Loader=yaml.FullLoader)
@@ -1440,9 +1459,9 @@ class Schedules:
 
     def observability_seclection(self, day):
         day_fmt = Time(day.iso, out_subfmt='date').iso
-        if os.path.exists('SPOCK_files/Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) +  '_ndays_'  + str(self.date_range_in_days) + '_' + str(
+        if os.path.exists(path_spock + '/SPOCK_files/Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) +  '_ndays_'  + str(self.date_range_in_days) + '_' + str(
                 len(self.targets)) + '.csv'):
-            name_file = 'SPOCK_files/Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) +  '_ndays_'  + str(self.date_range_in_days) + '_' + str(
+            name_file = path_spock + '/SPOCK_files/Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) +  '_ndays_'  + str(self.date_range_in_days) + '_' + str(
                 len(self.targets)) + '.csv'
             dataframe_ranking_months = pd.read_csv(name_file, delimiter=',')
             self.priority = Table.from_pandas(dataframe_ranking_months)
@@ -1481,7 +1500,7 @@ class Schedules:
             self.priority['priority'][idx_5th_opt_monthobs] = (self.priority['max_alt'][idx_5th_opt_monthobs] - 30 ) *10**0
 
             dataframe_priority = self.priority.to_pandas()
-            dataframe_priority.to_csv('SPOCK_files/Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) +  '_ndays_'  + str(self.date_range_in_days) + '_' + str(len(self.targets)) + '.csv', sep=',', index=False)
+            dataframe_priority.to_csv(path_spock + '/SPOCK_files/Ranking_months_' + str(self.observatory.name) + '_' + str(day_fmt) +  '_ndays_'  + str(self.date_range_in_days) + '_' + str(len(self.targets)) + '.csv', sep=',', index=False)
 
     def shift_hours_observation(self,idx_target):
 
@@ -1594,7 +1613,7 @@ class Schedules:
             print('INFO: no transition block')
 
         panda_table = self.night_block.to_pandas()
-        panda_table.to_csv(os.path.join('night_blocks_propositions/' +'night_blocks_' + self.telescope + '_' +  str(day_fmt) + '.txt'),sep=' ')
+        panda_table.to_csv(os.path.join(path_spock + '/night_blocks_propositions/' +'night_blocks_' + self.telescope + '_' +  str(day_fmt) + '.txt'),sep=' ')
 
     def is_constraint_hours(self,idx_target):
         """

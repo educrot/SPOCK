@@ -98,13 +98,19 @@ class Schedules:
         self.SS1_night_blocks_old  = None
         self.scheduled_table_sorted = None
 
-    def load_parameters(self, input_file_short_term, nb_observatory):
+    def load_parameters(self, input_file_short_term=None, nb_observatory=None,obs_name = None, start_end=None):
         if input_file_short_term == None:
+            self.observatory = charge_observatories(obs_name)[0]
             self.target_list = path_spock + '/target_lists/target_list_special.txt'
             self.target_list_follow_up = path_spock + '/target_lists/target_transit_follow_up.txt'
             self.constraints = [AtNightConstraint.twilight_nautical()]
             df = pd.read_csv(self.target_list, delimiter=' ')
+            df_followup = pd.read_csv(self.target_list_follow_up, delimiter=' ')
             self.target_table_spc = Table.from_pandas(df)
+            self.target_table_spc_follow_up = Table.from_pandas(df_followup)
+            self.targets = target_list_good_coord_format(self.target_list)
+            if start_end is not  None:
+                self.start_end_range = Time(start_end)
         else:
             with open(input_file_short_term, "r") as f:
                 Inputs = yaml.load(f, Loader=yaml.FullLoader)
