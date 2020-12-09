@@ -5,25 +5,12 @@ import matplotlib.pyplot as plt
 from astropy.time import Time
 from astropy.io import ascii
 from astropy.table import Table,Column, MaskedColumn
+import SPOCK.long_term_scheduler as SPOCKLT
+import pkg_resources
 from scipy.interpolate import interp1d
 import yaml
 
-# ************************ Read passwords ************************
-
-with open('passwords.csv', "r") as f:
-    Inputs = yaml.load(f, Loader=yaml.FullLoader)
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_HUB = Inputs['pwd_HUB'][0]
-    user_portal = Inputs['user_portal'][0]
-    pwd_portal = Inputs['pwd_portal'][0]
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_SNO_Reduc1 = Inputs['pwd_SNO_Reduc1'][0]
-    user_chart_studio = Inputs['user_chart_studio'][0]
-    pwd_chart_studio = Inputs['pwd_chart_studio'][0]
-    path_spock = Inputs['path_spock'][0]
-
-
+# pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
 
 class etc:
     def __init__(self,mag_val = None,mag_band = None,spt = None,filt = None,airmass = None,moonphase = None,irtf = None,\

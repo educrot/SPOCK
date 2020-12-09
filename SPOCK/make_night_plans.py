@@ -8,25 +8,12 @@ from SPOCK.txt_files import startup, startup_no_flats, Path_txt_files, flatexo_g
 from SPOCK.txt_files import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy import units as u
+import pkg_resources
 import pandas as pd
+from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
 import yaml
 pd.set_option('display.max_columns', 50)
-
-# ************************ Read passwords ************************
-
-with open('passwords.csv', "r") as f:
-    Inputs = yaml.load(f, Loader=yaml.FullLoader)
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_HUB = Inputs['pwd_HUB'][0]
-    user_portal = Inputs['user_portal'][0]
-    pwd_portal = Inputs['pwd_portal'][0]
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_SNO_Reduc1 = Inputs['pwd_SNO_Reduc1'][0]
-    user_chart_studio = Inputs['user_chart_studio'][0]
-    pwd_chart_studio = Inputs['pwd_chart_studio'][0]
-    path_spock = Inputs['path_spock'][0]
-
+import SPOCK.long_term_scheduler as SPOCKLT
 
 #initialisation
 filt={}
@@ -41,6 +28,7 @@ dec3={}
 
 
 def make_scheduled_table(telescope,day_of_night):
+
     Path = path_spock + '/DATABASE'
     scheduled_table = None
     day_of_night = Time(day_of_night)

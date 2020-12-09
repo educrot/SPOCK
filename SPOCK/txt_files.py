@@ -2,27 +2,17 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 import numpy as np
 import os
+import pkg_resources
 import pandas as pd
 from datetime import datetime
 from astroplan import Observer,FixedTarget
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy.time import Time
+import SPOCK.long_term_scheduler as SPOCKLT
+from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
 import yaml
 
-# ************************ Read passwords ************************
-
-with open('passwords.csv', "r") as f:
-    Inputs = yaml.load(f, Loader=yaml.FullLoader)
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_HUB = Inputs['pwd_HUB'][0]
-    user_portal = Inputs['user_portal'][0]
-    pwd_portal = Inputs['pwd_portal'][0]
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_appcs = Inputs['pwd_appcs'][0]
-    pwd_SNO_Reduc1 = Inputs['pwd_SNO_Reduc1'][0]
-    user_chart_studio = Inputs['user_chart_studio'][0]
-    pwd_chart_studio = Inputs['pwd_chart_studio'][0]
-    path_spock = Inputs['path_spock'][0]
+# pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
 
 
 startup_time=[]

@@ -16,6 +16,9 @@ setup(
     packages = find_packages(),
     long_description = read('README.rst'),
     python_requires='>=3.6',
+    package_data={'SPOCK': ['credentials/*.csv']},
+    include_package_data=True,
+    zip_safe=False,
     install_requires =['pandas','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml','docx','plotly',
                     'gspread', 'oauth2client', 'astroplan', 'alive_progress', 'paramiko' , 'chart_studio', 'markdown'],
 )
