@@ -8,8 +8,9 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
 
 
 .. toctree::
-   :caption: Documentation
    :maxdepth: 2
+   :caption: Documentation
+   :hidden:
 
    content/installation
    content/quick-ref
