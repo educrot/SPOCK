@@ -400,7 +400,7 @@ def gantt_chart(date_start,date_end,telescope):
     }
     offline.plot(fig,auto_open=True,filename=path_spock + '/SPOCK_Figures/Preview_schedule.html',config=config)
 
-def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_list):
+def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_list=None):
     """
 
     Parameters
@@ -419,7 +419,7 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
 
     """
     if path_target_list is None:
-        path_target_list = path_spock + 'target_lists/speculoos_target_list_v6'
+        path_target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
     observatory = charge_observatories(name_observatory)[0]
     delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day, which='next').jd - 0.07, \
                                       observatory.twilight_morning_nautical(day + 1, which='nearest').jd + 0.07, 100),
@@ -564,10 +564,10 @@ def getSPCdata(target, date, telescope='any', ap=6, user= user_portal, password=
         targetdf = pd.DataFrame({'JD':[],'DIFF_FLUX': [], 'ERROR': [], 'AIRMASS': []})
         return targetdf.reset_index(drop=True)
 
-def phase_coverage_given_target(name_observatory,target,path_target_list,pmin,pmax):
+def phase_coverage_given_target(name_observatory,target,pmin,pmax,path_target_list=None):
 
     if path_target_list is None:
-        path_target_list = 'SPECULOOS_target_list_v6.txt'
+        path_target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
 
     target_list = pd.read_csv(path_target_list,sep=' ')
     idx_target_list = list(target_list['Sp_ID']).index(target)

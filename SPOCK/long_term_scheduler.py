@@ -238,7 +238,7 @@ def SSO_planned_targets(date,telescope):
             for tar in c['target']:
                 targets_on_SSO_telescopes.append(tar)
         except FileNotFoundError:
-            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans on ' + telescopes[i] + ' on the ' + str(date))
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans in your local file for  ' + telescopes[i] + ' on the ' + str(date))
 
     return targets_on_SSO_telescopes
 
@@ -266,7 +266,7 @@ def SNO_planned_targets(date):
             for tar in c['target']:
                 targets_on_SNO_telescopes.append(tar)
         except FileNotFoundError:
-            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans on ' + telescopes[i] + ' on the ' + str(date))
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans in your local file for  ' + telescopes[i] + ' on the ' + str(date))
     #print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Targets on SNO: ',targets_on_SNO_telescopes)
     return targets_on_SNO_telescopes
 
@@ -294,7 +294,7 @@ def TS_planned_targets(date):
             for tar in c['target']:
                 targets_on_TS_telescopes.append(tar)
         except FileNotFoundError:
-            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans on ' + telescopes[i] + ' on the ' + str(date))
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans in your local file for  ' + telescopes[i] + ' on the ' + str(date))
     return targets_on_TS_telescopes
 
 def TN_planned_targets(date):
@@ -321,7 +321,7 @@ def TN_planned_targets(date):
             for tar in c['target']:
                 targets_on_TN_telescopes.append(tar)
         except FileNotFoundError:
-            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans on ' + telescopes[i] + ' on the ' + str(date))
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans in your local file for  ' + telescopes[i] + ' on the ' + str(date))
     return targets_on_TN_telescopes
 
 def target_list_good_coord_format(path_target_list):
