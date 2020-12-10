@@ -18,4 +18,3 @@ deploy:
   keep-history: true
   on:
     target_branch: gh-pages
-  local_dir: doc/build/
