@@ -5,21 +5,11 @@ API
 The SPOCK API reference
 =============================
 
-long_term_scheduler
------------------------
+.. autosummary::
+   :toctree: api/
 
-.. automodule:: SPOCK.long_term_scheduler
-   :members:
+   SPOCK.long_term_scheduler
+   SPOCK.short_term_scheduler
+   SPOCK.plots_scheduler
 
-short_term_scheduler
------------------------
-
-.. automodule:: SPOCK.short_term_scheduler
-   :members:
-
-plots_scheduler
-------------------
-
-.. automodule:: SPOCK.plots_scheduler
-   :members:
 
