@@ -2,11 +2,14 @@
 API
 ***
 
-.. autosummary::
-   :toctree: api/
+Long-term
+------------------
 
-   SPOCK.long_term_scheduler
-   SPOCK.short_term_scheduler
-   SPOCK.plots_scheduler
+.. automodule:: SPOCK.long_term_scheduler
+   :members:
 
+Short-term
+------------------
 
+.. automodule:: SPOCK.short_term_scheduler
+   :members:
