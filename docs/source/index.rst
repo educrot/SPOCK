@@ -9,20 +9,20 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
 
 .. toctree::
    :caption: Documentation
-   :maxdepth: 1
+   :maxdepth: 2
 
    content/installation
    content/quick-ref
-   content/api.rst
+   content/api
 
 
 .. toctree::
    :caption: Quick start
    :maxdepth: 1
 
-   examples/SPOCKLT/examples_spocklt.rst
-   examples/SPOCKST/examples_spockst.rst
-   examples/SPOCKapp/examples_app.rst
+   examples/SPOCKLT/examples_spocklt
+   examples/SPOCKST/examples_spockst
+   examples/SPOCKapp/examples_app
 
 
 
