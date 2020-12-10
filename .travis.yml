@@ -12,7 +12,7 @@ script:
   - pip install travis-sphinx nbsphinx sphinx_rtd_theme jupyter_client ipykernel jupyter_sphinx sphinx-jsonschema
   - travis-sphinx build -n
   - travis-sphinx deploy
-  
+
 deploy:
   provider: pages
   skip_cleanup: true
@@ -20,3 +20,4 @@ deploy:
   keep-history: true
   on:
     target_branch: gh-pages
+  local_dir: docs/source
