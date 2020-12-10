@@ -12,6 +12,7 @@ from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 import numpy as np
 import plotly.figure_factory as ff
 from astroplan.utils import time_grid_from_range
+from colorama import Fore
 import os
 import pkg_resources
 import requests
@@ -619,4 +620,4 @@ def phase_coverage_given_target(name_observatory,target,path_target_list,pmin,pm
         plt.title(r'Phase coverage for ' + target + ' with periods $\in$ ' + str(pmin) + ' - ' + str(pmax) )
         plt.show()
     except ValueError:
-        print('ERROR: No data for this target ! ')
+        print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No data for this target ! ')

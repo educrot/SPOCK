@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 from astropy.time import Time
+from colorama import Fore
 import numpy as np
 from alive_progress import alive_bar
 import os.path, time
@@ -110,7 +111,7 @@ def run_masterfile():
         try:
             basic_info = date_night_start_func(df_speculoos,target)
         except UnboundLocalError:
-            print('ERROR: solve')
+            print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' solve')
         date_night_start_each_target.append(basic_info[0])
         date_oldest_obs.append(basic_info[1])
         date_most_recent_obs.append(basic_info[2])

@@ -4,6 +4,7 @@ import shutil
 from astropy.table import Table
 from astroplan import Observer,FixedTarget
 from astropy.time import Time
+from colorama import Fore
 from SPOCK.txt_files import startup, startup_no_flats, Path_txt_files, flatexo_gany, flatexo_io, flatexo_euro, first_target_offset, flatexo_artemis_morning, flatexo_artemis_evening, startup_artemis,flatexo_saintex
 from SPOCK.txt_files import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
@@ -36,20 +37,20 @@ def make_scheduled_table(telescope,day_of_night):
         os.path.exists(os.path.join(Path, telescope, 'Archive_night_blocks',
                                     'night_blocks_' + telescope + '_' + day_of_night.tt.datetime[0].strftime(
                                         "%Y-%m-%d") + '.txt'))
-        print('INFO: Path exists and is: ', os.path.join(Path, telescope, 'night_blocks_' + telescope + '_' +
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Path exists and is: ', os.path.join(Path, telescope, 'night_blocks_' + telescope + '_' +
                                                          day_of_night.tt.datetime[0].strftime(
                                                              "%Y-%m-%d") + '.txt'))
     except TypeError:
         os.path.exists(os.path.join(Path, telescope, 'Archive_night_blocks',
                                     'night_blocks_' + telescope + '_' + day_of_night.tt.datetime.strftime(
                                         "%Y-%m-%d") + '.txt'))
-        print('INFO: Path exists and is: ', os.path.join(Path, telescope,
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Path exists and is: ', os.path.join(Path, telescope,
                                                          'night_blocks_' + telescope + '_' + day_of_night.tt.datetime.strftime(
                                                              "%Y-%m-%d") + '.txt'))
     except NameError:
-        print('INFO: no input night_block for this day')
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' no input night_block for this day')
     except FileNotFoundError:
-        print('INFO: no input night_block for this day')
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' no input night_block for this day')
 
     if not (scheduled_table is None):
         return scheduled_table
@@ -96,7 +97,7 @@ def dome_rotation(day_of_night,telescope):
         coords_dome_rotation = SkyCoord(alt=coords.alt, az=(coords.az.value - 180) * u.deg, obstime=start_dome_rot,
                                         frame='altaz', location=paranal.location)
         if (coords.alt.value < 50):
-            print('WARNING: not possible at that time because of altitude constraint, adding 20 degrees altitude')
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' not possible at that time because of altitude constraint, adding 20 degrees altitude')
             coords_dome_rotation = SkyCoord(alt=coords.alt + 20 * u.deg, az=(coords.az.value - 180) * u.deg,
                                             obstime=start_dome_rot, frame='altaz', location=paranal.location)
 
@@ -143,7 +144,7 @@ def dome_rotation(day_of_night,telescope):
         coords_dome_rotation = SkyCoord(alt=coords.alt, az=(coords.az.value - 180) * u.deg, obstime=start_dome_rot,
                                         frame='altaz', location=paranal.location)
         if (coords.alt.value < 50):
-            print('WARNING: not possible at that time because of altitude constraint, adding 20 degrees altitude')
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' not possible at that time because of altitude constraint, adding 20 degrees altitude')
             coords_dome_rotation = SkyCoord(alt=coords.alt + 20 * u.deg, az=(coords.az.value - 180) * u.deg,
                                             obstime=start_dome_rot,frame='altaz', location=paranal.location)
 

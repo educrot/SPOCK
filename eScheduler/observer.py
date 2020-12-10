@@ -40,10 +40,10 @@ def _generate_24hr_grid(t0, start, end, N, for_deriv=False):
         Time queried for, grid will be built from or up to this time.
 
     start : float
-        Number of days before/after ``t0`` to start the grid.
+        Number of days beFore/after ``t0`` to start the grid.
 
     end : float
-        Number of days before/after ``t0`` to end the grid.
+        Number of days beFore/after ``t0`` to end the grid.
 
     N : int
         Number of grid points to generate
@@ -594,26 +594,26 @@ class Observer(object):
             jd_lims1[np.nonzero(noncrossing_indices)] = np.nan
             jd_lims2[np.nonzero(noncrossing_indices)] = np.nan
 
-        before_indices = np.array(np.nonzero(condition))
+        beFore_indices = np.array(np.nonzero(condition))
         # we want to add an vector like (0, 1, ...) to get after indices
-        after_indices = before_indices.copy()
+        after_indices = beFore_indices.copy()
         after_indices[1, :] += 1
 
-        al1 = alt[tuple(before_indices)]
+        al1 = alt[tuple(beFore_indices)]
         al2 = alt[tuple(after_indices)]
         # slice the time in the same way, but delete the object index
-        before_time_index_tuple = np.delete(before_indices, 0, 0)
+        beFore_time_index_tuple = np.delete(beFore_indices, 0, 0)
         after_time_index_tuple = np.delete(after_indices, 0, 0)
         if finesse_time_indexes:
-            before_time_index_tuple[1:] = 0
+            beFore_time_index_tuple[1:] = 0
             after_time_index_tuple[1:] = 0
-        tl1 = t[tuple(before_time_index_tuple)]
+        tl1 = t[tuple(beFore_time_index_tuple)]
         tl2 = t[tuple(after_time_index_tuple)]
 
-        alt_lims1[tuple(np.delete(before_indices, 1, 0))] = al1
-        alt_lims2[tuple(np.delete(before_indices, 1, 0))] = al2
-        jd_lims1[tuple(np.delete(before_indices, 1, 0))] = tl1.utc.jd
-        jd_lims2[tuple(np.delete(before_indices, 1, 0))] = tl2.utc.jd
+        alt_lims1[tuple(np.delete(beFore_indices, 1, 0))] = al1
+        alt_lims2[tuple(np.delete(beFore_indices, 1, 0))] = al2
+        jd_lims1[tuple(np.delete(beFore_indices, 1, 0))] = tl1.utc.jd
+        jd_lims2[tuple(np.delete(beFore_indices, 1, 0))] = tl2.utc.jd
 
         if extra_dimension_added:
             return (alt_lims1.diagonal(), alt_lims2.diagonal(),
@@ -622,8 +622,8 @@ class Observer(object):
             return alt_lims1, alt_lims2, jd_lims1, jd_lims2
 
     @u.quantity_input(horizon=u.deg)
-    def _two_point_interp(self, jd_before, jd_after,
-                          alt_before, alt_after, horizon=0*u.deg):
+    def _two_point_interp(self, jd_beFore, jd_after,
+                          alt_beFore, alt_after, horizon=0*u.deg):
         """
         Do linear interpolation between two ``altitudes`` at
         two ``times`` to determine the time where the altitude
@@ -631,14 +631,14 @@ class Observer(object):
 
         Parameters
         ----------
-        jd_before : `float`
-            JD(UTC) before crossing event
+        jd_beFore : `float`
+            JD(UTC) beFore crossing event
 
         jd_after : `float`
             JD(UTC) after crossing event
 
-        alt_before : `~astropy.units.Quantity`
-            altitude before crossing event
+        alt_beFore : `~astropy.units.Quantity`
+            altitude beFore crossing event
 
         alt_after : `~astropy.units.Quantity`
             altitude after crossing event
@@ -653,7 +653,7 @@ class Observer(object):
             Time when target crosses the horizon
 
         """
-        slope = (alt_after-alt_before)/((jd_after - jd_before)*u.d)
+        slope = (alt_after-alt_beFore)/((jd_after - jd_beFore)*u.d)
         crossing_jd = (jd_after*u.d - ((alt_after - horizon)/slope))
         crossing_jd[np.isnan(crossing_jd)] = u.d*MAGIC_TIME.jd
         return np.squeeze(Time(crossing_jd, format='jd'))

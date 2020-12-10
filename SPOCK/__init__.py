@@ -8,13 +8,14 @@ import pkg_resources
 import os
 import requests
 import yaml
+from colorama import Fore
 
 def _get_files():
     data_path = pkg_resources.resource_filename('SPOCK', 'credentials/')
     filename_pwd = os.path.join(data_path, 'passwords.csv')
-    print('INFO: Please add password.csv file in: ' + data_path)
+    print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Please add password.csv file in: ' + data_path)
     if os.path.exists(filename_pwd):
-        print('INFO: OK Password file exists')
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' OK Password file exists')
         # ************************ Read passwords ************************
 
         with open(filename_pwd, "r") as f:
@@ -73,7 +74,7 @@ def _get_files():
 
         # **********************************************************************************************************
     else:
-        print('ERROR: No file '+ 'passwords.csv')
+        print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No file '+ 'passwords.csv')
 
 
 pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = _get_files()

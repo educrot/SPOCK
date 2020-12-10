@@ -1,5 +1,6 @@
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from colorama import Fore
 import numpy as np
 import os
 import pkg_resources

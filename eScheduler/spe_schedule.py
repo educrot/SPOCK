@@ -478,7 +478,7 @@ class Slot(object):
 
         Will return the new slots created, which can either
         be one, two or three slots depending on if there is
-        space remaining before or after the inserted slot.
+        space remaining beFore or after the inserted slot.
 
         Parameters
         ----------
@@ -863,7 +863,7 @@ class PriorityScheduler(Scheduler):
         # add 1 second to the start time to allow for scheduling at the start of a slot
         slot_index = [q for q, slot in enumerate(self.schedule.slots)
                       if slot.start < new_start_time + 1*u.second < slot.end][0]
-        slots_before = self.schedule.slots[:slot_index]
+        slots_beFore = self.schedule.slots[:slot_index]
         slots_after = self.schedule.slots[slot_index + 1:]
 
         # now check if there's a transition block where we want to go
@@ -876,7 +876,7 @@ class PriorityScheduler(Scheduler):
                 delete_this_block_first = True
 
         # no slots yet, so we should be fine to just shove this in
-        if not (slots_before or slots_after):
+        if not (slots_beFore or slots_after):
             b.end_idx = start_time_idx + duration_indices
             b.start_idx = start_time_idx
             if b.constraints is None:
@@ -894,22 +894,22 @@ class PriorityScheduler(Scheduler):
                 return False
 
         # Other slots exist, so now we have to see if it will fit
-        # if slots before or after, we need `TransitionBlock`s
-        tb_before = None
-        tb_before_already_exists = False
+        # if slots beFore or after, we need `TransitionBlock`s
+        tb_beFore = None
+        tb_beFore_already_exists = False
         tb_after = None
-        if slots_before:
+        if slots_beFore:
             if isinstance(
                     self.schedule.slots[slot_index - 1].block, ObservingBlock):
                 # make a transitionblock
-                tb_before = self.transitioner(
+                tb_beFore = self.transitioner(
                     self.schedule.slots[slot_index - 1].block, b,
                     self.schedule.slots[slot_index - 1].end, self.observer)
             elif isinstance(self.schedule.slots[slot_index - 1].block, TransitionBlock):
-                tb_before = self.transitioner(
+                tb_beFore = self.transitioner(
                     self.schedule.slots[slot_index - 2].block, b,
                     self.schedule.slots[slot_index - 2].end, self.observer)
-                tb_before_already_exists = True
+                tb_beFore_already_exists = True
 
         if slots_after:
             slot_offset = 2 if delete_this_block_first else 1
@@ -921,7 +921,7 @@ class PriorityScheduler(Scheduler):
                     new_start_time + b.duration, self.observer)
 
         # tweak durations to exact multiple of time resolution
-        for block in (tb_before, tb_after):
+        for block in (tb_beFore, tb_after):
             if block is not None:
                 block.duration = self.time_resolution * np.int(
                     np.ceil(float(block.duration / self.time_resolution))
@@ -934,13 +934,13 @@ class PriorityScheduler(Scheduler):
         # Shift if OK and update new_start_time and start_time_idx
 
         # Now let's see if the block and transition can fit in the schedule
-        if slots_before:
+        if slots_beFore:
             # we're OK if the index at the end of the updated transition
             # is less than or equal to `start_time_idx`
-            ob_offset = 2 if tb_before_already_exists else 1
+            ob_offset = 2 if tb_beFore_already_exists else 1
             previous_ob = self.schedule.slots[slot_index - ob_offset]
-            if tb_before:
-                transition_indices = np.int(tb_before.duration / self.time_resolution)
+            if tb_beFore:
+                transition_indices = np.int(tb_beFore.duration / self.time_resolution)
             else:
                 transition_indices = 0
 
@@ -965,11 +965,11 @@ class PriorityScheduler(Scheduler):
             # delete this block if it's a TransitionBlock
             if delete_this_block_first:
                 slot_index = self.schedule.change_slot_block(slot_index, new_block=None)
-            if tb_before and tb_before_already_exists:
-                self.schedule.change_slot_block(slot_index - 1, new_block=tb_before)
-            elif tb_before:
-                self.schedule.insert_slot(tb_before.start_time, tb_before)
-            elif tb_before_already_exists and not tb_before:
+            if tb_beFore and tb_beFore_already_exists:
+                self.schedule.change_slot_block(slot_index - 1, new_block=tb_beFore)
+            elif tb_beFore:
+                self.schedule.insert_slot(tb_beFore.start_time, tb_beFore)
+            elif tb_beFore_already_exists and not tb_beFore:
                 # we already have a TB here, but we no longer need it!
                 self.schedule.change_slot_block(slot_index-1, new_block=None)
 
@@ -1175,7 +1175,7 @@ class SPECULOOSScheduler(Scheduler):
         # add 1 second to the start time to allow for scheduling at the start of a slot
         slot_index = [q for q, slot in enumerate(self.schedule.slots)
                       if slot.start < new_start_time + 1*u.second < slot.end][0]
-        slots_before = self.schedule.slots[:slot_index]
+        slots_beFore = self.schedule.slots[:slot_index]
         slots_after = self.schedule.slots[slot_index + 1:]
 
         # now check if there's a transition block where we want to go
@@ -1189,7 +1189,7 @@ class SPECULOOSScheduler(Scheduler):
                 delete_this_block_first = True
 
         # no slots yet, so we should be fine to just shove this in
-        if not (slots_before or slots_after):
+        if not (slots_beFore or slots_after):
             b.end_idx = start_time_idx + duration_indices
             b.start_idx = start_time_idx
             if b.constraints is None:
@@ -1208,22 +1208,22 @@ class SPECULOOSScheduler(Scheduler):
                 return False
 
         # Other slots exist, so now we have to see if it will fit
-        # if slots before or after, we need `TransitionBlock`s
-        tb_before = None
-        tb_before_already_exists = False
+        # if slots beFore or after, we need `TransitionBlock`s
+        tb_beFore = None
+        tb_beFore_already_exists = False
         tb_after = None
-        if slots_before:
+        if slots_beFore:
             if isinstance(
                     self.schedule.slots[slot_index - 1].block, ObservingBlock):
                 # make a transitionblock
-                tb_before = self.transitioner(
+                tb_beFore = self.transitioner(
                     self.schedule.slots[slot_index - 1].block, b,
                     self.schedule.slots[slot_index - 1].end, self.observer)
             elif isinstance(self.schedule.slots[slot_index - 1].block, TransitionBlock):
-                tb_before = self.transitioner(
+                tb_beFore = self.transitioner(
                     self.schedule.slots[slot_index - 2].block, b,
                     self.schedule.slots[slot_index - 2].end, self.observer)
-                tb_before_already_exists = True
+                tb_beFore_already_exists = True
 
         if slots_after:
             slot_offset = 2 if delete_this_block_first else 1
@@ -1235,7 +1235,7 @@ class SPECULOOSScheduler(Scheduler):
                     new_start_time + b.duration, self.observer)
 
         # tweak durations to exact multiple of time resolution
-        for block in (tb_before, tb_after):
+        for block in (tb_beFore, tb_after):
             if block is not None:
                 block.duration = self.time_resolution * np.int(
                     np.ceil(float(block.duration / self.time_resolution))
@@ -1248,13 +1248,13 @@ class SPECULOOSScheduler(Scheduler):
         # Shift if OK and update new_start_time and start_time_idx
 
         # Now let's see if the block and transition can fit in the schedule
-        if slots_before:
+        if slots_beFore:
             # we're OK if the index at the end of the updated transition
             # is less than or equal to `start_time_idx`
-            ob_offset = 2 if tb_before_already_exists else 1
+            ob_offset = 2 if tb_beFore_already_exists else 1
             previous_ob = self.schedule.slots[slot_index - ob_offset]
-            if tb_before:
-                transition_indices = np.int(tb_before.duration / self.time_resolution)
+            if tb_beFore:
+                transition_indices = np.int(tb_beFore.duration / self.time_resolution)
             else:
                 transition_indices = 0
 
@@ -1279,11 +1279,11 @@ class SPECULOOSScheduler(Scheduler):
             # delete this block if it's a TransitionBlock
             if delete_this_block_first:
                 slot_index = self.schedule.change_slot_block(slot_index, new_block=None)
-            if tb_before and tb_before_already_exists:
-                self.schedule.change_slot_block(slot_index - 1, new_block=tb_before)
-            elif tb_before:
-                self.schedule.insert_slot(tb_before.start_time, tb_before)
-            elif tb_before_already_exists and not tb_before:
+            if tb_beFore and tb_beFore_already_exists:
+                self.schedule.change_slot_block(slot_index - 1, new_block=tb_beFore)
+            elif tb_beFore:
+                self.schedule.insert_slot(tb_beFore.start_time, tb_beFore)
+            elif tb_beFore_already_exists and not tb_beFore:
                 # we already have a TB here, but we no longer need it!
                 self.schedule.change_slot_block(slot_index-1, new_block=None)
 
@@ -1444,7 +1444,7 @@ class SimpleScheduler(Scheduler):
                     b.constraints.append(AltitudeConstraint(min=0*u.deg))
             b.observer = self.observer
 
-        # before we can schedule, we need to know where blocks meet the constraints
+        # beFore we can schedule, we need to know where blocks meet the constraints
         scorer = Scorer(blocks, self.observer, self.schedule,
                         global_constraints=self.constraints)
         score_array = scorer.create_score_array(self.time_resolution)

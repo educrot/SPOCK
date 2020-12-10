@@ -328,7 +328,7 @@ class CelestialPoleSeparationConstraint(Constraint):
 
         # Calculate separation between target and vega
         # Targets are automatically converted to SkyCoord objects
-        # by __call__ before compute_constraint is called.
+        # by __call__ beFore compute_constraint is called.
         celestial_pole_separation = celestial_pole.separation(targets)
 
         if self.boolean_constraint:

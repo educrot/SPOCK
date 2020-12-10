@@ -3,6 +3,7 @@
 import subprocess
 import os
 from astropy.time import Time
+from colorama import Fore
 import requests
 import yaml
 from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock

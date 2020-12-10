@@ -9,6 +9,7 @@ from astropy.utils.data import clear_download_cache
 clear_download_cache()
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,observability_table, is_observable, months_observable,time_grid_from_range,LocalTimeConstraint, is_always_observable
 from astroplan import TimeConstraint,Observer,moon_illumination
+from colorama import Fore
 from datetime import date , datetime , timedelta
 from docx import Document
 from docx.shared import *
@@ -61,7 +62,7 @@ def get_hours_files_SNO(username = 'speculoos',password = pwd_SNO_Reduc1):
     try:
         s.connect(hostname, port, username, password)
     except TimeoutError:
-        sys.exit('ERROR: Make sure the VPN is connected')
+        sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' Make sure the VPN is connected')
 
     ftp_client=s.open_sftp()
     ftp_client.get('/home/speculoos/SNO/ObservationHours/ObservationHours.txt',path_spock + '/survey_hours/ObservationHours.txt')
@@ -201,11 +202,11 @@ def compare_target_lists(path_target_listuser, user = 'educrot',password = pwd_p
     df_target_list_gaia = pd.read_csv('target_list_gaia.csv', delimiter=',',skipinitialspace=True,error_bad_lines=False)
     df_user = pd.read_csv(path_target_list, delimiter=' ',skipinitialspace=True,error_bad_lines=False)
     if Diff_list(df_user['Name'],df_target_list_gaia['spc']):
-        print('WARNING ! Tragets in User\'s list but not in Cambridge server\'s list: ',Diff_list(df_user['Name'],df_target_list_gaia['spc'] ))
+        print(Fore.YELLOW + 'WARNING:  ' + Fore.BLACK + ' Tragets in User\'s list but not in Cambridge server\'s list: ',Diff_list(df_user['Name'],df_target_list_gaia['spc'] ))
     if Diff_list(df_target_list_gaia['spc'],df_user['Name'] ):
-        print('WARNING ! Tragets in Cambridge server\'s list but not in User\'s list: ',Diff_list(df_target_list_gaia['spc'],df_user['Name'] ))
+        print(Fore.YELLOW + 'WARNING:  ' + Fore.BLACK + ' Tragets in Cambridge server\'s list but not in User\'s list: ',Diff_list(df_target_list_gaia['spc'],df_user['Name'] ))
     else:
-        print('INFO: OK ! User\'s list is similar to the one on the Cambridge server')
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' OK ! User\'s list is similar to the one on the Cambridge server')
 
 def SSO_planned_targets(date,telescope):
     """ tell which target are scheduled on SSO on a given day
@@ -237,7 +238,7 @@ def SSO_planned_targets(date,telescope):
             for tar in c['target']:
                 targets_on_SSO_telescopes.append(tar)
         except FileNotFoundError:
-            print('WARNING: No plans on ' + telescopes[i] + ' on the ' + str(date))
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans on ' + telescopes[i] + ' on the ' + str(date))
 
     return targets_on_SSO_telescopes
 
@@ -265,8 +266,8 @@ def SNO_planned_targets(date):
             for tar in c['target']:
                 targets_on_SNO_telescopes.append(tar)
         except FileNotFoundError:
-            print('WARNING: No plans on ' + telescopes[i] + ' on the ' + str(date))
-    #print('INFO: Targets on SNO: ',targets_on_SNO_telescopes)
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans on ' + telescopes[i] + ' on the ' + str(date))
+    #print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Targets on SNO: ',targets_on_SNO_telescopes)
     return targets_on_SNO_telescopes
 
 def TS_planned_targets(date):
@@ -293,7 +294,7 @@ def TS_planned_targets(date):
             for tar in c['target']:
                 targets_on_TS_telescopes.append(tar)
         except FileNotFoundError:
-            print('WARNING: No plans on ' + telescopes[i] + ' on the ' + str(date))
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans on ' + telescopes[i] + ' on the ' + str(date))
     return targets_on_TS_telescopes
 
 def TN_planned_targets(date):
@@ -320,7 +321,7 @@ def TN_planned_targets(date):
             for tar in c['target']:
                 targets_on_TN_telescopes.append(tar)
         except FileNotFoundError:
-            print('WARNING: No plans on ' + telescopes[i] + ' on the ' + str(date))
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No plans on ' + telescopes[i] + ' on the ' + str(date))
     return targets_on_TN_telescopes
 
 def target_list_good_coord_format(path_target_list):
@@ -396,9 +397,9 @@ def _generate_24hr_grid(t0, start, end, N, for_deriv=False):
     t0 : `~astropy.time.Time`
         Time queried for, grid will be built from or up to this time.
     start : float
-        Number of days before/after ``t0`` to start the grid.
+        Number of days beFore/after ``t0`` to start the grid.
     end : float
-        Number of days before/after ``t0`` to end the grid.
+        Number of days beFore/after ``t0`` to end the grid.
     N : int
         Number of grid points to generate
     for_deriv : bool
@@ -613,18 +614,18 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
             if over_write:
                 dest = shutil.copy(source, destination)
                 dest2 = shutil.copy(source, destination_2)
-                print('INFO : ' + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
-                print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
+                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
             if not over_write:
                 try:
                     dest = shutil.move(source, destination)
                     #dest2 = shutil.move(source, destination_2)
-                    print('INFO : ' + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
-                    #print('INFO : ' + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+                    print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
+                    #print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
                 except shutil.Error:
-                    print('INFO : ' + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
+                    print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
         if not save:
-            print('INFO : Those plans have not been saved')
+            print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + ' Those plans have not been saved')
 
 def make_plans(day, nb_days, telescope):
     """ make plans for telescope for a certain number of day from a start day
@@ -687,8 +688,8 @@ def upload_plans(day, nb_days, telescope):
     path_gant_chart_masterfile = os.path.join('/Users/elsaducrot/spock_2/SPOCK_Files/spock_stats_masterfile.csv')
     path_database_home = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/Preview_schedule.html')
     path_database_home_masterfile = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/spock_stats_masterfile.csv')
-    print('INFO: Path local \'Gant chart\' = ', path_gant_chart)
-    print('INFO: Path database \'Gant chart\' = ',  path_database_home)
+    print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Path local \'Gant chart\' = ', path_gant_chart)
+    print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Path database \'Gant chart\' = ',  path_database_home)
     subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", "-r", path_gant_chart, path_database_home])
     subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", "-r", path_gant_chart_masterfile, path_database_home_masterfile])
 
@@ -888,7 +889,7 @@ class Schedules:
 
         """
         if day is None:
-            print('INFO: Not using moon phase in ETC')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Not using moon phase in ETC')
         sso_texp = np.zeros(len(self.target_table_spc))
         sno_texp = np.zeros(len(self.target_table_spc))
         saintex_texp = np.zeros(len(self.target_table_spc))
@@ -947,11 +948,11 @@ class Schedules:
                                            format='datetime')).value * 24
             # self.update_nb_hours_all()
             if abs(time_since_last_update) > 24:  # in hours
-                print('INFO: Updating the number of hours observed')
+                print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Updating the number of hours observed')
                 self.update_nb_hours_all()
             self.date_range = Time(date_range)
             if self.date_range[1] <= self.date_range[0]:
-                sys.exit('ERROR: end date inferior to start date')
+                sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
 
         else:
             with open(input_file, "r") as f:
@@ -966,9 +967,9 @@ class Schedules:
                 try:
                     self.date_range = Time(Inputs['date_range']) #,Time(Inputs['date_range'][1])]
                 except ValueError:
-                    sys.exit('ERROR: Wrong date format, date must be %y-%m-%d HH:MM:SS.sss')
+                    sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' Wrong date format, date must be %y-%m-%d HH:MM:SS.sss')
                 if self.date_range[1] <= self.date_range[0]:
-                    sys.exit('ERROR: end date inferior to start date')
+                    sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
                 self.strategy = Inputs['strategy']
                 self.duration_segments = Inputs['duration_segments']
                 self.nb_segments = Inputs['nb_segments']
@@ -984,7 +985,7 @@ class Schedules:
                                          Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
                 #self.update_nb_hours_all()
                 if abs(time_since_last_update) > 24: # in hours
-                    print('INFO: Updating the number of hours observed')
+                    print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Updating the number of hours observed')
                     self.update_nb_hours_all()
 
     def update_nb_hours_all(self,user =user_portal, password = pwd_portal):
@@ -1114,7 +1115,7 @@ class Schedules:
         try:
             get_hours_files_SNO()
         except TimeoutError:
-            print('ERROR: Are on the Liege  VPN ?')
+            print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' Are on the Liege  VPN ?')
         target_list = pd.read_csv(self.target_list, delimiter=' ')
         df = pd.read_csv(path_spock + '/survey_hours/ObservationHours.txt', delimiter=',')
         SNO_in_targetlist, targetlist_in_SNO = index_list1_list2(df['Target'], target_list['Sp_ID'])
@@ -1203,7 +1204,7 @@ class Schedules:
 
             for t in tqdm(range(0,self.date_range_in_days),desc="Scheduling "):
                 pass
-                print('INFO: day is : ',Time(self.date_range[0] + t).iso)
+                print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' day is : ',Time(self.date_range[0] + t).iso)
                 day = self.date_ranges_day_by_day[t]
                 product_table_priority_prio = self.table_priority_prio(day)
                 self.index_prio = product_table_priority_prio[0]
@@ -1222,7 +1223,7 @@ class Schedules:
                     self.idx_first_target_by_day.append(self.idx_first_target)
 
                 if not self.is_constraints_met_first_target(t):
-                    print('WARNING: impossible to find the first target that respects the constraints')
+                    print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' impossible to find the first target that respects the constraints')
 
                 if self.idx_second_target != None and self.is_constraints_met_second_target(t):
                     self.second_target = self.priority[self.idx_second_target]
@@ -1230,7 +1231,7 @@ class Schedules:
                     self.idx_second_target_by_day.append(self.idx_second_target)
 
                 if self.idx_second_target is None:
-                    print('WARNING: no second target')
+                    print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' no second target')
 
                 self.night_block = self.schedule_blocks(day)
                 self.night_block_by_day.append(self.night_block)
@@ -1364,7 +1365,7 @@ class Schedules:
                 break
 
         if self.idx_second_target is None:
-            print('INFO: no second target available')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' no second target available')
 
     def table_priority_prio(self,day):
 
@@ -1372,7 +1373,7 @@ class Schedules:
         try:
             self.observability_seclection(day) #observability selection
         except ValueError:
-            sys.exit('ERROR: This is a known error, please re-run')
+            sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' This is a known error, please re-run')
 
         if (self.telescope == 'Io') or (self.telescope == 'Europa') or (self.telescope == 'Saint-Ex') or \
                 (self.telescope == 'Artemis') or (self.telescope == 'Ganymede') or (self.telescope == 'Callisto') or\
@@ -1570,19 +1571,19 @@ class Schedules:
             self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(day=None, i=self.idx_second_target)
 
         if self.first_target['set or rise'] == 'set':
-            print('INFO: First target is \'set\'')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' First target is \'set\'')
             a = ObservingBlock(self.targets[self.idx_first_target],dur_obs_set_target,-1,constraints= constraints_set_target,configuration={'filt=' + str(self.target_table_spc['Filter_spc'][self.idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][self.idx_first_target])})
             blocks.append(a)
             b = ObservingBlock(self.targets[self.idx_second_target],dur_obs_rise_target,-1,constraints=constraints_rise_target,configuration={'filt=' + str(self.target_table_spc['Filter_spc'][self.idx_second_target]),'texp=' + str(self.target_table_spc['texp_spc'][self.idx_second_target])})
             blocks.append(b)
 
         if self.first_target['set or rise'] == 'both':
-            print('INFO: First target is \'both\'')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' First target is \'both\'')
             a = ObservingBlock(self.targets[self.idx_first_target],dur_obs_both_target,-1,constraints= constraints_all,configuration={'filt=' + str(self.target_table_spc['Filter_spc'][self.idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][self.idx_first_target])})
             blocks.append(a)
 
         if self.first_target['set or rise'] == 'rise':
-            print('INFO: First target is \'rise\'')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' First target is \'rise\'')
             b = ObservingBlock(self.targets[self.idx_second_target],dur_obs_set_target,-1,constraints=constraints_set_target,configuration={'filt=' + str(self.target_table_spc['Filter_spc'][self.idx_second_target]),'texp=' + str(self.target_table_spc['texp_spc'][self.idx_second_target])})
             blocks.append(b)
             a = ObservingBlock(self.targets[self.idx_first_target],dur_obs_rise_target,-1,constraints=constraints_rise_target,configuration={'filt=' + str(self.target_table_spc['Filter_spc'][self.idx_first_target]),'texp=' + str(self.target_table_spc['texp_spc'][self.idx_first_target])})
@@ -1610,7 +1611,7 @@ class Schedules:
             index_to_delete = self.night_block.loc['TransitionBlock'].index
             self.night_block.remove_row(index_to_delete)
         except KeyError:
-            print('INFO: no transition block')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' no transition block')
 
         panda_table = self.night_block.to_pandas()
         panda_table.to_csv(os.path.join(path_spock + '/night_blocks_propositions/' +'night_blocks_' + self.telescope + '_' +  str(day_fmt) + '.txt'),sep=' ')
@@ -1753,10 +1754,10 @@ class Schedules:
 
         while not (is_moon_constraint_met_first_target & hours_constraint_first):
 
-            before_change_first_target=self.priority[self.idx_first_target]
-            before_change_idx_first_target=self.idx_first_target
+            beFore_change_first_target=self.priority[self.idx_first_target]
+            beFore_change_idx_first_target=self.idx_first_target
 
-            if before_change_first_target['set or rise'] == 'set':
+            if beFore_change_first_target['set or rise'] == 'set':
                 moon_idx_set_target += 1
                 if moon_idx_set_target >= len(self.idx_set_targets_sorted):
                     idx_safe_1rst_set += 1
@@ -1774,7 +1775,7 @@ class Schedules:
                         is_moon_constraint_met_first_target = False
                         hours_constraint_first = False
 
-            if before_change_first_target['set or rise'] == 'rise':
+            if beFore_change_first_target['set or rise'] == 'rise':
                 moon_idx_rise_target += 1
                 if moon_idx_rise_target >= len(self.idx_rise_targets_sorted):
                     idx_safe_1rst_rise += 1
@@ -1793,7 +1794,7 @@ class Schedules:
                         hours_constraint_first = False
 
 
-            if (before_change_first_target['set or rise'] != 'rise') and (before_change_first_target['set or rise'] != 'set'):
+            if (beFore_change_first_target['set or rise'] != 'rise') and (beFore_change_first_target['set or rise'] != 'set'):
                 idx_safe+=1
                 self.idx_first_target=self.index_prio[-idx_safe]
                 self.first_target=self.priority[self.idx_first_target]
@@ -1840,15 +1841,15 @@ class Schedules:
         moon_idx_rise_target=0
 
         if self.idx_first_target == self.idx_second_target:
-            print('INFO: 2nd = 1ere ')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' 2nd = 1ere ')
         if self.idx_second_target is None:
-            print('INFO: No second target for that night')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' No second target for that night')
         else:
             while not (is_moon_constraint_met_second_target & hours_constraint_second):
 
-                before_change_second_target = self.priority[self.idx_second_target]
+                beFore_change_second_target = self.priority[self.idx_second_target]
 
-                if before_change_second_target['set or rise'] == 'set':
+                if beFore_change_second_target['set or rise'] == 'set':
                     moon_idx_set_target += 1
                     if moon_idx_set_target >= len(self.idx_set_targets_sorted):
                         idx_safe_2nd_set += 1
@@ -1866,7 +1867,7 @@ class Schedules:
                             is_moon_constraint_met_second_target=False
                             hours_constraint_second = False
 
-                if before_change_second_target['set or rise'] == 'rise':
+                if beFore_change_second_target['set or rise'] == 'rise':
                     moon_idx_rise_target += 1
                     if moon_idx_rise_target >= len(self.idx_rise_targets_sorted):
                         idx_safe_2nd_rise += 1
@@ -1884,7 +1885,7 @@ class Schedules:
                             is_moon_constraint_met_second_target=False
                             hours_constraint_second = False
 
-                if (before_change_second_target['set or rise'] != 'rise') and (before_change_second_target['set or rise'] != 'set'):
+                if (beFore_change_second_target['set or rise'] != 'rise') and (beFore_change_second_target['set or rise'] != 'set'):
                     if self.first_target['set or rise'] == 'rise':
                         moon_idx_set_target+=1
                         if moon_idx_set_target >= len(self.idx_set_targets_sorted):
@@ -2090,7 +2091,7 @@ class Schedules:
         """
 
         if day is None:
-            print('INFO: Not using moon phase in ETC')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Not using moon phase in ETC')
         #moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
         if round(self.target_table_spc['SpT'][i]) <= 9:
             if round(self.target_table_spc['SpT'][i]) <= 0:
@@ -2129,7 +2130,7 @@ class Schedules:
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=50000)[0]
-            print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif obs =='SNO':
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
@@ -2139,7 +2140,7 @@ class Schedules:
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
-        print('INFO: texp is : ',texp)
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' texp is : ',texp)
         return texp
 
     def exposure_time(self, day, i):
@@ -2159,7 +2160,7 @@ class Schedules:
 
         """
         if day is None:
-            print('INFO: Not using moon phase in ETC')
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Not using moon phase in ETC')
         # moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
         if round(self.target_table_spc['SpT'][i]) <= 9:
             spt_type = 'M' + str(round(self.target_table_spc['SpT'][i]))
@@ -2193,7 +2194,7 @@ class Schedules:
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=50000)[0]
-            print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif self.telescope == 'Artemis':
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
@@ -2205,10 +2206,10 @@ class Schedules:
             texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
         while texp < 10:
-            print('WARNING: Change filter to avoid saturation!!')
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Change filter to avoid saturation!!')
             filt_idx += 1
             if (filt_idx >= 3):
-                print('ERROR: You have to defocus in we want to observe this target')
+                print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' You have to defocus in we want to observe this target')
                 texp = 10.0001
             filt_ = filters[filt_idx]
             if self.telescope == 'Saint-Ex':
@@ -2227,7 +2228,7 @@ class Schedules:
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=50000)[0]
-                print('WARNING: Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
+                print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
             elif self.telescope == 'Io' or self.telescope == 'Europa' or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
                 self.target_table_spc['Filter_spc'][i] = filt_
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
@@ -2306,7 +2307,7 @@ def read_night_block(telescope, day):
         nightb = requests.get(nightb_url, auth=(user_portal, pwd_portal))
 
         if nightb.status_code == 404:
-            sys.exit('ERROR: No plans on the server for this date')
+            sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No plans on the server for this date')
         else:
             open(path_local, 'wb').write(nightb.content)
             scheduler_table = pd.read_csv(path_local, delimiter=' ',
@@ -2341,7 +2342,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     par = doc.add_paragraph()
     par_format = par.paragraph_format
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    par_format.space_before = Pt(0)
+    par_format.space_beFore = Pt(0)
     par_format.space_after = Pt(6)
     run = par.add_run(observatory.name)
     run.bold = True
@@ -2351,7 +2352,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     par = doc.add_paragraph()
     par_format = par.paragraph_format
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    par_format.space_before = Pt(0)
+    par_format.space_beFore = Pt(0)
     par_format.space_after = Pt(12)
     run = par.add_run('Schedule from ' + Time(date_range[0].iso,out_subfmt='date').iso + ' to ' + Time(date_range[1].iso,out_subfmt='date').iso)
     run.bold = True
@@ -2361,7 +2362,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     par = doc.add_paragraph()
     par_format = par.paragraph_format
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    par_format.space_before = Pt(0)
+    par_format.space_beFore = Pt(0)
     par_format.space_after = Pt(12)
     run = par.add_run(
         '(Total time = 0hr, technical loss = 0hr, weather loss = 0hr, Exotime = 0hr, cometime = 0hr,   chilean time = 0hr)')
@@ -2372,7 +2373,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     par = doc.add_paragraph()
     par_format = par.paragraph_format
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    par_format.space_before = Pt(0)
+    par_format.space_beFore = Pt(0)
     par_format.space_after = Pt(20)
     run = par.add_run(name_operator)
     run.italic = True
@@ -2381,7 +2382,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     font.color.rgb = RGBColor(0, 0, 0)
     par = doc.add_paragraph()
     par_format = par.paragraph_format
-    par_format.space_before = Pt(16)
+    par_format.space_beFore = Pt(16)
     par_format.space_after = Pt(0)
 
     for i in range(nb_day_date_range):
@@ -2409,7 +2410,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_before = Pt(0)
+        par_format.space_beFore = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run('Moon illumination: ' + str(moon_illum))
         run.italic = True
@@ -2418,7 +2419,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_before = Pt(0)
+        par_format.space_beFore = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run(
             'Sunset - Sunrise: ' + '{:02d}'.format(Time(sun_set, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(sun_set, out_subfmt='date_hm').datetime.minute) +\
@@ -2429,7 +2430,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_before = Pt(0)
+        par_format.space_beFore = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run(
             'Civil/Naut./Astro. twilights: ' + \
@@ -2445,7 +2446,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_before = Pt(0)
+        par_format.space_beFore = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run('Start-end of night (Naut. twil.): ' + '{:02d}'.format(Time(start_night).datetime.hour) + 'h' + '{:02d}'.format(Time(start_night).datetime.minute) +\
                           ' to ' + '{:02d}'.format(Time(end_night).datetime.hour) + 'h' + '{:02d}'.format(Time(end_night).datetime.minute))
@@ -2455,7 +2456,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_before = Pt(0)
+        par_format.space_beFore = Pt(0)
         par_format.space_after = Pt(3)
         run = par.add_run('Night duration (Naut. twil.): ' + str(night_duration))
         run.italic = True
@@ -2485,7 +2486,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
 
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_before = Pt(0)
+            par_format.space_beFore = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run(
                 'From ' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.minute) +\
@@ -2497,7 +2498,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_before = Pt(0)
+            par_format.space_beFore = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run('  Note: Prio_target                                         ')
             font = run.font
@@ -2505,7 +2506,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_before = Pt(0)
+            par_format.space_beFore = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run(
                 '  SPECULOOS : ' + str(df['nb_hours_surved'][idx_target].data.data[0]*u.hour) + ' of obs over ' + str(
@@ -2515,7 +2516,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_before = Pt(0)
+            par_format.space_beFore = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run('Jmag= ' + str(df['J'][idx_target].data.data[0]) + ',  SpT= ' + str(
                 df['SpT'][idx_target].data[0]))  # + ', Moon at ' + str(dist_moon))
@@ -2524,7 +2525,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_before = Pt(0)
+            par_format.space_beFore = Pt(0)
             par_format.space_after = Pt(3)
             run = par.add_run(' RA = ' + str('{:02d}'.format(int(coords.ra.hms[0]))) + " " + str('{:02d}'.format(int(coords.ra.hms[1]))) + " " + str('{:05.3f}'.format(round(coords.ra.hms[2], 3))) + \
                 ', DEC = ' + str('{:02d}'.format(int(coords.dec.dms[0]))) + " " + str('{:02d}'.format(int(abs(coords.dec.dms[1])))) + " " + str('{:05.3f}'.format(round(abs(coords.dec.dms[2]), 3))) + ', ' + str(config[2:-2]).replace('\'',' '))
@@ -2533,7 +2534,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_before = Pt(16)
+            par_format.space_beFore = Pt(16)
             par_format.space_after = Pt(0)
 
     font = run.font
