@@ -38,13 +38,8 @@ Installation
 .. warning::
     You must be part of the SPECULOOS consortium to use *SPOCK*.
 
-Installation
-============
-
-Please follow the instructions below to install the package
-
 OSX
----
+=====
 
 Install *SPOCK* locally::
 
