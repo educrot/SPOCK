@@ -231,7 +231,7 @@ def SSO_planned_targets(date,telescope):
         telescopes = np.delete(telescopes, telescopes.index(telescope))
     targets_on_SSO_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = path_spock + '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str =  '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
@@ -259,7 +259,7 @@ def SNO_planned_targets(date):
     telescopes = ['Artemis', 'Saint-Ex']
     targets_on_SNO_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = path_spock + '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
@@ -287,7 +287,7 @@ def TS_planned_targets(date):
     telescopes = ['TS_La_Silla']
     targets_on_TS_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = path_spock + '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str =  '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)
@@ -314,7 +314,7 @@ def TN_planned_targets(date):
     telescopes = ['TN_Oukaimeden']
     targets_on_TN_telescopes = []
     for i in range(len(telescopes)):
-        night_block_str = path_spock + '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
+        night_block_str = '/night_blocks_' + telescopes[i] + '_' + str(date) + '.txt'
         path = path_spock + '/DATABASE/' + telescopes[i] + '/Archive_night_blocks/' + night_block_str
         try:
             c = pd.read_csv(path, delimiter=' ', index_col=False)

@@ -21,7 +21,7 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
    :caption: SPOCKApp
    :maxdepth: 1
 
-   examples/SPOCKapp/examples_app
+   examples/tutorials/notebooks/tutorials_SPOCKApp.ipynb
 
 
 
