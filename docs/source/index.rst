@@ -18,11 +18,9 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
 
 
 .. toctree::
-   :caption: Quick start
+   :caption: SPOCKApp
    :maxdepth: 1
 
-   examples/SPOCKLT/examples_spocklt
-   examples/SPOCKST/examples_spockst
    examples/SPOCKapp/examples_app
 
 
@@ -33,3 +31,5 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
 
    examples/tutorials/notebooks/tutorials_spocklt.ipynb
    examples/tutorials/notebooks/tutorials_spockst.ipynb
+   examples/tutorials/notebooks/tutorials_spockplot.ipynb
+   examples/tutorials/notebooks/tutorials_spocktools.ipynb

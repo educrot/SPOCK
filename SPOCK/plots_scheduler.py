@@ -250,7 +250,7 @@ def airmass_altitude_plot_proposition(name_observatory,telescope,day):
         plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
 
-def gantt_chart_all(target_list):
+def gantt_chart_all(target_list=None):
     """
 
     Parameters
@@ -264,6 +264,8 @@ def gantt_chart_all(target_list):
         gant chart of all scheduled targets so far
 
     """
+    if target_list is None:
+        target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
     target_table_spc = pd.read_csv(target_list,delimiter=' ')
     all_targets = target_table_spc['Sp_ID']
     files = []
@@ -444,8 +446,8 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
     plot_airmass(FixedTarget(coord=SkyCoord(ra=ra, dec=dec, unit=(u.deg, u.deg)), \
                              name=target), observatory, delta_midnight, brightness_shading=True, altitude_yaxis=True,
                  style_kwargs=plot_styles)
-    axs.vlines(sun_set, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
-    axs.vlines(sun_rise, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
+    #axs.vlines(sun_set, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
+    #axs.vlines(sun_rise, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
 
     plt.ylabel('Altitude (degrees)')
     plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
@@ -564,16 +566,13 @@ def getSPCdata(target, date, telescope='any', ap=6, user= user_portal, password=
         targetdf = pd.DataFrame({'JD':[],'DIFF_FLUX': [], 'ERROR': [], 'AIRMASS': []})
         return targetdf.reset_index(drop=True)
 
-def phase_coverage_given_target(name_observatory,target,pmin,pmax,path_target_list=None):
+def phase_coverage_given_target(target,pmin,pmax,path_target_list=None):
 
     if path_target_list is None:
         path_target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
 
     target_list = pd.read_csv(path_target_list,sep=' ')
     idx_target_list = list(target_list['Sp_ID']).index(target)
-
-    observatory = charge_observatories(name_observatory)[0]
-
     data = getSPClcV2(target=target, ap='', pwvCorr=0)
 
     t = data['BJDMID-2450000']
@@ -581,13 +580,6 @@ def phase_coverage_given_target(name_observatory,target,pmin,pmax,path_target_li
 
     colors_start_new_target = ['black', 'darkgray', 'lightgray']
 
-    plot_styles = {'linestyle': '-', 'color': 'k'}
-    if name_observatory == 'SSO':
-        plot_styles = {'linestyle': '-', 'color': 'skyblue'}
-    if name_observatory == 'SNO':
-        plot_styles = {'linestyle': '-', 'color': 'teal'}
-    if name_observatory == 'Saint-Ex':
-        plot_styles = {'linestyle': '-', 'color': 'gold'}
 
     P_min = pmin
     P_max = pmax

@@ -130,3 +130,9 @@ def run_masterfile():
                        'SpT': target_list_v6['SpT'][idx_all]})
 
     df_masterfile.to_csv('/Users/elsaducrot/spock_2/SPOCK_files/spock_stats_masterfile.csv',sep=',',index=None)
+
+def info_on_Sp_target(target):
+    target_list_v6 = pd.read_csv(path_spock + '/target_lists/speculoos_target_list_v6.txt', sep=' ')
+    a = target_list_v6.where((target_list_v6['Sp_ID'] == target))
+    a = a.dropna()
+    return a
