@@ -1,15 +1,11 @@
+.. _api:
+
 ***
 API
 ***
 
-Long-term
+SPOCK
 ------------------
 
 .. automodule:: SPOCK.long_term_scheduler
-   :members:
-
-Short-term
-------------------
-
-.. automodule:: SPOCK.short_term_scheduler
-   :members:
+    :members:
