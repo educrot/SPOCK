@@ -137,6 +137,7 @@ class Schedules:
                 self.target_table_spc = Table.from_pandas(df)
                 self.target_table_spc_follow_up = Table.from_pandas(df_followup)
                 self.targets = target_list_good_coord_format(self.target_list)
+                self.targets_follow_up = target_list_good_coord_format(self.target_list_follow_up)
 
     def night_duration(self, day):
         '''
@@ -521,6 +522,7 @@ class Schedules:
         if self.SS1_night_blocks['target'][0] in self.scheduled_table['target']:
             sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' This target is already scheduled this day')
         for i in range(len(self.scheduled_table['target'])):
+            print(i)
             try:
                 self.SS1_night_blocks['target'][0]
             except IndexError:
@@ -871,16 +873,16 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
         if over_write:
             dest = shutil.copy(source, destination)
             dest2 = shutil.copy(source, destination_2)
-            print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
-            print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been over-written to ' + '\"' + destination_2 + '\"')
+            print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
+            print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been over-written to ' + '\"' + destination_2 + '\"')
         if not over_write:
             try:
                 dest = shutil.move(source, destination)
                 dest2 = shutil.move(source, destination_2)
-                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
-                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
+                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
             except shutil.Error:
-                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
+                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
     if not save:
         print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + ' Those plans have not been saved')
 

@@ -307,6 +307,17 @@ def upload_np_tn(t_now,nb_jours):
         # print('----->', t_now, 'Zip Plans_by_dates folder uploaded on the Cambridge server')
 
 def upload_np_saint_ex(t_now,nb_jours):
+    """
+
+    Parameters
+    ----------
+    t_now
+    nb_jours
+
+    Returns
+    -------
+
+    """
     t0=Time(t_now)
     dt=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg') #1 day
 

@@ -614,16 +614,16 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
             if over_write:
                 dest = shutil.copy(source, destination)
                 dest2 = shutil.copy(source, destination_2)
-                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
-                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
+                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
             if not over_write:
                 try:
                     dest = shutil.move(source, destination)
                     #dest2 = shutil.move(source, destination_2)
-                    print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
-                    #print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+                    print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
+                    #print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
                 except shutil.Error:
-                    print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
+                    print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
         if not save:
             print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + ' Those plans have not been saved')
 
