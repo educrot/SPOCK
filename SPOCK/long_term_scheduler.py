@@ -180,7 +180,7 @@ def Diff_list(li1, li2):
 
     return (list(set(li1) - set(li2)))
 
-def compare_target_lists(path_target_listuser, user = 'educrot',password = pwd_portal):
+def compare_target_lists(path_target_list, user = 'educrot',password = pwd_portal):
     """ Compare the target list from the given folder to the one on STARGATE and Cambridge server
     If different trigger a warning a tell how many targets are actually different from the referenced target list
 
@@ -397,9 +397,9 @@ def _generate_24hr_grid(t0, start, end, N, for_deriv=False):
     t0 : `~astropy.time.Time`
         Time queried for, grid will be built from or up to this time.
     start : float
-        Number of days beFore/after ``t0`` to start the grid.
+        Number of days before/after ``t0`` to start the grid.
     end : float
-        Number of days beFore/after ``t0`` to end the grid.
+        Number of days before/after ``t0`` to end the grid.
     N : int
         Number of grid points to generate
     for_deriv : bool
@@ -1015,7 +1015,8 @@ class Schedules:
         # Read files
         df_SaintEx = pd.read_csv(path_spock + '/survey_hours/ObservationHours_Saint-Ex.txt', delimiter=',')
         df_TRAPPIST = pd.read_csv(path_spock + '/survey_hours/ObservationHours_TRAPPIST.txt', delimiter=',')
-        df_camserver_telescope = pd.read_csv(path_spock + '/survey_hours/SurveyByTelescope.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+        df_camserver_telescope = pd.read_csv(path_spock + '/survey_hours/SurveyByTelescope.txt', delimiter=' ',
+                                             skipinitialspace=True, error_bad_lines=False)
         df_camserver_telescope['Target'] = [x.strip().replace('SP', 'Sp') for x in df_camserver_telescope['Target']]
         for i in range(len(target_list)):
             idxs = np.where((df_camserver_telescope['Target'] == target_list['Sp_ID'][i]))[0]
@@ -1299,6 +1300,7 @@ class Schedules:
             # print(i, self.targets[self.index_prio[-(i)]])
             rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
             set_first_target = self.observatory.target_set_time(self.date_range[0]+t,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
+
             if self.observatory.target_set_time(self.date_range[0] + t, self.targets[self.idx_first_target], which='next',
                                              horizon=24 * u.deg) < self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.idx_first_target],which='nearest',horizon=24*u.deg):
                 set_first_target = self.observatory.target_set_time(self.date_range[0]+t+1,self.targets[self.idx_first_target],which='next',horizon=24*u.deg)
@@ -1319,9 +1321,25 @@ class Schedules:
                 set_target = self.observatory.target_set_time(self.date_range[0] + t,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg)
                 rise_target = self.observatory.target_rise_time(self.date_range[0] + t,self.targets[self.index_prio[-i]],which='next',horizon=24*u.deg)
 
+            start_between_civil_nautical = Time((Time(
+                self.observatory.twilight_evening_nautical(self.date_range[0] + dt_1day * t,
+                                                           which='next')).value +
+                                                 Time(self.observatory.twilight_evening_civil(
+                                                     self.date_range[0] + dt_1day * t,
+                                                     which='next')).value) / 2,
+                                                format='jd')
+
+            end_between_nautical_civil = Time((Time(
+                self.observatory.twilight_morning_nautical(self.date_range[0] + dt_1day * (t + 1),
+                                                           which='nearest')).value +
+                                               Time(self.observatory.twilight_morning_civil(
+                                                   self.date_range[0] + dt_1day * (t + 1),
+                                                   which='nearest')).value) / 2,
+                                              format='jd')
+
             if self.first_target['set or rise'] == 'rise':
                 if self.priority['set or rise'][self.index_prio[-i]]=='set':
-                    if (rise_target < self.observatory.twilight_evening_nautical(self.date_range[0]+t,which='next')) and \
+                    if (rise_target < start_between_civil_nautical ) and \
                             (set_target > rise_first_target):
                         self.idx_second_target=self.index_prio[-i]
                         self.second_target = self.priority[self.idx_second_target]
@@ -1332,7 +1350,7 @@ class Schedules:
                         self.idx_second_target = None
 
                 if self.priority['set or rise'][self.index_prio[-i]]=='both':
-                    if (rise_target < self.observatory.twilight_evening_nautical(self.date_range[0]+t,which='nearest')) and \
+                    if (rise_target < start_between_civil_nautical ) and \
                             (set_target > rise_first_target):
                         self.idx_second_target=self.index_prio[-i]
                         self.second_target = self.priority[self.idx_second_target]
@@ -1341,7 +1359,7 @@ class Schedules:
 
             if self.first_target['set or rise'] == 'set':
                 if self.priority['set or rise'][self.index_prio[-i]]=='rise':
-                    if (set_target > self.observatory.twilight_morning_nautical(self.date_range[0]+t,which='next')) and \
+                    if (set_target > end_between_nautical_civil) and \
                             (rise_target < set_first_target):
                         self.idx_second_target = self.index_prio[-i]
                         self.second_target = self.priority[self.idx_second_target]
@@ -1352,7 +1370,7 @@ class Schedules:
                         self.idx_second_target = None
 
                 if self.priority['set or rise'][self.index_prio[-i]]=='both':
-                    if (set_target > self.observatory.twilight_morning_nautical(self.date_range[0]+t,which='next')) and \
+                    if (set_target > end_between_nautical_civil) and \
                             (rise_target < set_first_target):
                         self.idx_second_target=self.index_prio[-i]
                         self.second_target = self.priority[self.idx_second_target]
@@ -1551,14 +1569,30 @@ class Schedules:
         dur_obs_set_target = (self.night_duration(day).value/2 - shift/self.date_range_in_days)  * u.day #(self.night_duration(day)/(2*u.day))*u.day+1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
         dur_obs_rise_target = (self.night_duration(day).value/2 + shift/self.date_range_in_days) * u.day  #(self.night_duration(day)/(2*u.day))*u.day-1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
 
-        constraints_set_target = self.constraints + [TimeConstraint((Time(self.observatory.twilight_evening_nautical(self.date_range[0]+ dt_1day * delta_day,which='next'))),
-                                                                    (Time(self.observatory.twilight_evening_nautical(self.date_range[0]+ dt_1day * delta_day,which='next') + dur_obs_set_target)))]
+        start_between_civil_nautical = Time((Time(
+            self.observatory.twilight_evening_nautical(day + dt_1day * 0,
+                                                       which='next')).value +
+                                             Time(self.observatory.twilight_evening_civil(
+                                                 day + dt_1day * 0,
+                                                 which='next')).value) / 2,
+                                            format='jd')
 
-        constraints_rise_target = self.constraints + [TimeConstraint((Time(self.observatory.twilight_evening_nautical(self.date_range[0] + dt_1day * delta_day,which='next') + dur_obs_set_target)),
-                                                                     (Time(self.observatory.twilight_morning_nautical(self.date_range[0] + dt_1day * (delta_day+1),which='nearest') )))]
+        end_between_nautical_civil = Time((Time(
+            self.observatory.twilight_morning_nautical(day + dt_1day * (0 + 1),
+                                                       which='nearest')).value +
+                                           Time(self.observatory.twilight_morning_civil(
+                                               day + dt_1day * (0 + 1),
+                                               which='nearest')).value) / 2,
+                                          format='jd')
 
-        constraints_all = self.constraints + [TimeConstraint((Time(self.observatory.twilight_evening_nautical(self.date_range[0] + dt_1day * delta_day,which='next'))),
-                                                             (Time(self.observatory.twilight_morning_nautical(self.date_range[0] + dt_1day * (delta_day+1),which='nearest'))))]
+        constraints_set_target = self.constraints + [TimeConstraint((start_between_civil_nautical),
+                                                                    (start_between_civil_nautical+ dur_obs_set_target))]
+
+        constraints_rise_target = self.constraints + [TimeConstraint((start_between_civil_nautical+ dur_obs_set_target),
+                                                                     (end_between_nautical_civil))]
+
+        constraints_all = self.constraints + [TimeConstraint((start_between_civil_nautical),
+                                                             (end_between_nautical_civil))]
 
         blocks=[]
         if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
@@ -1643,8 +1677,25 @@ class Schedules:
         :return:
         '''
         dt_1day=Time('2018-01-02 00:00:00',scale='tt')-Time('2018-01-01 00:00:00',scale='tt')
-        dura = Time(Time(self.observatory.twilight_morning_nautical(day + dt_1day ,which='nearest')).jd - \
-               Time(self.observatory.twilight_evening_nautical(day ,which='next')).jd,format='jd')
+        start_between_civil_nautical = Time((Time(
+            self.observatory.twilight_evening_nautical(day,
+                                                       which='next')).value +
+                                             Time(self.observatory.twilight_evening_civil(
+                                                 day,
+                                                 which='next')).value) / 2,
+                                            format='jd')
+
+        end_between_nautical_civil = Time((Time(
+            self.observatory.twilight_morning_nautical(day+1,
+                                                       which='nearest')).value +
+                                           Time(self.observatory.twilight_morning_civil(
+                                               day+1,
+                                               which='nearest')).value) / 2,
+                                          format='jd')
+
+        dura = end_between_nautical_civil - start_between_civil_nautical
+        #dura = Time(Time(self.observatory.twilight_morning_nautical(day + dt_1day ,which='nearest')).jd - \
+        #       Time(self.observatory.twilight_evening_nautical(day ,which='next')).jd,format='jd')
         return dura
 
     def info_obs_possible(self,day):
@@ -1702,16 +1753,32 @@ class Schedules:
 
         dt_1day=Time('2018-01-02 00:00:00',scale='utc')-Time('2018-01-01 00:00:00',scale='utc')
 
+        start_between_civil_nautical = Time((Time(
+            self.observatory.twilight_evening_nautical(day,
+                                                       which='next')).value +
+                                             Time(self.observatory.twilight_evening_civil(
+                                                 day,
+                                                 which='next')).value) / 2,
+                                            format='jd')
+
+        end_between_nautical_civil = Time((Time(
+            self.observatory.twilight_morning_nautical(day+dt_1day,
+                                                       which='nearest')).value +
+                                           Time(self.observatory.twilight_morning_civil(
+                                               day+dt_1day,
+                                               which='nearest')).value) / 2,
+                                          format='jd')
+
         self.observability_table_day = observability_table(self.constraints, self.observatory, self.targets,
-         time_range = Time([Time(self.observatory.twilight_evening_nautical(Time(day,format='jd'), which='next')).iso,
-                            Time(self.observatory.twilight_morning_nautical(Time(day + dt_1day,format='jd'),
-                                                                            which='nearest')).iso])) # + nd/2
+         time_range = Time([start_between_civil_nautical.iso,end_between_nautical_civil.iso]) ) #Time([Time(self.observatory.twilight_evening_nautical(Time(day,format='jd'), which='next')).iso,
+                           # Time(self.observatory.twilight_morning_nautical(Time(day + dt_1day,format='jd'),
+                            #                                                which='nearest')).iso])) # + nd/2
 
         self.observability_table_day['fraction of time observable'] =  self.observability_table_day['fraction of time observable'] * \
-                                                                       Time(self.night_duration(day)).value * 24
+                                                                       self.night_duration(day).value * 24
 
         is_visible_mid_night = is_observable(constraints, self.observatory, self.targets, \
-            times= Time(self.observatory.twilight_evening_nautical(Time(day),which='next') +
+            times= Time(start_between_civil_nautical +
                         self.night_duration(day).value/2))
 
         idx_not_visible_mid_night = np.where((is_visible_mid_night == False))
@@ -1754,10 +1821,10 @@ class Schedules:
 
         while not (is_moon_constraint_met_first_target & hours_constraint_first):
 
-            beFore_change_first_target=self.priority[self.idx_first_target]
-            beFore_change_idx_first_target=self.idx_first_target
+            before_change_first_target=self.priority[self.idx_first_target]
+            before_change_idx_first_target=self.idx_first_target
 
-            if beFore_change_first_target['set or rise'] == 'set':
+            if before_change_first_target['set or rise'] == 'set':
                 moon_idx_set_target += 1
                 if moon_idx_set_target >= len(self.idx_set_targets_sorted):
                     idx_safe_1rst_set += 1
@@ -1775,7 +1842,7 @@ class Schedules:
                         is_moon_constraint_met_first_target = False
                         hours_constraint_first = False
 
-            if beFore_change_first_target['set or rise'] == 'rise':
+            if before_change_first_target['set or rise'] == 'rise':
                 moon_idx_rise_target += 1
                 if moon_idx_rise_target >= len(self.idx_rise_targets_sorted):
                     idx_safe_1rst_rise += 1
@@ -1794,7 +1861,7 @@ class Schedules:
                         hours_constraint_first = False
 
 
-            if (beFore_change_first_target['set or rise'] != 'rise') and (beFore_change_first_target['set or rise'] != 'set'):
+            if (before_change_first_target['set or rise'] != 'rise') and (before_change_first_target['set or rise'] != 'set'):
                 idx_safe+=1
                 self.idx_first_target=self.index_prio[-idx_safe]
                 self.first_target=self.priority[self.idx_first_target]
@@ -1847,9 +1914,9 @@ class Schedules:
         else:
             while not (is_moon_constraint_met_second_target & hours_constraint_second):
 
-                beFore_change_second_target = self.priority[self.idx_second_target]
+                before_change_second_target = self.priority[self.idx_second_target]
 
-                if beFore_change_second_target['set or rise'] == 'set':
+                if before_change_second_target['set or rise'] == 'set':
                     moon_idx_set_target += 1
                     if moon_idx_set_target >= len(self.idx_set_targets_sorted):
                         idx_safe_2nd_set += 1
@@ -1867,7 +1934,7 @@ class Schedules:
                             is_moon_constraint_met_second_target=False
                             hours_constraint_second = False
 
-                if beFore_change_second_target['set or rise'] == 'rise':
+                if before_change_second_target['set or rise'] == 'rise':
                     moon_idx_rise_target += 1
                     if moon_idx_rise_target >= len(self.idx_rise_targets_sorted):
                         idx_safe_2nd_rise += 1
@@ -1885,7 +1952,7 @@ class Schedules:
                             is_moon_constraint_met_second_target=False
                             hours_constraint_second = False
 
-                if (beFore_change_second_target['set or rise'] != 'rise') and (beFore_change_second_target['set or rise'] != 'set'):
+                if (before_change_second_target['set or rise'] != 'rise') and (before_change_second_target['set or rise'] != 'set'):
                     if self.first_target['set or rise'] == 'rise':
                         moon_idx_set_target+=1
                         if moon_idx_set_target >= len(self.idx_set_targets_sorted):
@@ -2126,11 +2193,17 @@ class Schedules:
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                          observatory_altitude=2780))
             texp = a.exp_time_calculator(ADUpeak=30000)[0]
-        elif obs == 'TS' or obs =='TN':
+        elif obs == 'TS' :
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
-                        moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+                        moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.4, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=50000)[0]
             print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
+        elif obs == 'TN':
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+            texp = a.exp_time_calculator(ADUpeak=50000)[0]
+            print(
+                Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif obs =='SNO':
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
@@ -2190,9 +2263,14 @@ class Schedules:
                          moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                          observatory_altitude=2780))
             texp = a.exp_time_calculator(ADUpeak=30000)[0]
-        elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
+        elif self.telescope == 'TN_Oukaimeden':
             a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
-                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+            texp = a.exp_time_calculator(ADUpeak=50000)[0]
+            print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
+        elif self.telescope == 'TS_La_Silla':
+            a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                         moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.4, gain=1.1))
             texp = a.exp_time_calculator(ADUpeak=50000)[0]
             print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
         elif self.telescope == 'Artemis':
@@ -2223,10 +2301,15 @@ class Schedules:
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=45000)[0]
-            elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
-                self.target_table_spc['Filter_spc'][i] = filt_
+            elif self.telescope == 'TN_Oukaimeden':
                 a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
-                             moonphase=0.6, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.05, gain=1.1))
+                texp = a.exp_time_calculator(ADUpeak=50000)[0]
+                print(
+                    Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
+            elif self.telescope == 'TS_La_Silla':
+                a = (ETC.etc(mag_val=self.target_table_spc['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.4, gain=1.1))
                 texp = a.exp_time_calculator(ADUpeak=50000)[0]
                 print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
             elif self.telescope == 'Io' or self.telescope == 'Europa' or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
@@ -2342,7 +2425,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     par = doc.add_paragraph()
     par_format = par.paragraph_format
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    par_format.space_beFore = Pt(0)
+    par_format.space_before = Pt(0)
     par_format.space_after = Pt(6)
     run = par.add_run(observatory.name)
     run.bold = True
@@ -2352,7 +2435,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     par = doc.add_paragraph()
     par_format = par.paragraph_format
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    par_format.space_beFore = Pt(0)
+    par_format.space_before = Pt(0)
     par_format.space_after = Pt(12)
     run = par.add_run('Schedule from ' + Time(date_range[0].iso,out_subfmt='date').iso + ' to ' + Time(date_range[1].iso,out_subfmt='date').iso)
     run.bold = True
@@ -2362,7 +2445,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     par = doc.add_paragraph()
     par_format = par.paragraph_format
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    par_format.space_beFore = Pt(0)
+    par_format.space_before = Pt(0)
     par_format.space_after = Pt(12)
     run = par.add_run(
         '(Total time = 0hr, technical loss = 0hr, weather loss = 0hr, Exotime = 0hr, cometime = 0hr,   chilean time = 0hr)')
@@ -2373,7 +2456,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     par = doc.add_paragraph()
     par_format = par.paragraph_format
     par_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    par_format.space_beFore = Pt(0)
+    par_format.space_before = Pt(0)
     par_format.space_after = Pt(20)
     run = par.add_run(name_operator)
     run.italic = True
@@ -2382,7 +2465,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
     font.color.rgb = RGBColor(0, 0, 0)
     par = doc.add_paragraph()
     par_format = par.paragraph_format
-    par_format.space_beFore = Pt(16)
+    par_format.space_before = Pt(16)
     par_format.space_after = Pt(0)
 
     for i in range(nb_day_date_range):
@@ -2410,7 +2493,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_beFore = Pt(0)
+        par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run('Moon illumination: ' + str(moon_illum))
         run.italic = True
@@ -2419,7 +2502,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_beFore = Pt(0)
+        par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run(
             'Sunset - Sunrise: ' + '{:02d}'.format(Time(sun_set, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(sun_set, out_subfmt='date_hm').datetime.minute) +\
@@ -2430,7 +2513,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_beFore = Pt(0)
+        par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run(
             'Civil/Naut./Astro. twilights: ' + \
@@ -2446,7 +2529,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_beFore = Pt(0)
+        par_format.space_before = Pt(0)
         par_format.space_after = Pt(0)
         run = par.add_run('Start-end of night (Naut. twil.): ' + '{:02d}'.format(Time(start_night).datetime.hour) + 'h' + '{:02d}'.format(Time(start_night).datetime.minute) +\
                           ' to ' + '{:02d}'.format(Time(end_night).datetime.hour) + 'h' + '{:02d}'.format(Time(end_night).datetime.minute))
@@ -2456,7 +2539,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
         font.color.rgb = RGBColor(0, 0, 0)
         par = doc.add_paragraph()
         par_format = par.paragraph_format
-        par_format.space_beFore = Pt(0)
+        par_format.space_before = Pt(0)
         par_format.space_after = Pt(3)
         run = par.add_run('Night duration (Naut. twil.): ' + str(night_duration))
         run.italic = True
@@ -2486,7 +2569,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
 
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_beFore = Pt(0)
+            par_format.space_before = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run(
                 'From ' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.hour) + 'h' + '{:02d}'.format(Time(start_time_target, out_subfmt='date_hm').datetime.minute) +\
@@ -2498,7 +2581,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_beFore = Pt(0)
+            par_format.space_before = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run('  Note: Prio_target                                         ')
             font = run.font
@@ -2506,7 +2589,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_beFore = Pt(0)
+            par_format.space_before = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run(
                 '  SPECULOOS : ' + str(df['nb_hours_surved'][idx_target].data.data[0]*u.hour) + ' of obs over ' + str(
@@ -2516,7 +2599,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_beFore = Pt(0)
+            par_format.space_before = Pt(0)
             par_format.space_after = Pt(0)
             run = par.add_run('Jmag= ' + str(df['J'][idx_target].data.data[0]) + ',  SpT= ' + str(
                 df['SpT'][idx_target].data[0]))  # + ', Moon at ' + str(dist_moon))
@@ -2525,7 +2608,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_beFore = Pt(0)
+            par_format.space_before = Pt(0)
             par_format.space_after = Pt(3)
             run = par.add_run(' RA = ' + str('{:02d}'.format(int(coords.ra.hms[0]))) + " " + str('{:02d}'.format(int(coords.ra.hms[1]))) + " " + str('{:05.3f}'.format(round(coords.ra.hms[2], 3))) + \
                 ', DEC = ' + str('{:02d}'.format(int(coords.dec.dms[0]))) + " " + str('{:02d}'.format(int(abs(coords.dec.dms[1])))) + " " + str('{:05.3f}'.format(round(abs(coords.dec.dms[2]), 3))) + ', ' + str(config[2:-2]).replace('\'',' '))
@@ -2534,7 +2617,7 @@ def make_docx_schedule(observatory,telescope, date_range, name_operator):
             font.color.rgb = RGBColor(0, 0, 0)
             par = doc.add_paragraph()
             par_format = par.paragraph_format
-            par_format.space_beFore = Pt(16)
+            par_format.space_before = Pt(16)
             par_format.space_after = Pt(0)
 
     font = run.font

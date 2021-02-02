@@ -304,7 +304,9 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
-        df2 = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ', index_col=None)
+        df2 = pd.concat([df_special,df_follow_up],ignore_index=True)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         try:
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
@@ -479,9 +481,9 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write('#dir'+ '\n')
             out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
             if name_2 is None:
-                if telescope == 'Callisto':
-                    out.write(str10 + 'Cal_biasdark.txt' + '\n')
-                else:
+                # if telescope == 'Callisto':
+                #     out.write(str10 + 'Cal_biasdark.txt' + '\n')
+                # else:
                     out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
             else:
                 out.write(str10 + 'Obj_' + name_2  +'.txt' + '\n')
@@ -499,7 +501,9 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
     if idx_target is None:
-        df2 = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ', index_col=None)
+        df2 = pd.concat([df_special,df_follow_up],ignore_index=True)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)]
 
@@ -589,9 +593,11 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         idx_target = np.where((df['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     if not idx_target:
-        df2 = pd.read_csv(target_list_path,delimiter = ',',index_col = False)
+        df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ', index_col=None)
+        df2 = pd.concat([df_special,df_follow_up],ignore_index=True)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
-        gaia_id_target = int(df['Gaia_ID'][idx_target].values)
+        gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
     binning=1
@@ -690,7 +696,9 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
     if idx_target is None:
-        df2 = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
+        df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ', index_col=None)
+        df2 = pd.concat([df_special,df_follow_up],ignore_index=True)
         try:
             idx_target = np.where((df2['Sp_ID'] == name))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]

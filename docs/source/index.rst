@@ -33,3 +33,10 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
    examples/tutorials/notebooks/tutorials_spockst.ipynb
    examples/tutorials/notebooks/tutorials_spockplot.ipynb
    examples/tutorials/notebooks/tutorials_spocktools.ipynb
+
+.. toctree::
+   :caption: How spock works ?
+   :maxdepth: 1
+
+   examples/tutorials/notebooks/how.ipynb
+

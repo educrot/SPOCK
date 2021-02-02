@@ -1187,7 +1187,8 @@ def prediction(obs_name,name,ra,dec,timing,period,duration, start_date,ntr):
                                      orbital_period=period*u.day, duration=duration*u.day,
                                      name=name)
 
-    timing_to_obs_jd = Time(target_transit.next_primary_eclipse_time(start_date, n_eclipses=ntr)).jd
+    mid_transit_timing = Time(target_transit.next_primary_eclipse_time(start_date, n_eclipses=ntr)).iso
+    mid_transit_timing_jd = Time(target_transit.next_primary_eclipse_time(start_date, n_eclipses=ntr)).jd
 
     ing_egr = target_transit.next_primary_ingress_egress_time(start_date, n_eclipses=ntr)
 
@@ -1208,6 +1209,11 @@ def prediction(obs_name,name,ra,dec,timing,period,duration, start_date,ntr):
 
 
     df = pd.DataFrame(data=ing_egr.sort().iso, index=[name]*len(ing_egr),columns=["Ingress", "Egress"])
+
+    df['mid transit'] = mid_transit_timing
+
+    df['mid transit JD'] = np.round(mid_transit_timing_jd,3)
+
     df['Observable SSO'] = observable_SSO[0]
 
     df['Observable SNO'] = observable_SNO[0]
