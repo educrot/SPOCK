@@ -1,4 +1,4 @@
-.. image:: https://travis-ci.com/educrot/SPOCK.svg?branch=master
+.. image:: https://travis-ci.com/educrot/SPOCK_chilean.svg?token=JyPx6cqUzxMxHWAk8xyS&branch=master
     :target: https://travis-ci.com/educrot/SPOCK
 
 .. image:: https://img.shields.io/badge/docs-dev-green.svg
@@ -20,12 +20,12 @@ Schedule targets on several criteria:
 
 *  Number of hours already performed
 
-*  Coordination between different sites
+*  Coordination between different site
 
 Documentation SPOCK
 ---------------------
 
-You will find complete documentation for setting up your project at `SPOCK Read
+You will find complete documentation (in dev) for setting up your project at `SPOCK Read
 the Docs site <https://educrot.github.io/SPOCK/index.html>`_.
 
 
@@ -38,8 +38,9 @@ Installation
 .. warning::
     You must be part of the SPECULOOS consortium to use *SPOCK*.
 
+
 OSX
-=====
+---
 
 Install *SPOCK* locally::
 
@@ -47,6 +48,7 @@ Install *SPOCK* locally::
 
     cd spock
     python setup.py install
+
 
 
 
