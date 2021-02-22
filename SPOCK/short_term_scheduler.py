@@ -512,6 +512,15 @@ class Schedules:
                 else:
                     print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' no transit of ', df['Sp_ID'][i],' this day')
 
+    def locking_observations(self):
+        night_block = self.SS1_night_blocks.to_pandas()
+
+        night_block.to_csv(path_spock + '/DATABASE/' + self.telescope + '/' +
+                           'Locked_obs/'+'lock_night_block_'+self.telescope+'_'+Time(self.day_of_night,out_subfmt='date').iso+'.txt',index=None)
+
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + 'Observation block saved as '+ path_spock + '/DATABASE/' + self.telescope + '/' +
+                           'Locked_obs/'+'lock_night_block_'+self.telescope+'_'+Time(self.day_of_night,out_subfmt='date').iso+'.txt')
+
     def planification(self):
         end_scheduled_table = pd.DataFrame(columns=['target','start time (UTC)','end time (UTC)','duration (minutes)','ra (h)','ra (m)','ra (s)',\
                                                     'dec (d)','dec (m)','dec (s)','configuration'])
@@ -795,11 +804,12 @@ class Schedules:
             if target_list['J'][i] != 0.:
                 a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
-            if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
-                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
-                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             else:
-                sys.exit('ERROR: You must precise Vmag or Jmag for this target')
+                if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
+                    a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                                 moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+                else:
+                    sys.exit('ERROR: You must precise Vmag or Jmag for this target')
             texp = a.exp_time_calculator(ADUpeak=50000)[0]
             print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
 
@@ -807,11 +817,12 @@ class Schedules:
             if target_list['J'][i] != 0.:
                 a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
-            if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
-                a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
-                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             else:
-                sys.exit('ERROR: You must precise Vmag or Jmag for this target')
+                if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
+                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
+                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+                else:
+                    sys.exit('ERROR: You must precise Vmag or Jmag for this target')
             texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
         elif self.telescope == 'Io' or self.telescope == 'Europa' \
@@ -1234,7 +1245,19 @@ def date_range_in_days(date_range):
     return date_range_in_days
 
 
-def prediction(obs_name,name,ra,dec,timing,period,duration, start_date,ntr):
+def get_info_follow_up_target(name):
+    target_list_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt',delimiter=' ')
+    idx_target = np.where((target_list_follow_up['Sp_ID'] == name ))[0]
+    if idx_target.size ==0:
+        sys.exit('ERROR: This target name is not in the list.')
+    else:
+        return float(target_list_follow_up['RA'][idx_target]), float(target_list_follow_up['DEC'][idx_target]),\
+               float(target_list_follow_up['T0'][idx_target]), float(target_list_follow_up['P'][idx_target]),\
+               float(target_list_follow_up['W'][idx_target])
+
+
+
+def prediction(name,ra,dec,timing,period,duration, start_date,ntr):
     start_date = Time(start_date)
 
     constraints = [AltitudeConstraint(min=25 * u.deg), AtNightConstraint()]

@@ -33,6 +33,7 @@ import sys
 from tqdm.auto import tqdm
 import yaml
 from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
+import SPOCK.short_term_scheduler as SPOCKST
 
 iers.IERS_A_URL  = 'https://datacenter.iers.org/data/9/finals2000A.all' #'http://maia.usno.navy.mil/ser7/finals2000A.all'#'ftp://cddis.gsfc.nasa.gov/pub/products/iers/finals2000A.all'
 #from astroplan import download_IERS_A
@@ -732,6 +733,7 @@ class Schedules:
         self.priority_by_day = []
         self.priority_ranked = None
         self.priority_ranked_by_day = []
+        self.read_locked_target = True
         self.reverse_df1 = None
         self.second_target = None
         self.second_target_by_day = []
@@ -990,7 +992,7 @@ class Schedules:
 
     def update_nb_hours_all(self,user =user_portal, password = pwd_portal):
         # *********** TRAPPIST ***********
-        #self.get_hours_files_TRAPPIST()
+        self.get_hours_files_TRAPPIST()
 
         # *********** SSO & SNO ***********
         self.update_telescope_from_server() # get hours SSO
@@ -1235,9 +1237,26 @@ class Schedules:
                     print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' no second target')
 
                 self.night_block = self.schedule_blocks(day)
+
+
+                if self.read_locked_target:
+                    schedule_short = SPOCKST.Schedules()
+                    schedule_short.load_parameters(obs_name=self.observatory.name)
+                    schedule_short.day_of_night = day
+                    schedule_short.telescope = self.telescope
+                    try :
+                        schedule_short.SS1_night_blocks = Table.read(path_spock + '/DATABASE/' + schedule_short.telescope + '/' +
+                                              'Locked_obs/' + 'lock_night_block_' + schedule_short.telescope + '_' + Time(
+                        schedule_short.day_of_night.iso, out_subfmt='date').iso + '.txt',format='ascii')
+                        schedule_short.scheduled_table = self.night_block
+                        schedule_short.planification()
+                        self.night_block = schedule_short.scheduled_table_sorted
+                    except FileNotFoundError:
+                        pass
+
                 self.night_block_by_day.append(self.night_block)
                 self.make_night_block(day)
-                self.make_plan_file(day)
+                self.make_night_block(day)
 
         if str(self.strategy) == 'segmented':
             print()

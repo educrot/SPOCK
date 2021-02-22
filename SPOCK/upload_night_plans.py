@@ -103,7 +103,6 @@ def upload_np_calli(t_now,nb_jours):
         p = subprocess.Popen(["sshpass", "-p", pwd_HUB,"scp", path_local_zip_file, 'speculoos@172.16.4.169:/home/speculoos/Plans_scheduler/Callisto/Plans/'])
         print('----->',t_now,'Zip Plans_by_dates folder uploaded on the HUB for Callisto')
 
-
 def upload_np_io(t_now,nb_jours):
     t0=Time(t_now)
     dt=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg') #1 day
