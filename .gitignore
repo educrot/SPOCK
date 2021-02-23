@@ -29,3 +29,9 @@ build/
 test/
 
 docs/
+
+test.py
+
+input_short_term.csv
+
+input.csv
