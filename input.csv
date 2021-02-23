@@ -1,0 +1,24 @@
+--- 
+date_range: 
+  - "2021-01-01 15:00:00"
+  - "2021-02-01 15:00:00"
+observatories:
+  1:
+    name: SSO
+    telescopes: [Io,Callisto,Ganymede,Europa]
+  2:
+    name: SNO
+    telescopes: [Artemis]
+  3: 
+    name: Saint-Ex
+    telescopes: [Saint-Ex]
+  4: 
+    name: TS_La_Silla
+    telescopes: [TS_La_Silla]
+  5: 
+    name: TN_Oukaimeden
+    telescopes: [TN_Oukaimeden]
+strategy: "continuous"
+duration_segments: 20
+nb_segments: 3
+target_list: ./target_lists/speculoos_target_list_v6.txt
