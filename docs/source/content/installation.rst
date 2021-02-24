@@ -17,8 +17,8 @@ Install *SPOCK* locally::
     python setup.py install
 
 
-Initialisation
-====================
+First step
+---------------
 
 To use *SPOCK* you will need to be part of the SPECULOOS consortium and have access to:
  * the SPECULOOS server,
