@@ -26,5 +26,5 @@ To use *SPOCK* you will need to be part of the SPECULOOS consortium and have acc
  * the SSO HUB,
  * SNO reduction PC.
 
-If so, the first step is to create a `/credentials` folder in /SPOCK/SPOCK/` and add a password.csv` fil` in this folder.
+If so, the first step is to create a */credentials* folder in */SPOCK/SPOCK/* and add a *password.csv* file in this folder.
 Contact Elsa Ducrot or more details (educrot@uliege.be)
