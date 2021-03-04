@@ -14,15 +14,16 @@ from docx import Document
 from docx.shared import *
 from datetime import datetime
 from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock,Transitioner
+import gspread
 import matplotlib.pyplot as plt
 import numpy as np
+from oauth2client.service_account import ServiceAccountCredentials
 import os
 import pkg_resources
 import pandas as pd
 import requests
 import SPOCK.upload_night_plans as SPOCKunp #import upload_np_calli, upload_np_gany, upload_np_io, upload_np_euro,upload_np_artemis,upload_np_ts,upload_np_tn
 from SPOCK.make_night_plans import make_np
-import SPOCK.long_term_scheduler as SPOCKLT
 import subprocess
 import sys
 import shutil
@@ -30,9 +31,17 @@ import SPOCK.ETC as ETC
 from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
 import yaml
 
+
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/elsaducrot/spock_2/client_secret.json', scope)
+client = gspread.authorize(creds)
+
 # pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
 dt=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg') #1 day
 constraints = [AltitudeConstraint(min=24*u.deg), AtNightConstraint()] #MoonSeparationConstraint(min=30*u.deg)
+
+
 
 def charge_observatories(Name):
     observatories = []
@@ -63,7 +72,7 @@ def charge_observatories(Name):
 
     return observatories
 
-def target_list_good_coord_format(path_target_list):
+def target_list_good_coord_format(df=None,path_target_list=None):
 
     """
     Give target corrdinates in ICRS format (used for astropy.coordinates SkyCoord function)
@@ -78,11 +87,11 @@ def target_list_good_coord_format(path_target_list):
 
 
     """
-    df = pd.read_csv(path_target_list, delimiter=' ')
+    if df is None:
+        df = pd.read_csv(path_target_list, delimiter=' ')
     target_table_spc = Table.from_pandas(df)
     targets = [FixedTarget(coord=SkyCoord(ra=target_table_spc['RA'][i]* u.degree,dec=target_table_spc['DEC'][i] * u.degree),name=target_table_spc['Sp_ID'][i]) for i in range(len(target_table_spc['RA']))]
     return targets
-
 
 class Schedules:
 
@@ -93,51 +102,58 @@ class Schedules:
         self.start_end_range = None  # date_range
         self.day_of_night = None
         self.target_table_spc = []
-        self.constraints = None
+        self.constraints = [AtNightConstraint.twilight_nautical()]
+        self.observatory_name = None
         self.SS1_night_blocks = None
         self.scheduled_table = None
         self.SS1_night_blocks_old  = None
         self.scheduled_table_sorted = None
+        self.targets_follow_up = None
+        self.target_table_spc_follow_up = None
+        self.targets = None
+        self.target_table_spc == None
 
-    def load_parameters(self, input_file_short_term=None, nb_observatory=None,obs_name = None, start_end=None):
-        if input_file_short_term == None:
-            self.observatory = charge_observatories(obs_name)[0]
-            self.target_list = path_spock + '/target_lists/target_list_special.txt'
-            self.target_list_follow_up = path_spock + '/target_lists/target_transit_follow_up.txt'
-            self.constraints = [AtNightConstraint.twilight_nautical()]
-            df = pd.read_csv(self.target_list, delimiter=' ')
-            df_followup = pd.read_csv(self.target_list_follow_up, delimiter=' ')
-            self.target_table_spc = Table.from_pandas(df)
-            self.target_table_spc_follow_up = Table.from_pandas(df_followup)
-            self.targets = target_list_good_coord_format(self.target_list)
-            self.targets_follow_up = target_list_good_coord_format(self.target_list_follow_up)
-            if start_end is not  None:
-                self.start_end_range = Time(start_end)
-        else:
-            with open(input_file_short_term, "r") as f:
-                Inputs = yaml.load(f, Loader=yaml.FullLoader)
-                self.target_list = path_spock + '/target_lists/target_list_special.txt'
-                self.target_list_follow_up = path_spock + '/target_lists/target_transit_follow_up.txt'
-                self.use = Inputs['use']
-                df = pd.DataFrame.from_dict(Inputs['observatories'])
-                self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
-                self.telescopes = df[nb_observatory]['telescopes']
-                self.telescope = self.telescopes[0]
-                self.day_of_night = Time(Inputs['day_of_night'])  # ,Time(Inputs['date_range'][1])]
-                try:
-                    self.day_of_night = self.day_of_night[0]
-                except TypeError:
-                    self.day_of_night = self.day_of_night
-                self.start_end_range = Time(Inputs['start_end_range'])
-                if self.start_end_range[1] <= self.start_end_range[0]:
-                    sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
-                self.constraints = [AtNightConstraint.twilight_nautical()]
-                df = pd.read_csv(self.target_list, delimiter=' ')
-                df_followup = pd.read_csv(self.target_list_follow_up, delimiter=' ')
-                self.target_table_spc = Table.from_pandas(df)
-                self.target_table_spc_follow_up = Table.from_pandas(df_followup)
-                self.targets = target_list_good_coord_format(self.target_list)
-                self.targets_follow_up = target_list_good_coord_format(self.target_list_follow_up)
+    def load_local_special_target_list(self,filename):
+        self.targets = target_list_good_coord_format(filename)
+        self.target_table_spc = Table.from_pandas(pd.read_csv(filename, delimiter=' '))
+
+    def load_local_follow_up_list(self,filename):
+        self.targets_follow_up = target_list_good_coord_format(filename)
+        self.target_table_spc_follow_up = Table.from_pandas(pd.read_csv(filename, delimiter=' '))
+
+    def load_parameters(self, filename_list_special=None,filename_follow_up=None):
+
+        if (filename_list_special is None) or (filename_follow_up is None):
+            sh = client.open('SPECULOOS WG6')
+            #Read stars lists
+            worksheet_follow_up = sh.worksheet("Annex_Targets_V1-PLANETS")
+            dataframe = pd.DataFrame(worksheet_follow_up.get_all_records())
+            self.target_table_spc_follow_up = dataframe.rename(columns={"sp_id": "Sp_ID", "gaia_dr2": "Gaia_ID",
+                                                                        "period":"P", "period_e":"P_err",
+                                                                        "duration":"W", "duration_e":"W_err",
+                                                                        "dec": "DEC", "ra": "RA",
+                                                                        "dec_err": "DEC_err", "ra_err": "RA_err"
+                                                                        })
+            self.targets_follow_up = target_list_good_coord_format(df=self.target_table_spc_follow_up)
+
+            #Read follow up (planet candidates) list
+            self.target_table_spc_follow_up['W'] /= 24
+            self.target_table_spc_follow_up['W_err'] /= 24
+            worksheet_special = sh.worksheet("Annex_Targets_V2-STARS")
+            dataframe = pd.DataFrame(worksheet_special.get_all_records())
+            self.target_table_spc = dataframe.rename(columns={"spc": "Sp_ID", "gaia": "Gaia_ID","dec":"DEC","ra":"RA",
+                                     "dec_err":"DEC_err","ra_err":"RA_err","spc":"Sp_ID"})
+            self.targets = target_list_good_coord_format(df=self.target_table_spc)
+
+
+        if filename_list_special is not None:
+            self.targets = target_list_good_coord_format(path_target_list=filename_list_special)
+            self.target_table_spc = Table.from_pandas(pd.read_csv(filename_list_special, delimiter=' '))
+        if filename_follow_up is not None:
+            self.target_list_follow_up = filename_follow_up
+            self.targets_follow_up = target_list_good_coord_format(path_target_list=filename_follow_up)
+            self.target_table_spc_follow_up = Table.from_pandas(pd.read_csv(filename_follow_up, delimiter=' '))
+
 
     def night_duration(self, day):
         '''
@@ -219,6 +235,7 @@ class Schedules:
             sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No Dom rotation possible that night')
 
     def special_target_with_start_end(self, input_name):
+        self.observatory = charge_observatories(self.observatory_name)[0]
         start = self.start_end_range[0]
         end = self.start_end_range[1]
 
@@ -249,6 +266,7 @@ class Schedules:
         return self.SS1_night_blocks
 
     def special_target(self,input_name):
+        self.observatory = charge_observatories(self.observatory_name)[0]
         dur_obs_both_target=(self.night_duration(self.day_of_night)/(2*u.day))*2*u.day
         constraints_special_target=[AltitudeConstraint(min=24*u.deg),MoonSeparationConstraint(min=30*u.deg), \
         TimeConstraint((Time(self.observatory.twilight_evening_nautical(self.day_of_night,which='next'))), \
@@ -273,13 +291,11 @@ class Schedules:
         return self.SS1_night_blocks
 
     def transit_follow_up(self,follow_up_list=None,name=None):
-        self.targets = self.targets_follow_up
-        if follow_up_list is None:
-            follow_up_list = self.target_list_follow_up
+        self.observatory = charge_observatories(self.observatory_name)[0]
 
-        df = pd.read_csv(follow_up_list,delimiter= ' ')
         constraints = [AltitudeConstraint(min=25 * u.deg), AtNightConstraint(),
                        TimeConstraint(Time(self.day_of_night),Time(self.day_of_night+1))]
+        df = self.target_table_spc_follow_up
 
         if name is not None:
             i = int(np.where((df['Sp_ID']==name))[0])
@@ -296,14 +312,14 @@ class Schedules:
             print(Fore.GREEN + Fore.GREEN + Fore.GREEN + 'INFO: ' + Fore.BLACK + ' ' + Fore.BLACK + Fore.BLACK + str(df['Sp_ID'][i]) + ' next transit: ')
             print(Time(target_transit.next_primary_eclipse_time(self.day_of_night, n_eclipses=1)).iso)
             timing_to_obs_jd = Time(target_transit.next_primary_eclipse_time(self.day_of_night, n_eclipses=1)).jd
-            target = target_list_good_coord_format(follow_up_list)
+            #target = target_list_good_coord_format(follow_up_list)
             n_transits = 1
             try:
                 ing_egr = target_transit.next_primary_ingress_egress_time(self.day_of_night, n_eclipses=n_transits)
             except ValueError:
                 print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' No transit of ', df['Sp_ID'][i], ' on the period chosen')
 
-            observable = is_event_observable(constraints, self.observatory, target, times_ingress_egress=ing_egr)
+            observable = is_event_observable(constraints, self.observatory, self.targets_follow_up, times_ingress_egress=ing_egr)
             if np.any(observable):
                 err_T0_neg = timing_to_obs_jd[0] - (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value, 1) *
                                                     (period.value - P_err_transit) + (epoch.jd - T0_err_transit))
@@ -335,7 +351,7 @@ class Schedules:
                         if df['texp_spc'][idx_first_target] == 0:
                             df['texp_spc'][idx_first_target] = self.exposure_time(
                                 input_name=df['Sp_ID'][idx_first_target], target_list=self.target_table_spc_follow_up)
-                        a = ObservingBlock(target[idx_first_target], dur_obs_transit_target, -1,
+                        a = ObservingBlock(self.targets_follow_up[idx_first_target], dur_obs_transit_target, -1,
                                            constraints=constraints_transit_target,
                                            configuration={'filt=' + str(df['Filter_spc'][idx_first_target]),
                                                           'texp=' + str(df['texp_spc'][idx_first_target])})
@@ -359,7 +375,7 @@ class Schedules:
                         if df['texp_spc'][idx_first_target] == 0:
                             df['texp_spc'][idx_first_target] = self.exposure_time(
                                 input_name=df['Sp_ID'][idx_first_target], target_list=self.target_table_spc_follow_up)
-                        a = ObservingBlock(target[idx_first_target], dur_obs_transit_target, -1,
+                        a = ObservingBlock(self.targets_follow_up[idx_first_target], dur_obs_transit_target, -1,
                                            constraints=constraints_transit_target,
                                            configuration={'filt=' + str(df['Filter_spc'][idx_first_target]),
                                                           'texp=' + str(df['texp_spc'][idx_first_target])})
@@ -378,8 +394,8 @@ class Schedules:
                     idx_first_target = int(np.where((df['Sp_ID'] == df['Sp_ID'][i]))[0])
                     if df['texp_spc'][idx_first_target] == 0:
                         df['texp_spc'][idx_first_target] = self.exposure_time(input_name=df['Sp_ID'][idx_first_target],
-                                                                              target_list=self.target_table_spc_follow_up)
-                    a = ObservingBlock(target[idx_first_target], dur_obs_transit_target, -1,
+                                                                target_list=self.target_table_spc_follow_up)
+                    a = ObservingBlock(self.targets_follow_up[idx_first_target], dur_obs_transit_target, -1,
                                        constraints=constraints_transit_target,
                                        configuration={'filt=' + str(df['Filter_spc'][idx_first_target]),
                                                       'texp=' + str(df['texp_spc'][idx_first_target])})
@@ -756,6 +772,8 @@ class Schedules:
         # moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
         try:
             spectral_type = round(float(target_list['SpT'][i].data.data[0]))
+        except AttributeError:
+            spectral_type = round(float(target_list['SpT'][i]))
         except NotImplementedError:
             try:
                 spectral_type = round(float(target_list['SpT'][i]))
@@ -765,7 +783,7 @@ class Schedules:
             if spectral_type <= 9:
                 spt_type = 'M' + str(spectral_type)
             if spt_type == 'M3':
-                    spt_type = 'M2'
+                spt_type = 'M2'
             elif (spectral_type == 12) or (spectral_type == 15) or (
                     int(spectral_type) == 18):
                 spt_type = 'M' + str(spectral_type - 10)
@@ -788,25 +806,26 @@ class Schedules:
         filt_idx = 0
         filt_ = filters[filt_idx]
         if self.telescope == 'Saint-Ex':
-            if target_list['J'][i] != 0.:
+            if float(target_list['J'][i]) != 0.:
                 a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                              observatory_altitude=2780))
-            if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.) :
-                a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,
-                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
-                             observatory_altitude=2780))
             else:
-                sys.exit('ERROR: You must precise Vmag or Jmag for this target')
+                if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.) :
+                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,
+                                 moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
+                                 observatory_altitude=2780))
+                else:
+                    sys.exit('ERROR: You must precise Vmag or Jmag for this target')
             texp = a.exp_time_calculator(ADUpeak=35000)[0]
 
         elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
-            if target_list['J'][i] != 0.:
-                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+            if float(target_list['J'][i]) != 0.:
+                a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             else:
-                if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
-                    a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
+                    a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 else:
                     sys.exit('ERROR: You must precise Vmag or Jmag for this target')
@@ -814,11 +833,11 @@ class Schedules:
             print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
 
         elif self.telescope == 'Artemis':
-            if target_list['J'][i] != 0.:
-                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+            if float(target_list['J'][i]) != 0.:
+                a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             else:
-                if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
+                if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
                     a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 else:
@@ -827,10 +846,10 @@ class Schedules:
 
         elif self.telescope == 'Io' or self.telescope == 'Europa' \
                 or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
-            if target_list['J'][i] != 0.:
-                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+            if float(target_list['J'][i]) != 0.:
+                a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
-            if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
+            if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
                 a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
             else:
@@ -845,50 +864,54 @@ class Schedules:
                 texp = 10.0001
             filt_ = filters[filt_idx]
             if self.telescope == 'Saint-Ex':
-                if target_list['J'][i] != 0.:
-                    a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
-                                 moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
-                                 observatory_altitude=2780))
-                if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
-                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,
+                if float(target_list['J'][i]) != 0.:
+                    a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                                  observatory_altitude=2780))
                 else:
-                    sys.exit('ERROR: You must precise Vmag or Jmag for this target')
+                    if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
+                        a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,
+                                     moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
+                                     observatory_altitude=2780))
+                    else:
+                        sys.exit('ERROR: You must precise Vmag or Jmag for this target')
                 texp = a.exp_time_calculator(ADUpeak=35000)[0]
 
             elif self.telescope == 'Artemis':
                 target_list['Filter_spc'][i] = filt_
-                if target_list['J'][i] != 0.:
-                    a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
-                                 moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
-                if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
-                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,\
+                if float(target_list['J'][i]) != 0.:
+                    a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 else:
-                    sys.exit('ERROR: You must precise Vmag or Jmag for this target')
+                    if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
+                        a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
+                                     moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+                    else:
+                        sys.exit('ERROR: You must precise Vmag or Jmag for this target')
                 texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
             elif self.telescope == 'TS_La_Silla' or self.telescope == 'TN_Oukaimeden':
                 target_list['Filter_spc'][i] = filt_
-                if target_list['J'][i] != 0.:
-                    a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
-                                 moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
-                if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
-                    a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
+                if float(target_list['J'][i]) != 0.:
+                    a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 else:
-                    sys.exit('ERROR: You must precise Vmag or Jmag for this target')
+                    if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
+                        a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
+                                     moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
+                    else:
+                        sys.exit('ERROR: You must precise Vmag or Jmag for this target')
                 texp = a.exp_time_calculator(ADUpeak=50000)[0]
-                print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
+                print(
+                    Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Don\'t forget to  calculate exposure time for TRAPPIST observations!!')
 
             elif self.telescope == 'Io' or self.telescope == 'Europa' or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
                 target_list['Filter_spc'][i] = filt_
-                if target_list['J'][i] != 0.:
-                    a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,\
+                if float(target_list['J'][i]) != 0.:
+                    a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
-                if (target_list['J'][i] == 0.) and (target_list['V'][i] != 0.):
-                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,\
+                if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
+                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
                 else:
                     sys.exit('ERROR: You must precise Vmag or Jmag for this target')
@@ -917,22 +940,7 @@ def visibility_plot(day,observatory,night_block):
         plt.vlines(t.iso, 3, 1,linestyle='-', color='r',alpha = 0.7)
         plt.legend(shadow=True, loc=2)
 
-def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope):
-    if input_file is None:
-        telescope = telescope
-        date_range = date_range
-        try:
-            day = date_range[0]
-        except TypeError:
-            day = date_range
-    else:
-        with open(input_file, "r") as f:
-            Inputs = yaml.load(f, Loader=yaml.FullLoader)
-            df = pd.DataFrame.from_dict(Inputs['observatories'])
-            observatory = charge_observatories(df[nb_observatory]['name'])[0]
-            date_range = Time(Inputs['day_of_night'])
-            telescope = df[nb_observatory]['telescopes'][0]
-            day = date_range[0]
+def save_schedule(save,over_write,day,telescope):
     if save:
         source = path_spock + '/night_blocks_propositions/' + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt'
         destination = path_spock + '/DATABASE/' + telescope + '/'
@@ -941,13 +949,13 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
             dest = shutil.copy(source, destination)
             dest2 = shutil.copy(source, destination_2)
             print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been over-written to ' + '\"' +  destination + '\"' )
-            print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been over-written to ' + '\"' + destination_2 + '\"')
+            #print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been over-written to ' + '\"' + destination_2 + '\"')
         if not over_write:
             try:
                 dest = shutil.move(source, destination)
                 dest2 = shutil.move(source, destination_2)
                 print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' +  source + '\"' +  ' has been copied to ' + '\"' + destination + '\"' )
-                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
+                #print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been copied to ' + '\"' + destination_2 + '\"')
             except shutil.Error:
                 print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + destination + 'night_blocks_' + telescope + '_' +  day.tt.datetime.strftime("%Y-%m-%d") + '.txt' + '\"' +  ' already exists')
     if not save:

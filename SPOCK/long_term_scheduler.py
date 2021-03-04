@@ -571,7 +571,7 @@ def month_option(target_name,reverse_df1):
         months_5th_option = 0
     return [months, months_2nd_option , months_3rd_option,months_4th_option, months_5th_option]
 
-def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope):
+def save_schedule(save,over_write,date_range,telescope):
     """ save schedules in destination
 
     Parameters
@@ -594,18 +594,19 @@ def save_schedule(input_file,nb_observatory,save,over_write,date_range,telescope
     message
 
     """
-    if input_file is None:
-        telescope = telescope
-        date_range = date_range
-        date_range_in_days = int((date_range[1] - date_range[0]).value)
-    else:
-        with open(input_file, "r") as f:
-            Inputs = yaml.load(f, Loader=yaml.FullLoader)
-            df = pd.DataFrame.from_dict(Inputs['observatories'])
-            observatory = charge_observatories(df[nb_observatory]['name'])[0]
-            date_range = Time(Inputs['date_range'])
-            date_range_in_days = int((date_range[1]- date_range[0]).value)
-            telescope = df[nb_observatory]['telescopes'][0]
+    # if input_file is None:
+    #     telescope = telescope
+    #     date_range = date_range
+    #     date_range_in_days = int((date_range[1] - date_range[0]).value)
+    # else:
+    #     with open(input_file, "r") as f:
+    #         Inputs = yaml.load(f, Loader=yaml.FullLoader)
+    #         df = pd.DataFrame.from_dict(Inputs['observatories'])
+    #         observatory = charge_observatories(df[nb_observatory]['name'])[0]
+    #         date_range = Time(Inputs['date_range'])
+    #         date_range_in_days = int((date_range[1]- date_range[0]).value)
+    #         telescope = df[nb_observatory]['telescopes'][0]
+    date_range_in_days = int((date_range[1] - date_range[0]).value)
     for i in range(0,date_range_in_days):
         day = date_range[0] + i
         if save:
@@ -931,68 +932,68 @@ class Schedules:
         trappist_in_targetlist, targetlist_in_trappist = index_list1_list2(df_trappist['Target'], self.target_table_spc['Sp_ID'])
         return trappist_in_targetlist
 
-    def load_parameters(self,nb_observatory=None,input_file=None,date_range=None,obs_name=None):
-        if input_file == None:
-            self.telescopes = ['Io','Europa','Ganymede','Callisto']
-            self.strategy = 'continuous'
-            self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
-            self.constraints = [AtNightConstraint.twilight_nautical()]
-            df = pd.read_csv(self.target_list, delimiter=' ')
-            self.observatory = charge_observatories(obs_name)[0]
-            self.target_table_spc = Table.from_pandas(df)
-            self.targets = target_list_good_coord_format(self.target_list)
+    def load_parameters(self,date_range=None,obs_name=None):
+        self.observatory = charge_observatories(self.observatory_name)[0]
+        #if input_file == None:
+        #self.telescopes = ['Io','Europa','Ganymede','Callisto']
+        self.strategy = 'continuous'
+        self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
+        self.constraints = [AtNightConstraint.twilight_nautical()]
+        df = pd.read_csv(self.target_list, delimiter=' ')
+        self.target_table_spc = Table.from_pandas(df)
+        self.targets = target_list_good_coord_format(self.target_list)
 
-            last_mod = time.ctime(os.path.getmtime(self.target_list))
-            now = datetime.now()
-            current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-            time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"), format='datetime') - \
-                                      Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"),
-                                           format='datetime')).value * 24
-            # self.update_nb_hours_all()
-            if abs(time_since_last_update) > 24:  # in hours
-                print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Updating the number of hours observed')
-                self.update_nb_hours_all()
-            self.date_range = Time(date_range)
-            if self.date_range[1] <= self.date_range[0]:
-                sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
+        last_mod = time.ctime(os.path.getmtime(self.target_list))
+        now = datetime.now()
+        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"), format='datetime') - \
+                                  Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"),
+                                       format='datetime')).value * 24
+        # self.update_nb_hours_all()
+        if abs(time_since_last_update) > 24:  # in hours
+            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Updating the number of hours observed')
+            self.update_nb_hours_all()
+        self.date_range = Time(date_range)
+        if self.date_range[1] <= self.date_range[0]:
+            sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
 
-        else:
-            with open(input_file, "r") as f:
-                Inputs = yaml.load(f, Loader=yaml.FullLoader)
-                self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
-                df = pd.read_csv(self.target_list, delimiter=' ')
-                self.target_table_spc = Table.from_pandas(df)
-                df = pd.DataFrame.from_dict(Inputs['observatories'])
-                self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
-                self.telescopes = df[nb_observatory]['telescopes']
-                self.telescope = self.telescopes[0]
-                try:
-                    self.date_range = Time(Inputs['date_range']) #,Time(Inputs['date_range'][1])]
-                except ValueError:
-                    sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' Wrong date format, date must be %y-%m-%d HH:MM:SS.sss')
-                if self.date_range[1] <= self.date_range[0]:
-                    sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
-                self.strategy = Inputs['strategy']
-                self.duration_segments = Inputs['duration_segments']
-                self.nb_segments = Inputs['nb_segments']
-                self.constraints = [AtNightConstraint.twilight_nautical()]
-                df = pd.read_csv(self.target_list, delimiter=' ')
-                self.target_table_spc = Table.from_pandas(df)
-                self.targets = target_list_good_coord_format(self.target_list)
-
-                last_mod = time.ctime(os.path.getmtime(self.target_list))
-                now = datetime.now()
-                current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-                time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
-                                         Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
-                #self.update_nb_hours_all()
-                if abs(time_since_last_update) > 24: # in hours
-                    print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Updating the number of hours observed')
-                    self.update_nb_hours_all()
+        # else:
+        #     with open(input_file, "r") as f:
+        #         Inputs = yaml.load(f, Loader=yaml.FullLoader)
+        #         self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
+        #         df = pd.read_csv(self.target_list, delimiter=' ')
+        #         self.target_table_spc = Table.from_pandas(df)
+        #         df = pd.DataFrame.from_dict(Inputs['observatories'])
+        #         self.observatory = charge_observatories(df[nb_observatory]['name'])[0]
+        #         self.telescopes = df[nb_observatory]['telescopes']
+        #         self.telescope = self.telescopes[0]
+        #         try:
+        #             self.date_range = Time(Inputs['date_range']) #,Time(Inputs['date_range'][1])]
+        #         except ValueError:
+        #             sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' Wrong date format, date must be %y-%m-%d HH:MM:SS.sss')
+        #         if self.date_range[1] <= self.date_range[0]:
+        #             sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
+        #         self.strategy = Inputs['strategy']
+        #         self.duration_segments = Inputs['duration_segments']
+        #         self.nb_segments = Inputs['nb_segments']
+        #         self.constraints = [AtNightConstraint.twilight_nautical()]
+        #         df = pd.read_csv(self.target_list, delimiter=' ')
+        #         self.target_table_spc = Table.from_pandas(df)
+        #         self.targets = target_list_good_coord_format(self.target_list)
+        #
+        #         last_mod = time.ctime(os.path.getmtime(self.target_list))
+        #         now = datetime.now()
+        #         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        #         time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"),format='datetime') - \
+        #                                  Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"), format='datetime')).value * 24
+        #         #self.update_nb_hours_all()
+        #         if abs(time_since_last_update) > 0: # in hours
+        #             print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Updating the number of hours observed')
+        #             self.update_nb_hours_all()
 
     def update_nb_hours_all(self,user =user_portal, password = pwd_portal):
         # *********** TRAPPIST ***********
-        self.get_hours_files_TRAPPIST()
+        #self.get_hours_files_TRAPPIST()
 
         # *********** SSO & SNO ***********
         self.update_telescope_from_server() # get hours SSO

@@ -29,6 +29,7 @@ def _get_files():
             user_chart_studio = Inputs['user_chart_studio'][0]
             pwd_chart_studio = Inputs['pwd_chart_studio'][0]
             path_spock = Inputs['path_spock'][0]
+            path_credential_json = Inputs['credential_json'][0]
         # ************************ Create database ************************
 
         telescopes_names = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Artemis', 'Saint-Ex', 'TS_La_Silla', 'TN_Oukaimeden']
