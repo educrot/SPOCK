@@ -71,14 +71,14 @@ def _get_files():
             content = resp.text.replace("\n", "")
             open(path_spock + '/survey_hours/' + file, 'wb').write(resp.content)
 
-        return pwd_appcs, pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_chart_studio, pwd_chart_studio, path_spock
+        return pwd_appcs, pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_chart_studio, pwd_chart_studio, path_spock,path_credential_json
 
         # **********************************************************************************************************
     else:
         print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No file '+ 'passwords.csv')
 
 
-pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = _get_files()
+pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock,path_credential_json = _get_files()
 
 
 from .long_term_scheduler import *

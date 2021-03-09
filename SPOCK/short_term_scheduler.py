@@ -28,13 +28,13 @@ import subprocess
 import sys
 import shutil
 import SPOCK.ETC as ETC
-from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
+from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock,path_credential_json
 import yaml
 
 
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/elsaducrot/spock_2/client_secret.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name(path_credential_json, scope)
 client = gspread.authorize(creds)
 
 # pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
@@ -132,7 +132,8 @@ class Schedules:
                                                                         "period":"P", "period_e":"P_err",
                                                                         "duration":"W", "duration_e":"W_err",
                                                                         "dec": "DEC", "ra": "RA",
-                                                                        "dec_err": "DEC_err", "ra_err": "RA_err"
+                                                                        "dec_err": "DEC_err", "ra_err": "RA_err",
+
                                                                         })
             self.targets_follow_up = target_list_good_coord_format(df=self.target_table_spc_follow_up)
 
@@ -142,7 +143,7 @@ class Schedules:
             worksheet_special = sh.worksheet("Annex_Targets_V2-STARS")
             dataframe = pd.DataFrame(worksheet_special.get_all_records())
             self.target_table_spc = dataframe.rename(columns={"spc": "Sp_ID", "gaia": "Gaia_ID","dec":"DEC","ra":"RA",
-                                     "dec_err":"DEC_err","ra_err":"RA_err","spc":"Sp_ID"})
+                                     "dec_err":"DEC_err","ra_err":"RA_err","spc":"Sp_ID","mag_j":"J","V_mag":"V"})
             self.targets = target_list_good_coord_format(df=self.target_table_spc)
 
 
@@ -807,12 +808,12 @@ class Schedules:
         filt_ = filters[filt_idx]
         if self.telescope == 'Saint-Ex':
             if float(target_list['J'][i]) != 0.:
-                a = (ETC.etc(mag_val=target_list['J'][i], mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
+                a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1,
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                              observatory_altitude=2780))
             else:
-                if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.) :
-                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,
+                if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.) :
+                    a = (ETC.etc(mag_val=float(target_list['V'][i]), mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                                  observatory_altitude=2780))
                 else:
@@ -824,7 +825,7 @@ class Schedules:
                 a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             else:
-                if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
+                if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.):
                     a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 else:
@@ -837,8 +838,8 @@ class Schedules:
                 a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
             else:
-                if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
-                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
+                if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.):
+                    a = (ETC.etc(mag_val=float(target_list['V'][i]), mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 else:
                     sys.exit('ERROR: You must precise Vmag or Jmag for this target')
@@ -849,11 +850,12 @@ class Schedules:
             if float(target_list['J'][i]) != 0.:
                 a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                              moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
-            if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
-                a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
-                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
             else:
-                sys.exit('ERROR: You must precise Vmag or Jmag for this target')
+                if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.):
+                    a = (ETC.etc(mag_val=float(target_list['V'][i]), mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
+                             moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
+                else:
+                    sys.exit('ERROR: You must precise Vmag or Jmag for this target')
             texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
         while texp < 10:
@@ -869,8 +871,8 @@ class Schedules:
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                                  observatory_altitude=2780))
                 else:
-                    if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
-                        a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,
+                    if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.):
+                        a = (ETC.etc(mag_val=float(target_list['V'][i]), mag_band='V', spt=spt_type, filt=filt_, airmass=1.1,
                                      moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=3.48, temp_ccd=-70,
                                      observatory_altitude=2780))
                     else:
@@ -883,8 +885,8 @@ class Schedules:
                     a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 else:
-                    if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
-                        a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
+                    if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.):
+                        a = (ETC.etc(mag_val=float(target_list['V'][i]), mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
                                      moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                     else:
                         sys.exit('ERROR: You must precise Vmag or Jmag for this target')
@@ -896,7 +898,7 @@ class Schedules:
                     a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                                  moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                 else:
-                    if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
+                    if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.):
                         a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
                                      moonphase=0.5, irtf=0.8, num_tel=1, seeing=1.0, gain=1.1))
                     else:
@@ -909,12 +911,14 @@ class Schedules:
                 target_list['Filter_spc'][i] = filt_
                 if float(target_list['J'][i]) != 0.:
                     a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type, filt=filt_, airmass=1.1, \
-                                 moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
-                if (float(target_list['J'][i]) == 0.) and (target_list['V'][i] != 0.):
-                    a = (ETC.etc(mag_val=target_list['V'][i], mag_band='V', spt=spt_type, filt=filt_, airmass=1.1, \
-                                 moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
+                                moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
                 else:
-                    sys.exit('ERROR: You must precise Vmag or Jmag for this target')
+                    if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.):
+                        a = (ETC.etc(mag_val=float(target_list['V'][i]), mag_band='V', spt=spt_type, filt=filt_,
+                                     airmass=1.1, \
+                                     moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
+                    else:
+                        sys.exit('ERROR: You must precise Vmag or Jmag for this target')
                 texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
         return int(texp)
@@ -1253,8 +1257,19 @@ def date_range_in_days(date_range):
     return date_range_in_days
 
 
-def get_info_follow_up_target(name):
-    target_list_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt',delimiter=' ')
+def get_info_follow_up_target(name,target_list_follow_up):
+    """
+
+    Parameters
+    ----------
+    name: name of the target  you wish to the next transit windows of
+    target_list_follow_up: dataframe
+
+    Returns
+    -------
+
+    """
+    #target_list_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt',delimiter=' ')
     idx_target = np.where((target_list_follow_up['Sp_ID'] == name ))[0]
     if idx_target.size ==0:
         sys.exit('ERROR: This target name is not in the list.')
