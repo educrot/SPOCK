@@ -1,25 +1,45 @@
 from astropy import units as u
-from astropy.coordinates import SkyCoord
-from colorama import Fore
 import numpy as np
 import os
-import pkg_resources
 import pandas as pd
 from datetime import datetime
-from astroplan import Observer,FixedTarget
-from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
+from astroplan import Observer
+from astropy.coordinates import SkyCoord, EarthLocation
 from astropy.time import Time
-import SPOCK.long_term_scheduler as SPOCKLT
-from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
-import yaml
-
-# pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
-
+import gspread
+from SPOCK import path_spock
+from oauth2client.service_account import ServiceAccountCredentials
+from SPOCK import path_credential_json
 
 startup_time=[]
 hour=[]
 minute=[]
 target_list_path = path_spock + '/target_lists/speculoos_target_list_v6.txt'
+
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name(path_credential_json, scope)
+client = gspread.authorize(creds)
+
+sh = client.open('SPECULOOS WG6')
+# Read stars lists
+worksheet_follow_up = sh.worksheet("Annex_Targets_V1-PLANETS")
+dataframe = pd.DataFrame(worksheet_follow_up.get_all_records())
+target_table_spc_follow_up = dataframe.rename(columns={"sp_id": "Sp_ID", "gaia_dr2": "Gaia_ID",
+                                                            "period": "P", "period_e": "P_err",
+                                                            "duration": "W", "duration_e": "W_err",
+                                                            "dec": "DEC", "ra": "RA",
+                                                            "dec_err": "DEC_err", "ra_err": "RA_err",
+
+                                                            })
+target_table_spc_follow_up['W'] /= 24
+target_table_spc_follow_up['W_err'] /= 24
+# Read follow up (planet candidates) list
+worksheet_special = sh.worksheet("Annex_Targets_V2-STARS")
+dataframe = pd.DataFrame(worksheet_special.get_all_records())
+target_table_spc_special = dataframe.rename(columns={"spc": "Sp_ID", "gaia": "Gaia_ID", "dec": "DEC",
+                                                  "ra": "RA", "dec_err": "DEC_err", "ra_err": "RA_err",
+                                                  "mag_j": "J", "V_mag": "V"})
 
 def charge_observatory(Name):
     observatories = []
@@ -291,8 +311,9 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
         out.write(str5 + 'Obj_' + name + '.txt' + '\n')
         out.write(str00)
 
-def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
-    df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
+def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
+           ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
+    df = pd.read_csv(target_list_path,delimiter=' ',index_col = False)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
@@ -304,9 +325,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
-        df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
-        df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ', index_col=None)
-        df2 = pd.concat([df_special,df_follow_up],ignore_index=True)
+        df2 = pd.concat([target_table_spc_follow_up,target_table_spc_special],ignore_index=True)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         try:
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
@@ -325,7 +344,8 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
     minute1=date_end.astype(object).minute
     minute1='{:02d}'.format(int(minute1))
     if telescope == 'Saint-Ex':
-        with open(os.path.join(Path, str(t_now),'Obj_' + name + '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt'),
+        with open(os.path.join(Path, str(t_now),'Obj_' + name + '_' +
+                                                datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt'),
                   'w') as out:
             str00 = ';'
             str1 = '#waituntil 1, '
@@ -398,9 +418,11 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             out.write(str00 + '\n')
             out.write(str9 + pd.to_datetime(str(date_end)).strftime('%m/%d/%Y %H:%M:%S') + '\n')
             if name_2 is None:
-                out.write(str10 + 'Cal_flatdawn' + '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
+                out.write(str10 + 'Cal_flatdawn' + '_' +
+                          datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
             else:
-                out.write(str10 + 'Obj_' + name_2 + '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
+                out.write(str10 + 'Obj_' + name_2 + '_' +
+                          datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
             out.write(str00 + '\n')
     if telescope != 'Saint-Ex':
         with open(os.path.join(Path,str(t_now),'Obj_' + name_file),'w') as out:
@@ -467,14 +489,20 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write('#TAG Donuts=on'+'\n')
             if int(dec1)==-0:
                 #print('ici')
-                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
-                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
             if int(dec1)<0 and int(dec1)!=-0:
-                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(abs(dec1)))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
             if int(dec1)>0:
                 #print('la')
-                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '+' + str('{:02d}'.format(int(dec1))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
             out.write(str00 + '\n')
             if name == 'dome_rot':
@@ -489,7 +517,8 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write(str10 + 'Obj_' + name_2  +'.txt' + '\n')
             out.write(str00 + '\n')
 
-def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
+def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
+                     ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     idx_target = None
     if 'Trappist' in name:
@@ -501,9 +530,7 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
     if idx_target is None:
-        df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
-        df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ', index_col=None)
-        df2 = pd.concat([df_special,df_follow_up],ignore_index=True)
+        df2 = pd.concat([target_table_spc_follow_up,target_table_spc_special],ignore_index=True)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)]
 
@@ -564,14 +591,20 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         out.write(';#TAG Donuts=on'+'\n')
         if int(dec1)==-0:
             #print('ici')
-            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
-             + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
+            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                      '-' + str('{:02d}'.format(int(dec1))) \
+             + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
-            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
+            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                      '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
             #print('la')
-            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
+            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                      '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
         out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
@@ -581,7 +614,8 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
 
-def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
+def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
+                  ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     idx_target = None
     if 'NOI-105435' in name:
@@ -593,9 +627,7 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         idx_target = np.where((df['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     if not idx_target:
-        df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
-        df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ', index_col=None)
-        df2 = pd.concat([df_special,df_follow_up],ignore_index=True)
+        df2 = pd.concat([target_table_spc_follow_up, target_table_spc_special], ignore_index=True)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     date_start=np.datetime64(date_start)
@@ -665,14 +697,20 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         out.write('#TAG Donuts=on'+'\n')
         if int(dec1)==-0:
             #print('ici')
-            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
-             + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
+            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                      '-' + str('{:02d}'.format(int(dec1))) \
+             + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
-            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
+            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                      '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
             #print('la')
-            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
+            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                      '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
         out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
@@ -682,7 +720,8 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
 
-def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
+def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
+                 ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
     df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
     #print(name)
     idx_target = None
@@ -696,9 +735,7 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
     if idx_target is None:
-        df_special = pd.read_csv(path_spock + '/target_lists/target_list_special.txt',delimiter=' ',index_col=None)
-        df_follow_up = pd.read_csv(path_spock + '/target_lists/target_transit_follow_up.txt', delimiter=' ', index_col=None)
-        df2 = pd.concat([df_special,df_follow_up],ignore_index=True)
+        df2 = pd.concat([target_table_spc_special,target_table_spc_follow_up],ignore_index=True)
         try:
             idx_target = np.where((df2['Sp_ID'] == name))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
@@ -718,7 +755,8 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
     minute1=date_end.astype(object).minute
     minute1='{:02d}'.format(int(minute1))
     if telescope == 'Saint-Ex':
-        with open(os.path.join(Path, str(t_now),'Obj_' + name + '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt'),
+        with open(os.path.join(Path, str(t_now),'Obj_' + name + '_' +
+                                                datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt'),
                   'w') as out:
             str00 = ';'
             str1 = '#waituntil 1, '
@@ -792,7 +830,8 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             if name_2 is None:
                 out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
             else:
-                out.write(str10 + 'Obj_' + name_2 + '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
+                out.write(str10 + 'Obj_' + name_2 + '_' +
+                          datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
             out.write(str00 + '\n')
 
     if telescope != 'Saint-Ex':
@@ -826,7 +865,7 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write(str00 + ' ' + str(gaia_id_target) + '\n')
             for i in range(1,2):
                 out.write(str00 + '\n')
-            out.write(str1 + pd.to_datetime(str(date_start)).strftime('%Y/%m/%d %H:%M:%S') + '\n')#+ str(hour0) + ':' + str(minute0) + '\n')
+            out.write(str1 + pd.to_datetime(str(date_start)).strftime('%Y/%m/%d %H:%M:%S') + '\n')  # + str(hour0) + ':' + str(minute0) + '\n')
             out.write(str22)
             if telescope == 'Artemis':
                 out.write('#chill -60\n')
@@ -846,14 +885,19 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write('#TAG Donuts=on'+'\n')
             if int(dec1)==-0:
                 #print('ici')
-                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
-                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) +
+                          ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) +
+                          '\t' + '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
             if int(dec1)<0 and int(dec1)!=-0:
-                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(abs(dec1)))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
             if int(dec1)>0:
-                #print('la')
-                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '+' + str('{:02d}'.format(int(dec1))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
             out.write(str00 + '\n')
             out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
@@ -863,7 +907,9 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
                 out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
             out.write(str00 + '\n')
 
-def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
+
+def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,
+                        filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
     binning=1
@@ -948,7 +994,9 @@ def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,auto
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
 
-def first_target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
+
+def first_target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,
+                           filt,exptime,ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     date_start=np.datetime64(date_start)
     date_end=np.datetime64(date_end)
     binning=1
@@ -1021,6 +1069,7 @@ def first_target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,a
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
 
+
 def flatdawn(t_now,date_end,sun_rise,Path,telescope):
     date_end_saint_ex = date_end
     date_end=np.datetime64(date_end)
@@ -1064,6 +1113,7 @@ def flatdawn(t_now,date_end,sun_rise,Path,telescope):
             out.write(str44 + str(hour1) + ':' + str(minute1) + '\n')
             out.write(str5 + str6)
 
+
 def flatdawn_artemis(t_now,date_end,sun_rise,Path):
     date_end=np.datetime64(date_end)
     hour0=date_end.astype(object).hour
@@ -1087,6 +1137,7 @@ def flatdawn_artemis(t_now,date_end,sun_rise,Path):
         out.write(str3 + str4)
         out.write(str44 + str(hour1) + ':' + str(minute1) + '\n')
         out.write(str5 + str6)
+
 
 def flatdawn_no_flats(t_now,date_end,sun_rise,Path):
     date_end=np.datetime64(date_end)
@@ -1112,7 +1163,9 @@ def flatdawn_no_flats(t_now,date_end,sun_rise,Path):
         out.write(str44 + str(hour1) + ':' + str(minute1) + '\n')
         out.write(str5 + str6)
 
-def flatexo_gany(Path,t_now,filt,nbOIII=None,nbHa=None,nbSII=None,nbz=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):
+
+def flatexo_gany(Path,t_now,filt, nbOIII=None, nbHa=None, nbSII=None, nbz=None, nbr=None, nbi=None, nbg=None,
+                 nbIz=None, nbExo=None, nbClear=None):
     str00=';'
     if nbOIII is None:
         nbOIII=3
@@ -1135,52 +1188,59 @@ def flatexo_gany(Path,t_now,filt,nbOIII=None,nbHa=None,nbSII=None,nbz=None,nbr=N
     if nbClear is None:
         nbClear=3
     with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
-        if filt.find('OIII',1)!=-1:
+        if 'OIII' in filt:
             out.write(str(nbOIII) + ',' + 'OIII' + ',' + '1' + '\n')
         else:
-            out.write(str00 +  str(nbOIII) + ',' + 'OIII' + ',' + '1' + '\n')
-        if filt.find('Ha',1)!=-1:
+            out.write(str00 + str(nbOIII) + ',' + 'OIII' + ',' + '1' + '\n')
+
+        if 'Ha' in filt:
             out.write(str(nbHa) + ',' + 'Ha' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbHa) + ',' + 'Ha' ',' + '1' + '\n')
-        if filt.find('SII',1)!=-1:
+
+        if 'SII' in filt:
             out.write(str(nbSII) + ',' + 'SII' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbSII) + ',' + 'SII' + ',' + '1' + '\n')
-        if filt.find('z\'',1)!=-1 and filt.find('I+z',1)==-1:
+
+        if ('z' in filt) or ('z\'' in filt):
             out.write(str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
-        if filt.find('r\'',1)!=-1:
+
+        if ('r' in filt) or ('r\'' in filt):
             out.write(str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
-        if filt.find('i\'',1)!=-1:
+
+        if ('i' in filt) or ('i\'' in filt):
             out.write(str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
         else:
             out.write(str00 +  str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
-        if filt.find('g\'',1)!=-1:
+
+        if ('gg' in filt) or ('gg\'' in filt):
             out.write(str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
-        if filt.find('I+z',1)!=-1:
+
+        if ('I+z' in filt) or ('I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
         else:
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
-        if filt.find('Exo',1)!=-1:
+
+        if 'Exo' in filt:
             out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
-        if filt.find('Clear',1)!=-1:
+
+        if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
-    # out.write(';5,Clear,1' + '\n')
-    # out.write(';5,Clear1,1' + '\n')
-    # out.write(';5,Clear2,1' + '\n')
 
-def flatexo_calli(Path,t_now,filt,nbu=None,nbB=None,nbz=None,nbV=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):#u=None,nbu=None,nbr=None,nbz=None,nbg=None,nbi=None,nbIz=None,nbExo=None):
+def flatexo_calli(Path,t_now,filt, nbu=None, nbB=None, nbz=None, nbV=None, nbr=None, nbi=None, nbg=None,
+                  nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbu is None:
         nbu=3
@@ -1203,48 +1263,59 @@ def flatexo_calli(Path,t_now,filt,nbu=None,nbB=None,nbz=None,nbV=None,nbr=None,n
     if nbClear is None:
         nbClear=3
     with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
-        if filt.find('u\'',1)!=-1:
+        if ('u' in filt) or ('u\'' in filt):
             out.write(str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
-        if filt.find('B',1)!=-1:
+
+        if ('B' in filt) or ('B\'' in filt):
             out.write(str(nbB) + ',' + 'B' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbB) + ',' + 'B' + ',' + '1' + '\n')
-        if filt.find('z\'',1)!=-1 and filt.find('I+z',1)==-1:
+
+        if ('z' in filt) or ('z\'' in filt):
             out.write(str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
-        if filt.find('V',1)!=-1:
+
+        if ('V' in filt) or ('V\'' in filt):
             out.write(str(nbV) + ',' + 'V' + ',' + '1' + '\n')
         else:
             out.write(str00 +  str(nbV) + ',' + 'V' + ',' + '1' + '\n')
-        if filt.find('r\'',1)!=-1:
+
+        if ('r' in filt) or ('r\'' in filt):
             out.write(str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
-        if filt.find('i\'',1)!=-1:
+
+        if ('i' in filt) or ('i\'' in filt):
             out.write(str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
         else:
             out.write(str00 +  str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
-        if filt.find('g\'',1)!=-1:
+
+        if ('g' in filt) or ('g\'' in filt):
             out.write(str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
-        if filt.find('I+z',1)!=-1:
+
+        if ('I+z' in filt) or ('I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
         else:
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
-        if filt.find('Exo',1)!=-1:
+
+        if 'Exo' in filt:
             out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
-        if filt.find('Clear',1)!=-1:
+
+        if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
-def flatexo_euro(Path,t_now,filt,nbRc=None,nbB=None,nbz=None,nbV=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):#u=None,nbu=None,nbr=None,nbz=None,nbg=None,nbi=None,nbIz=None,nbExo=None):
+
+def flatexo_euro(Path,t_now,filt, nbRc=None, nbB=None, nbz=None, nbV=None, nbr=None,
+                 nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbRc is None:
         nbRc=3
@@ -1267,48 +1338,59 @@ def flatexo_euro(Path,t_now,filt,nbRc=None,nbB=None,nbz=None,nbV=None,nbr=None,n
     if nbClear is None:
         nbClear=3
     with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
-        if filt.find('Rc',1)!=-1:
+        if 'Rc' in filt:
             out.write(str(nbRc) + ',' + 'Rc' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbRc) + ',' + 'Rc' ',' + '1' + '\n')
-        if filt.find('B',1)!=-1:
+
+        if ('BB' in filt) or ('BB\'' in filt):
             out.write(str(nbB) + ',' + 'B' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbB) + ',' + 'B' + ',' + '1' + '\n')
-        if filt.find('z\'',1)!=-1 and filt.find('I+z',1)==-1:
+
+        if ('z' in filt) or ('z\'' in filt):
             out.write(str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
-        if filt.find('V',1)!=-1:
+
+        if ('V' in filt) or ('V\'' in filt):
             out.write(str(nbV) + ',' + 'V' + ',' + '1' + '\n')
         else:
-            out.write(str00 +  str(nbV) + ',' + 'V' + ',' + '1' + '\n')
-        if filt.find('r\'',1)!=-1:
+            out.write(str00 + str(nbV) + ',' + 'V' + ',' + '1' + '\n')
+
+        if ('r' in filt) or ('r\'' in filt):
             out.write(str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
-        if filt.find('i\'',1)!=-1:
+
+        if ('i' in filt) or ('i\'' in filt):
             out.write(str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
         else:
             out.write(str00 +  str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
-        if filt.find('g\'',1)!=-1:
+
+        if ('g' in filt) or ('g\'' in filt):
             out.write(str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
-        if filt.find('I+z',1)!=-1:
+
+        if ('I+z' in filt) or ('I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
         else:
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
-        if filt.find('Exo',1)!=-1:
+
+        if 'Exo' in filt:
             out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
-        if filt.find('Clear',1)!=-1:
+
+        if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
-def flatexo_saintex(Path,t_now,filt,nbu=None,nbz=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):#u=None,nbu=None,nbr=None,nbz=None,nbg=None,nbi=None,nbIz=None,nbExo=None):
+
+def flatexo_saintex(Path, t_now, filt, nbu=None, nbz=None, nbr=None, nbi=None, nbg=None,
+                    nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbu is None:
         nbu=3
@@ -1327,47 +1409,56 @@ def flatexo_saintex(Path,t_now,filt,nbu=None,nbz=None,nbr=None,nbi=None,nbg=None
     if nbClear is None:
         nbClear=3
     with open(os.path.join(Path,str(t_now),'Cal_flatexo'+ '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') +'.txt'),'w') as out:
-        if filt.find('u\'',1)!=-1:
-            out.write(str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
+        if ('u' in filt) or( 'u\'' in filt):
+            out.write(str(nbu) + ',' + 'u' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
-        if filt.find('z\'',1)!=-1 and filt.find('I+z',1)==-1:
-            out.write(str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
+            out.write(str00 + str(nbu) + ',' + 'u' ',' + '1' + '\n')
+
+        if ('z' in filt) or( 'z\'' in filt):
+            out.write(str(nbz) + ',' + 'z' ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
-        if filt.find('r\'',1)!=-1:
-            out.write(str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
+            out.write(str00 + str(nbz) + ',' + 'z' ',' + '1' + '\n')
+
+        if ('r' in filt) or( 'r\'' in filt):
+            out.write(str(nbr) + ',' + 'r' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
-        if filt.find('i\'',1)!=-1:
-            out.write(str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
+            out.write(str00 + str(nbr) + ',' + 'r' ',' + '1' + '\n')
+
+        if ('i' in filt) or( 'i\'' in filt):
+            out.write(str(nbi) + ',' + 'i' + ',' + '1' + '\n')
         else:
-            out.write(str00 +  str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
-        if filt.find('g\'',1)!=-1:
-            out.write(str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
+            out.write(str00 +  str(nbi) + ',' + 'i' ',' + '1' + '\n')
+
+        if ('g' in filt) or( 'g\'' in filt):
+            out.write(str(nbg) + ',' + 'g' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
-        if filt.find('I+z',1)!=-1:
+            out.write(str00 + str(nbg) + ',' + 'g' + ',' + '1' + '\n')
+
+        if ('I+z' in filt) or( 'I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
         else:
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
-        if filt.find('Exo',1)!=-1:
+
+        if 'Exo' in filt:
             out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
-        if filt.find('Clear',1)!=-1:
+
+        if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
-def flatexo_io(Path,t_now,filt,nbu=None,nbHa=None,nbRc=None,nbz=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):
+
+def flatexo_io(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=None, nbi=None,
+               nbg=None, nbIz=None, nbExo=None, nbClear=None):
     str00=';'
     if nbu is None:
         nbu=3
     if nbHa is None:
         nbHa=3
     if nbRc is None:
-        nbu=Rc
+        nbRc=3
     if nbz is None:
         nbz=3
     if nbr is None:
@@ -1382,49 +1473,60 @@ def flatexo_io(Path,t_now,filt,nbu=None,nbHa=None,nbRc=None,nbz=None,nbr=None,nb
         nbExo=3
     if nbClear is None:
         nbClear=3
-    with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
-        if filt.find('u\'',1)!=-1:
-            out.write(str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
+    with open(os.path.join(Path, str(t_now), 'Cal_flatexo.txt'), 'w') as out:
+        if ('u' in filt) or ('u\'' in filt):
+            out.write(str(nbu) + ',' + 'u' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
-        if filt.find('Ha',1)!=-1:
+            out.write(str00 + str(nbu) + ',' + 'u' ',' + '1' + '\n')
+
+        if 'Ha' in filt:
             out.write(str(nbHa) + ',' + 'Ha' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbHa) + ',' + 'Ha' + ',' + '1' + '\n')
-        if filt.find('Rc',1)!=-1:
+
+        if 'Rc' in filt:
             out.write(str(nbRc) + ',' + 'Rc' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbRc) + ',' + 'Rc' + ',' + '1' + '\n')
-        if filt.find('z\'',1)!=-1 and filt.find('I+z',1)==-1:
-            out.write(str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
+
+        if ('z' in filt) or ('z\'' in filt):
+            out.write(str(nbz) + ',' + 'z' ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
-        if filt.find('r\'',1)!=-1:
+            out.write(str00 + str(nbz) + ',' + 'z' ',' + '1' + '\n')
+
+        if ('r' in filt) or ('r\'' in filt):
             out.write(str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
-        if filt.find('i\'',1)!=-1:
+
+        if ('i' in filt) or ('i\'' in filt):
             out.write(str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
         else:
             out.write(str00 +  str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
-        if filt.find('g\'',1)!=-1:
+
+        if ('g' in filt) or ('g\'' in filt):
             out.write(str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
-        if filt.find('I+z',1)!=-1:
+
+        if ('I+z' in filt) or ('I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
         else:
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
-        if filt.find('Exo',1)!=-1:
+
+        if 'Exo' in filt:
             out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
-        if filt.find('Clear',1)!=-1:
+
+        if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
-def flatexo_artemis_morning(Path,t_now,filt,nbu=None,nbz=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):#u=None,nbu=None,nbr=None,nbz=None,nbg=None,nbi=None,nbIz=None,nbExo=None):
+
+def flatexo_artemis_morning(Path,t_now,filt, nbu=None, nbz=None, nbr=None, nbi=None, nbg=None,
+                            nbIz=None, nbExo=None, nbClear=None):#u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbu is None:
         nbu=7
@@ -1442,41 +1544,50 @@ def flatexo_artemis_morning(Path,t_now,filt,nbu=None,nbz=None,nbr=None,nbi=None,
         nbExo=7
     if nbClear is None:
         nbClear=7
-    with open(os.path.join(Path,str(t_now),'Cal_flatexo_morning.txt'),'w') as out:
-        if filt.find('u',1)!=-1:
+    with open(os.path.join(Path, str(t_now), 'Cal_flatexo_morning.txt'), 'w') as out:
+        if ('u' in filt) or ('u\'' in filt):
             out.write(str(nbu) + ',' + 'u' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbu) + ',' + 'u' ',' + '1' + '\n')
-        if filt.find('z',1)!=-1 and filt.find('I+z',1)==-1:
-            out.write(str(nbz) + ',' + 'z' + ',' + '1' + '\n')
+
+        if ('z' in filt) or ('z\'' in filt):
+            out.write(str(nbz) + ',' + 'z' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbz) + ',' + 'z' ',' + '1' + '\n')
-        if filt.find('r',1)!=-1:
+
+        if ('r' in filt) or ('r\'' in filt):
             out.write(str(nbr) + ',' + 'r' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbr) + ',' + 'r' ',' + '1' + '\n')
-        if filt.find('i',1)!=-1:
+
+        if ('i' in filt) or ('i\'' in filt):
             out.write(str(nbi) + ',' + 'i' + ',' + '1' + '\n')
         else:
-            out.write(str00 +  str(nbi) + ',' + 'i' ',' + '1' + '\n')
-        if filt.find('g',1)!=-1:
+            out.write(str00 + str(nbi) + ',' + 'i' ',' + '1' + '\n')
+
+        if ('g' in filt) or ('g\'' in filt):
             out.write(str(nbg) + ',' + 'g' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbg) + ',' + 'g' + ',' + '1' + '\n')
-        if filt.find('I+z',1)!=-1:
+
+        if ('I+z' in filt) or ('I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
         else:
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
-        if filt.find('Exo',1)!=-1:
+
+        if 'Exo' in filt:
             out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
-        if filt.find('Clear',1)!=-1:
+
+        if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
-def flatexo_artemis_evening(Path,t_now,filt,nbu=None,nbHa=None,nbRc=None,nbz=None,nbr=None,nbi=None,nbg=None,nbIz=None,nbExo=None,nbClear=None):#u=None,nbu=None,nbr=None,nbz=None,nbg=None,nbi=None,nbIz=None,nbExo=None):
+
+def flatexo_artemis_evening(Path,t_now,filt, nbu=None,
+                            nbz=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbu is None:
         nbu=7
@@ -1495,40 +1606,47 @@ def flatexo_artemis_evening(Path,t_now,filt,nbu=None,nbHa=None,nbRc=None,nbz=Non
     if nbClear is None:
         nbClear=7
     with open(os.path.join(Path,str(t_now),'Cal_flatexo_evening.txt'),'w') as out:
-        if filt.find('u',1)!=-1:
+        if ('u' in filt) or( 'u\'' in filt):
             out.write(str(nbu) + ',' + 'u' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbu) + ',' + 'u' ',' + '1' + '\n')
-        if filt.find('z',1)!=-1 and filt.find('I+z',1)==-1:
+
+        if ('z' in filt) or( 'z\'' in filt):
             out.write(str(nbz) + ',' + 'z' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbz) + ',' + 'z' ',' + '1' + '\n')
-        if filt.find('r',1)!=-1:
+
+        if ('r' in filt) or( 'r\'' in filt):
             out.write(str(nbr) + ',' + 'r' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbr) + ',' + 'r' ',' + '1' + '\n')
-        if filt.find('i',1)!=-1:
+
+        if ('i' in filt) or( 'i\'' in filt):
             out.write(str(nbi) + ',' + 'i' + ',' + '1' + '\n')
         else:
             out.write(str00 +  str(nbi) + ',' + 'i' ',' + '1' + '\n')
-        if filt.find('g',1)!=-1:
+
+        if ('g' in filt) or( 'g\'' in filt):
             out.write(str(nbg) + ',' + 'g' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbg) + ',' + 'g' + ',' + '1' + '\n')
-        if filt.find('I+z',1)!=-1:
+
+        if ('I+z' in filt) or( 'I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
         else:
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
-        if filt.find('Exo',1)!=-1:
+
+        if 'Exo' in filt:
             out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
-        if filt.find('Clear',1)!=-1:
+
+        if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
-def biasdark(t_now,Path,telescope,texps=None):
+def biasdark(t_now, Path, telescope, texps=None):
     if telescope == 'Saint-Ex':
         with open(os.path.join(Path, str(t_now), 'Cal_biasdark'+ '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') +'.txt'), 'w') as out:
             str00 = ';'

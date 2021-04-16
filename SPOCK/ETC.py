@@ -1,15 +1,10 @@
 import os
 import numpy as np
 import sys
-import matplotlib.pyplot as plt
-from astropy.time import Time
 from astropy.io import ascii
 from astropy.table import Table,Column, MaskedColumn
-import SPOCK.long_term_scheduler as SPOCKLT
 from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
-import pkg_resources
-from scipy.interpolate import interp1d
-import yaml
+
 
 # pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
 
@@ -49,7 +44,7 @@ class etc:
         ########## CCD
         self.npix        = 2048 #Number of pixels x
         self.npiy        = 2048 #Number of pixels y
-        self.mipi        = 13.5 #picelscale
+        self.mipi        = 13.5 #picelsize
         #self.gain        = 1.1  #Gain [el/ADU] # SSO
         self.tqe         = 243
         self.qefac       = 1.0  #coefficient
@@ -71,7 +66,7 @@ class etc:
 
         ########## Light curve
         self.bin_lc      = 7.2  #Time bin for SNR [min]
-        self.rednoise    = 0.   #Red noise[ppm]
+        self.rednoise    = 500.   #Red noise[ppm]
         self.nsigma      = 5.   #
 
         ########## constants
@@ -155,12 +150,13 @@ class etc:
         if dt < 0.:
             self.ccd['col2']=self.ccd['col2']*self.qet['col2']
 
-        bg_file=path_spock + "/SPOCK/files_ETC/background.dat"
-        bg=ascii.read(bg_file, data_start=0)
+        bg_file = path_spock + "/SPOCK/files_ETC/background.dat"
+        self.bg = ascii.read(bg_file, data_start=0)
 
-        #plt.xlim(500,510)
+        # plt.xlim(500,510)
 
-        #plt.plot(bg['col1'],bg['col6'],bg['col1'],bg['col5'],bg['col1'],bg['col4'],bg['col1'],bg['col3'],bg['col1'],bg['col2'])
+        # plt.plot(self.bg['col1'],self.bg['col6'],self.bg['col1'],self.bg['col5'],self.bg['col1'],
+        # self.bg['col4'],self.bg['col1'],self.bg['col3'],self.bg['col1'],self.bg['col2'])
         moonph_sin=np.arcsin(self.moonphase)*360/(np.pi)
         #Moonphase dependence of background
         if moonph_sin>=0. and moonph_sin <45.:
@@ -204,14 +200,24 @@ class etc:
             print("airmass not supported (1-3)")
             print(5/0.)
 
-        #only use first 5 entries of background.dat!!!
-        exdif=np.array(bg['col'+str(int(l1))][:5]-bg['col'+str(int(l2))][:5])
-        backe=bg['col'+str(int(l1))][:5]-exdif*((self.airmass-airzero)/0.5)
-        exdif=backe[m1]-backe[m2]
+        # only use first 5 entries of background.dat!!!
+        exdif = np.array(self.bg['col'+str(int(l1))][:5]-self.bg['col'+str(int(l2))][:5])
+        backe = self.bg['col'+str(int(l1))][:5]-exdif*((self.airmass-airzero)/0.5)
+        exdif = backe[m1]-backe[m2]
 
         #
         self.back = Table(self.ccd)
-        self.back['col2']=np.zeros(len(self.back['col2']))+backe[m1]-exdif*((moonph_sin-moonzero)/45.)
+        # only use first 5 entries of background.dat!!!
+        col2_bck = []
+        for i in range(len(self.bg)):
+            if i % 5 == 0:
+                exdif = np.array(self.bg['col' + str(int(l1))][i:i + 5] - self.bg['col' + str(int(l2))][i:i + 5])
+                backe = self.bg['col' + str(int(l1))][i:i + 5] - exdif * ((self.airmass - airzero) / 0.5)
+                exdif = backe[m1] - backe[m2]
+
+                col2_bck.append(backe[m1] - exdif * ((moonph_sin - moonzero) / 45.))
+
+        self.back['col2'] = col2_bck
         #plt.grid(True)
         #plt.xlabel("Wavelength [nm]")
         #plt.ylabel("Background")
@@ -253,7 +259,7 @@ class etc:
                         [0.,0.,0.,0.,0., \
                         0.,0.,0.,0., \
                         0.,0.,0.,0., \
-                        0.,0.,0.,0.,0., \
+                        10.23,0.,0.,0.,0., \
                         0.,0.,0.,0., \
                         0.,0.,0.,0.,7.09,9.78,9.91,9.54, \
                         13.41,12.83,13.25],
@@ -395,6 +401,7 @@ class etc:
         scinti_exp=scinti_alt/np.sqrt(2*exp_t)
         scinti2=(scinti_exp*signal)**2
         snr = signal/np.sqrt(signal+tbackape+tronape+tdarkape+scinti2)
+        error = 1/snr
 
         #more (similar) telescopes used?
         if self.num_tel > 1:
@@ -410,7 +417,7 @@ class etc:
         print("Sky [ADU]:\t", tbackape/self.gain)
         peak_ADU = peak/self.gain
         sky_gain = tbackape/self.gain
-        return
+        return error
 
     def exp_time_calculator(self,ADUpeak = None):
         ##########  Observation

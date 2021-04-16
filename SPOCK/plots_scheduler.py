@@ -250,6 +250,7 @@ def airmass_altitude_plot_proposition(name_observatory,telescope,day):
         plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
         plt.title('Visibility plot for the night of the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' on ' + str(telescope))
 
+
 def gantt_chart_all(target_list=None):
     """
 
@@ -323,7 +324,8 @@ def gantt_chart_all(target_list=None):
     }
     offline.plot(fig,auto_open=True,filename=path_spock + '/SPOCK_Figures/Preview_schedule.html',config=config)
 
-def gantt_chart(date_start,date_end,telescope):
+
+def gantt_chart(date_start, date_end, telescope):
     """
 
     Parameters
@@ -543,7 +545,8 @@ def getSPClcV2(target, ap = '', pwvCorr = 0, user= user_portal, password= pwd_po
     lc.reset_index(drop=True)
     return lc
 
-def getSPCdata(target, date, telescope='any', ap=6, user= user_portal, password= pwd_portal):
+
+def getSPCdata(target, date, telescope='any', ap=6, user= user_portal, password=pwd_portal):
     if telescope == 'any':
         urlGet = "http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_file.php?telescope=&date=" + date + "&id=" + target + "&filter=&file=MCMC_text_" + str(ap)
     else:
