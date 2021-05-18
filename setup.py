@@ -14,9 +14,9 @@ setup(
     keywords = '',
     url = 'https://github.com/educrot/SPOCK/',
     packages = find_packages(),
-    long_description=read('README.rst'),
+    long_description = read('README.rst'),
     python_requires='>=3.6',
     install_requires =['pandas','tqdm','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml','docx',
                        'plotly','colorama','gspread', 'oauth2client', 'astroplan', 'alive_progress', 'paramiko',
-                       'requests','chart_studio', 'markdown'],
+                       'requests','chart_studio', 'markdown','python-docx'],
 )
