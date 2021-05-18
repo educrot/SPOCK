@@ -18,5 +18,6 @@ setup(
     python_requires='>=3.6',
     install_requires =['pandas','tqdm','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml',
                        'plotly','colorama','gspread', 'oauth2client', 'astroplan', 'alive_progress', 'paramiko',
-                       'requests','chart_studio', 'markdown','python-docx','bs4','ipywidgets','widgetsnbextension'],
+                       'requests','chart_studio', 'markdown','python-docx','bs4','ipywidgets==7.6.3',
+                       'widgetsnbextension'],
 )
