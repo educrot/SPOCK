@@ -23,6 +23,8 @@ Using *SPOCK*
 To use *SPOCK* you will need to be part of the SPECULOOS consortium and have access to:
  * the SPECULOOS server,
  * the Portal,
+ * the Cambridge Archive,
+ * the SPECULOOS WG6 spread sheet
  * the SSO HUB,
  * SNO reduction PC.
 
