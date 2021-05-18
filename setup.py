@@ -16,7 +16,7 @@ setup(
     packages = find_packages(),
     long_description = read('README.rst'),
     python_requires='>=3.6',
-    install_requires =['pandas','tqdm','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml','docx',
+    install_requires =['pandas','tqdm','numpy==1.19.0','astroplan','astropy','matplotlib','datetime','pyaml',
                        'plotly','colorama','gspread', 'oauth2client', 'astroplan', 'alive_progress', 'paramiko',
                        'requests','chart_studio', 'markdown','python-docx'],
 )
