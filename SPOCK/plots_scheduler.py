@@ -517,8 +517,9 @@ def constraints_scores(constraints,target,observatory,start,end):
     ax.set_xlabel('Time on {0} UTC'.format(time_grid[0].datetime.date()))
     fig.subplots_adjust(left=0.35, right=0.9, top=0.9, bottom=0.1)
 
+
 def coverage(t, p):
-    if p==0:
+    if p == 0:
         return 1
     else:
         ph = ((t + 0.5*p)%p - (0.5*p))
@@ -534,6 +535,7 @@ def coverage(t, p):
         spaces_out = np.sort(sph_out[np.hstack([*np.argwhere(sph_out_diff > 4*df).T, len(sph_in)-1])])
 
         return np.sum(spaces_in - spaces_out)/p
+
 
 def getSPClcV2(target, ap = '', pwvCorr = 0, user= user_portal, password= pwd_portal):
     urlGet ="http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_tls_prep_v2.php?date=*&id=" + target + "&filter=&telescope=&ap=" + str(ap) + "&pwvCorr=" + str(pwvCorr)
@@ -569,20 +571,23 @@ def getSPCdata(target, date, telescope='any', ap=6, user= user_portal, password=
         targetdf = pd.DataFrame({'JD':[],'DIFF_FLUX': [], 'ERROR': [], 'AIRMASS': []})
         return targetdf.reset_index(drop=True)
 
-def phase_coverage_given_target(target,pmin,pmax,path_target_list=None):
+
+def phase_coverage_given_target(target,pmin,pmax,path_target_list=None,times=None):
 
     if path_target_list is None:
         path_target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
 
     target_list = pd.read_csv(path_target_list,sep=' ')
     idx_target_list = list(target_list['Sp_ID']).index(target)
-    data = getSPClcV2(target=target, ap='', pwvCorr=0)
+    if times is None:
+        data = getSPClcV2(target=target, ap='', pwvCorr=0)
 
-    t = data['BJDMID-2450000']
-    t = t.fillna(0)
+        t = data['BJDMID-2450000']
+        t = t.fillna(0)
+    else:
+        t = times
 
-    colors_start_new_target = ['black', 'darkgray', 'lightgray']
-
+    # colors_start_new_target = ['black', 'darkgray', 'lightgray']
 
     P_min = pmin
     P_max = pmax
@@ -592,27 +597,22 @@ def phase_coverage_given_target(target,pmin,pmax,path_target_list=None):
         covs = [coverage(t, period) for period in periods]
         mean_cov = np.mean(covs)*100
         fig, ax = plt.subplots(1, figsize=(9, 7))
-        anchored_text = AnchoredText(r'$SNR_{JWST}$ = ' +  str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3))
+        anchored_text = AnchoredText(r'$SNR_{JWST}$ = ' +
+                                     str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3))
                                      + "\n" +
-                                     "Hours observed = " + str(round(target_list['nb_hours_surved'][idx_target_list],2)) + ' hours',
+                                     "Hours observed = " +
+                                     str(round(target_list['nb_hours_surved'][idx_target_list],2)) + ' hours',
                                      loc=3)
 
         plt.plot(periods, covs, c="silver",label='Effective cov = ' +  str(round(mean_cov,1)) + ' %')
         plt.plot(periods, covs, ".", c="k",)
-        # ax.annotate(r'$SNR_{JWST}$ = ' +  str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3)), (3,1),
-        #             xytext=(0.8, 0.85), textcoords='axes fraction',
-        #             fontsize=16,
-        #             horizontalalignment='right', verticalalignment='top')
-        # ax.annotate(r'Effective cov = ' +  str(round(mean_cov,1)) + ' %', (3,1),
-        #             xytext=(0.8, 0.8), textcoords='axes fraction',
-        #             fontsize=16,
-        #             horizontalalignment='right', verticalalignment='top')
+
         ax.add_artist(anchored_text)
         plt.ylabel('Phase coverage in %')
         plt.xlabel('Period in days')
         plt.legend(fontsize=16)
         plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
-        plt.title(r'Phase coverage for ' + target + ' with periods $\in$ ' + str(pmin) + ' - ' + str(pmax) )
+        plt.title(r'Phase coverage for ' + target + ' with periods $\in$ ' + str(pmin) + ' - ' + str(pmax))
         plt.show()
     except ValueError:
         print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No data for this target ! ')

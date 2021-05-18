@@ -358,7 +358,6 @@ class etc:
         #Correction factor, accounting the apparent magnitude of the target.
         self.corflux = 10**((self.spectra['vref'][i]-self.mag_val)/2.5)
 
-
     def peak_calculation(self,exp_t = 10):
 
         #Object independend effective troughput of the system

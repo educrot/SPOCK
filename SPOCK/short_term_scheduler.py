@@ -1,11 +1,11 @@
 #!/anaconda3/bin/python3.6
 from astropy.time import Time
-from astropy.table import unique,Table
+from astropy.table import unique,Table, vstack
 from astropy import units as u
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 from astroplan.utils import time_grid_from_range
 from astroplan import FixedTarget, AltitudeConstraint, MoonSeparationConstraint,AtNightConstraint,AirmassConstraint,\
-    TimeConstraint
+    TimeConstraint, observability_table
 from astroplan.plots import dark_style_sheet,plot_airmass
 from astroplan import Observer,moon_illumination
 from astroplan.periodic import EclipsingSystem
@@ -37,7 +37,7 @@ scope = ['https://spreadsheets.google.com/feeds',
 creds = ServiceAccountCredentials.from_json_keyfile_name(path_credential_json, scope)
 client = gspread.authorize(creds)
 
-dt=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')  # 1 day
+dt = Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')  # 1 day
 constraints = [AltitudeConstraint(min=24*u.deg), AtNightConstraint()]  # MoonSeparationConstraint(min=30*u.deg)
 
 
@@ -119,15 +119,15 @@ class Schedules:
         self.altitude_constraint = 25
         self.target_list = None
         self.telescopes = []
-        self.telescope =  []
+        self.telescope = []
         self.start_end_range = None  # date_range
         self.day_of_night = None
-        self.constraints = [AtNightConstraint.twilight_nautical()]
-        self.observatory =  None
+        self.constraints = [AtNightConstraint.twilight_civil()]
+        self.observatory = None
         self.observatory_name = None
         self.SS1_night_blocks = None
         self.scheduled_table = None
-        self.SS1_night_blocks_old  = None
+        self.SS1_night_blocks_old = None
         self.scheduled_table_sorted = None
         self.targets_follow_up = None
         self.target_table_spc_follow_up = None
@@ -283,8 +283,8 @@ class Schedules:
                       ' not possible at that time because of altitude constraint')
 
             else:
-                target = FixedTarget(coord=SkyCoord(ra= coords_dome_rotation.icrs.ra.value * u.degree,
-                                                    dec= coords_dome_rotation.icrs.dec.value * u.degree),
+                target = FixedTarget(coord=SkyCoord(ra=coords_dome_rotation.icrs.ra.value * u.degree,
+                                                    dec=coords_dome_rotation.icrs.dec.value * u.degree),
                         name='dome_rot')
                 dom_rot_possible = True
 
@@ -348,7 +348,7 @@ class Schedules:
         self.SS1_night_blocks = seq_schedule_ss1.to_table()
         return self.SS1_night_blocks
 
-    def special_target(self,input_name):
+    def special_target(self, input_name):
         """
         Function to add a special target night block in the plans
         Parameters
@@ -361,13 +361,13 @@ class Schedules:
 
         """
         self.observatory = charge_observatories(self.observatory_name)[0]
-        dur_obs_both_target=(self.night_duration(self.day_of_night)/(2*u.day))*2*u.day
-        constraints_special_target=[AltitudeConstraint(min=self.altitude_constraint*u.deg),
-                                    MoonSeparationConstraint(min=30*u.deg),
-                                    TimeConstraint((Time(self.observatory.twilight_evening_nautical(self.day_of_night,
-                                                                                                    which='next'))),
-                                                   (Time(self.observatory.twilight_morning_nautical(self.day_of_night+1,
-                                                                                                    which='nearest'))))]
+        dur_obs_both_target = (self.night_duration(self.day_of_night)/(2*u.day))*2*u.day
+        constraints_special_target = [AltitudeConstraint(min=self.altitude_constraint*u.deg),
+                                      MoonSeparationConstraint(min=30*u.deg),
+                                      TimeConstraint((Time(self.observatory.twilight_evening_civil(self.day_of_night,
+                                                                                                   which='next'))),
+                                                     (Time(self.observatory.twilight_morning_civil(self.day_of_night+1,
+                                                                                                   which='nearest'))))]
         idx_first_target = int(np.where((self.target_table_spc["Sp_ID"] == input_name))[0])
         if int(self.target_table_spc['texp_spc'][idx_first_target]) == 0:
             self.target_table_spc['texp_spc'][idx_first_target] = \
@@ -375,7 +375,7 @@ class Schedules:
                                    target_list=self.target_table_spc)
         blocks=[]
         a = ObservingBlock(self.targets[idx_first_target], dur_obs_both_target, -1,
-                           constraints= constraints_special_target,
+                           constraints=constraints_special_target,
                            configuration={"filt": str(self.target_table_spc['Filter_spc'][idx_first_target]),
                                           "texp":  str(self.target_table_spc['texp_spc'][idx_first_target])})
         blocks.append(a)
@@ -434,10 +434,11 @@ class Schedules:
             observable = is_event_observable(constraints_follow_up, self.observatory, self.targets_follow_up,
                                              times_ingress_egress=ing_egr)
             if np.any(observable):
-                err_T0_neg = timing_to_obs_jd[0] - (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value, 1) *
-                                                    (period.value - P_err_transit) + (epoch.jd - T0_err_transit))
-                err_T0_pos = (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value, 1) *
-                              (period.value + P_err_transit) + (epoch.jd + T0_err_transit)) - timing_to_obs_jd[0]
+                err_T0_neg = T0_err_transit  # timing_to_obs_jd[0] -
+                # (np.round((timing_to_obs_jd[0] - epoch.jd) / period.value, 1) *(period.value -
+                # P_err_transit) + (epoch.jd - T0_err_transit))
+                err_T0_pos = T0_err_transit  #(np.round((timing_to_obs_jd[0] - epoch.jd) / period.value, 1) *
+                # (period.value + P_err_transit) + (epoch.jd + T0_err_transit)) - timing_to_obs_jd[0]
                 start_transit = Time(ing_egr[0][0].value - err_T0_neg - oot_time.value - W_err_transit,
                                      format='jd')
                 end_transit = Time(ing_egr[0][1].value + err_T0_pos + oot_time.value + W_err_transit,
@@ -464,7 +465,7 @@ class Schedules:
                         if df['texp_spc'][idx_first_target] == 0:
                             df['texp_spc'][idx_first_target] = self.exposure_time(
                                 input_name=df['Sp_ID'][idx_first_target], target_list=self.target_table_spc_follow_up,
-                            day=self.day_of_night)
+                                day=self.day_of_night)
                         a = ObservingBlock(self.targets_follow_up[idx_first_target], dur_obs_transit_target, -1,
                                            constraints=constraints_transit_target,
                                            configuration={"filt": str(df['Filter_spc'][idx_first_target]),
@@ -762,7 +763,7 @@ class Schedules:
                         (self.SS1_night_blocks['end time (UTC)'][0] <= 
                          Time(self.observatory.twilight_morning_nautical(self.day_of_night+1, which='nearest')).iso):
                     print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' situation 4')
-                    self.scheduled_table[i] = self.SS1_night_blocks[0]  # a way  to erase self.scheduled_table block
+                    self.scheduled_table[i] = self.SS1_night_blocks[0]  # a way to erase self.scheduled_table block
 
                 # situation 5
                 elif (self.SS1_night_blocks['end time (UTC)'][0] >= 
@@ -770,7 +771,7 @@ class Schedules:
                     print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' situation 5')
                     self.SS1_night_blocks['end time (UTC)'][0] = \
                         Time(self.observatory.twilight_morning_nautical(self.day_of_night+1, which='nearest')).iso
-                    self.scheduled_table[i] = self.SS1_night_blocks[0]  # a way  to erase self.scheduled_table block
+                    self.scheduled_table[i] = self.SS1_night_blocks[0]  # a way to erase self.scheduled_table block
 
             if self.SS1_night_blocks['start time (UTC)'][0] >= start_before_cut:
 
@@ -1682,6 +1683,14 @@ def prediction(name, ra, dec, timing, period, duration, start_date, ntr):
     target_transit = EclipsingSystem(primary_eclipse_time=Time(timing, format='jd'),
                                      orbital_period=period*u.day, duration=duration*u.day,
                                      name=name)
+    target = [FixedTarget(coord=SkyCoord(ra=ra* u.degree, dec=dec* u.degree), name=name)]
+
+
+    target_set_time_sso = charge_observatories('SSO')[0].target_set_time(start_date,
+                                                                         target,
+                                                                         which='next',
+                                                                         horizon=altitude_constraint * u.deg)
+
 
     mid_transit_timing = Time(target_transit.next_primary_eclipse_time(start_date, n_eclipses=ntr)).iso
     mid_transit_timing_jd = Time(target_transit.next_primary_eclipse_time(start_date, n_eclipses=ntr)).jd
@@ -1702,6 +1711,31 @@ def prediction(name, ra, dec, timing, period, duration, start_date, ntr):
     observable_ts_la_silla = is_event_observable(constraints_predictions, charge_observatories('TS_La_Silla')[0],
                                                  target, times_ingress_egress=ing_egr)
 
+    dates = [Time(Time(ing_egr[i][0]).iso, out_subfmt='date').iso for i in range(len(ing_egr))]
+
+    observable_sso_tables = []
+    observable_sno_tables = []
+    observable_saint_ex_tables = []
+
+    for i in range(len(ing_egr)):
+        date = Time(Time(Time(Time(ing_egr[i][0]).iso, out_subfmt='date').iso).jd+0.625, format='jd')
+        observable_sso_tables.append(observability_table(constraints_predictions, charge_observatories('SSO')[0],
+                                                         target, time_range=Time([date, date+1]),
+                                                         time_grid_resolution=0.5 * u.hour))
+
+        observable_sno_tables.append(observability_table(constraints_predictions, charge_observatories('SNO')[0],
+                                                         target, time_range=Time([date, date + 1]),
+                                                         time_grid_resolution=0.5 * u.hour))
+
+        observable_saint_ex_tables.append(observability_table(constraints_predictions_stx,
+                                                              charge_observatories('Saint-Ex')[0],
+                                                              target, time_range=Time([date, date + 1]),
+                                                              time_grid_resolution=0.5 * u.hour))
+
+    observable_sso_table = vstack(observable_sso_tables)
+    observable_sno_table = vstack(observable_sno_tables)
+    observable_saint_ex_table = vstack(observable_saint_ex_tables)
+
     df = pd.DataFrame(data=ing_egr.sort().iso, index=[name]*len(ing_egr), columns=["Ingress", "Egress"])
 
     df['mid transit'] = mid_transit_timing
@@ -1710,9 +1744,15 @@ def prediction(name, ra, dec, timing, period, duration, start_date, ntr):
 
     df['Observable SSO'] = observable_sso[0]
 
+    df['Hours observable SSO (h)'] = observable_sso_table['fraction of time observable'] * 24*u.hour
+
     df['Observable SNO'] = observable_sno[0]
 
+    df['Hours observable SNO (h)'] = observable_sno_table['fraction of time observable'] * 24*u.hour
+
     df['Observable Saint-Ex'] = observable_saintex[0]
+
+    df['Hours observable Saint-Ex (h)'] = observable_saint_ex_table['fraction of time observable'] * 24*u.hour
 
     df['Observable TN Oukaimeden'] = observable_tn_oukaimeden[0]
 

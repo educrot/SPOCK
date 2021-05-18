@@ -17,6 +17,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock, Transitioner
 import functools
 from functools import reduce
+from ftplib import FTP
 import gspread
 import numpy as np
 import os
@@ -518,8 +519,8 @@ def observability(j, time_range, observatory, targets, constraints):
     # WARNING: Need to be replace by a np.where, but I can't find how
     [targets_observable.append(targets[int(obs)]) for obs in observable]
 
-    table_observability=observability_table(constraints, observatory, targets_observable, time_range=time_range,
-                                            time_grid_resolution = 0.5*u.hour) # calcul une deuxieme fois is observable
+    table_observability = observability_table(constraints, observatory, targets_observable, time_range=time_range,
+                                              time_grid_resolution=0.5*u.hour)  # calcul une deuxieme fois is observable
     table_observability.remove_column('always observable')
     table_observability.remove_column('ever observable')
     table_observability.rename_column('fraction of time observable', 'Month' + str(j))
@@ -759,7 +760,7 @@ class Schedules:
         self.idx_second_target_by_day = []
         self.index_prio = None
         self.index_prio_by_day = []
-        self.idx_planned_SSO = None
+        self.idx_planned_sso = None
         self.idx_SSO_in_planned = None
         self.Moon_constraint = 30
         self.moon_and_visibility_constraint_table = None
@@ -1171,13 +1172,13 @@ class Schedules:
         observed_targets_TS = list(set(observed_targets_TS))
         observed_targets_TN = list(set(observed_targets_TN))
 
-        self.idx_planned_SSO, self.idx_SSO_in_planned = index_list1_list2(observed_targets_SSO,
+        self.idx_planned_sso, self.idx_SSO_in_planned = index_list1_list2(observed_targets_SSO,
                                                                           self.target_table_spc['Sp_ID'])
-        self.idx_planned_SNO, self.idx_SNO_in_planned = index_list1_list2(observed_targets_SNO,
+        self.idx_planned_sno, self.idx_sno_in_planned = index_list1_list2(observed_targets_SNO,
                                                                           self.target_table_spc['Sp_ID'])
-        self.idx_planned_TS, self.idx_TS_in_planned = index_list1_list2(observed_targets_TS,
+        self.idx_planned_ts, self.idx_ts_in_planned = index_list1_list2(observed_targets_TS,
                                                                         self.target_table_spc['Sp_ID'])
-        self.idx_planned_TN, self.idx_TN_in_planned = index_list1_list2(observed_targets_TN,
+        self.idx_planned_tn, self.idx_tn_in_planned = index_list1_list2(observed_targets_TN,
                                                                         self.target_table_spc['Sp_ID'])
 
         if self.Altitude_constraint:
@@ -1189,12 +1190,12 @@ class Schedules:
             self.is_moon_and_visibility_constraint()
 
         if str(self.strategy) == 'continuous':
-            self.reverse_df1 = reverse_observability(self.observatory,self.targets,self.constraints,self.time_ranges)
+            self.reverse_df1 = reverse_observability(self.observatory, self.targets, self.constraints, self.time_ranges)
             end = time.time()
 
-            for t in tqdm(range(0,self.date_range_in_days),desc="Scheduling "):
+            for t in tqdm(range(0, self.date_range_in_days), desc="Scheduling "):
                 pass
-                print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' day is : ',Time(self.date_range[0] + t).iso)
+                print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' day is : ', Time(self.date_range[0] + t).iso)
                 day = self.date_ranges_day_by_day[t]
                 self.table_priority_prio(day)
                 self.idx_targets(t)
@@ -1226,6 +1227,7 @@ class Schedules:
                     schedule_short = SPOCKST.Schedules()
                     schedule_short.load_parameters()
                     schedule_short.day_of_night = day
+                    schedule_short.observatory = self.observatory
                     schedule_short.telescope = self.telescope
                     try:
                         schedule_short.SS1_night_blocks = Table.read(path_spock + '/DATABASE/' +
@@ -1271,8 +1273,8 @@ class Schedules:
         """
         idx_init_first = -1
         self.idx_first_target = self.index_prio[idx_init_first]
-        self.first_target=self.priority[self.idx_first_target]
-        dt_1day = Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')  # 1 day
+        self.first_target = self.priority[self.idx_first_target]
+        dt_1day = Time('2018-01-02 00:00:00', scale='tcg')-Time('2018-01-01 00:00:00', scale='tcg')  # 1 day
 
         if (self.telescope == 'Io') or (self.telescope == 'Europa') or (self.telescope == 'Ganymede') \
                 or (self.telescope == 'Callisto'):
@@ -1290,7 +1292,7 @@ class Schedules:
         if (self.telescope == 'TS_La_Silla') or (self.telescope == 'TN_Oukaimeden'):
             while (self.target_table_spc['texp_spc'][self.idx_first_target] > 150) \
                     or np.any([self.telescopes[j] in self.target_table_spc['telescope'][self.idx_first_target]
-                            for j in range(len(list(self.telescopes)))])  \
+                               for j in range(len(list(self.telescopes)))])  \
                     or ('Artemis' in self.target_table_spc['telescope'][self.idx_first_target]) \
                     or ('Saint-Ex' in self.target_table_spc['telescope'][self.idx_first_target]):
                 print('test ')
@@ -1322,7 +1324,7 @@ class Schedules:
                                                                     horizon=self.Altitude_constraint*u.deg)
 
                 if self.observatory.target_rise_time(self.date_range[0] + t, self.targets[self.idx_first_target],
-                                                     which='next',horizon=24 * u.deg) \
+                                                     which='next', horizon=24 * u.deg) \
                         < self.observatory.target_rise_time(self.date_range[0] + t,
                                                             self.targets[self.idx_first_target],
                                                             which='nearest',
@@ -1376,10 +1378,12 @@ class Schedules:
                                                    self.date_range[0] + dt_1day * (t + 1),
                                                    which='nearest')).value) / 2,
                                               format='jd')
-            start_saint_ex = Time(self.observatory.sun_set_time(self.date_range[0] + dt_1day * t, which='nearest',
+            start_saint_ex = Time(self.observatory.sun_set_time(self.date_range[0] + dt_1day * t, which='next',
                                                                 horizon=-8.19 * u.degree).iso)
             end_saint_ex = Time(self.observatory.sun_rise_time(self.date_range[0] + dt_1day * t, which='next',
                                                                horizon=-8.19 * u.degree).iso)
+            if (start_saint_ex > end_saint_ex) or (end_saint_ex-start_saint_ex).value > 1:
+                sys.exit('ERROR: Problem with start/end of night  on Saint-Ex !!')
 
             if self.telescope == "Saint-Ex":
                 if self.first_target['set or rise'] == 'rise':
@@ -1423,7 +1427,6 @@ class Schedules:
                 if self.first_target['set or rise'] == 'both':
                     self.idx_second_target = self.idx_first_target
                     self.second_target = self.first_target
-                    # print( self.first_target)
                     break
             else:
                 if self.first_target['set or rise'] == 'rise':
@@ -1439,9 +1442,9 @@ class Schedules:
                             self.idx_second_target = None
 
                     if self.priority['set or rise'][self.index_prio[-i]] == 'both':
-                        if (rise_target < start_between_civil_nautical ) and \
+                        if (rise_target < start_between_civil_nautical) and \
                                 (set_target > rise_first_target):
-                            self.idx_second_target =  self.index_prio[-i]
+                            self.idx_second_target = self.index_prio[-i]
                             self.second_target = self.priority[self.idx_second_target]
                             break
 
@@ -1460,7 +1463,7 @@ class Schedules:
                     if self.priority['set or rise'][self.index_prio[-i]] == 'both':
                         if (set_target > end_between_nautical_civil) and \
                                 (rise_target < set_first_target):
-                            self.idx_second_target=self.index_prio[-i]
+                            self.idx_second_target = self.index_prio[-i]
                             self.second_target = self.priority[self.idx_second_target]
                             break
 
@@ -1522,29 +1525,29 @@ class Schedules:
         self.priority['priority'][priority_non_observable_idx] = 0.5
 
         if self.observatory.name == 'SSO':
-            self.priority['priority'][self.idx_planned_SSO] = -500
-            self.priority['priority'][self.idx_planned_SNO] = -500
-            self.priority['priority'][self.idx_planned_TS] = -500
-            self.priority['priority'][self.idx_planned_TN] = -500
+            self.priority['priority'][self.idx_planned_sso] = -500
+            self.priority['priority'][self.idx_planned_sno] = -500
+            self.priority['priority'][self.idx_planned_ts] = -500
+            self.priority['priority'][self.idx_planned_tn] = -500
 
         if (self.telescope == 'Artemis') or (self.telescope == 'Saint-Ex'):
-            self.priority['priority'][self.idx_planned_SSO] = -500
-            self.priority['priority'][self.idx_planned_TS] = -500
-            self.priority['priority'][self.idx_planned_TN] = -500
+            self.priority['priority'][self.idx_planned_sso] = -500
+            self.priority['priority'][self.idx_planned_ts] = -500
+            self.priority['priority'][self.idx_planned_tn] = -500
 
         if self.telescope == 'TN_Oukaimeden':
-            self.priority['priority'][self.idx_planned_SSO] = -500
-            self.priority['priority'][self.idx_planned_SNO] = -500
-            self.priority['priority'][self.idx_planned_TS] = -500
+            self.priority['priority'][self.idx_planned_sso] = -500
+            self.priority['priority'][self.idx_planned_sno] = -500
+            self.priority['priority'][self.idx_planned_ts] = -500
 
         if self.telescope == 'TS_La_Silla':
-            self.priority['priority'][self.idx_planned_SSO] = -500
-            self.priority['priority'][self.idx_planned_SNO] = -500
-            self.priority['priority'][self.idx_planned_TN] = -500
+            self.priority['priority'][self.idx_planned_sso] = -500
+            self.priority['priority'][self.idx_planned_sno] = -500
+            self.priority['priority'][self.idx_planned_tn] = -500
 
         # self.no_obs_with_different_tel()  # This line takes time
         try:
-            read_exposure_time_table = pd.read_csv(path_spock + '/SPOCK_files/exposure_time_table.csv',sep=',')
+            read_exposure_time_table = pd.read_csv(path_spock + '/SPOCK_files/exposure_time_table.csv', sep=',')
         except FileNotFoundError:
             self.exposure_time_table(day)
             read_exposure_time_table = pd.read_csv(path_spock + '/SPOCK_files/exposure_time_table.csv', sep=',')
@@ -1577,7 +1580,7 @@ class Schedules:
     def observability_seclection(self, day):
         day_fmt = Time(day.iso, out_subfmt='date').iso
         if os.path.exists(path_spock + '/SPOCK_files/Ranking_months_' + str(self.observatory.name) + '_' +
-                          str(day_fmt) +  '_ndays_'  + str(self.date_range_in_days) + '_' + str(
+                          str(day_fmt) + '_ndays_' + str(self.date_range_in_days) + '_' + str(
                 len(self.targets)) + '.csv'):
             name_file = path_spock + '/SPOCK_files/Ranking_months_' + str(self.observatory.name) + '_' +\
                         str(day_fmt) + '_ndays_' + str(self.date_range_in_days) + '_' + str(
@@ -1586,8 +1589,10 @@ class Schedules:
             self.priority = Table.from_pandas(dataframe_ranking_months)
         else:
             if self.telescope == 'Saint-Ex':
-                start_night_start_saint_ex = Time(self.observatory.sun_set_time(day, which='nearest',
+                start_night_start_saint_ex = Time(self.observatory.sun_set_time(day, which='next',
                                                                                 horizon=-8.19 * u.degree).iso)
+                if start_night_start_saint_ex < day:
+                    sys.exit('ERROR: Problem with start/end of night  on Saint-Ex !!')
                 delta_midnight_start = np.linspace(0, self.observatory.sun_rise_time(day, which='next',
                                                                                      horizon=-8.19 * u.degree).jd -
                                                    self.observatory.sun_set_time(day, which='nearest',
@@ -1676,24 +1681,24 @@ class Schedules:
 
             set_time_begin = datetime.strptime(self.observatory.target_set_time(self.date_range[0],
                                                                                 self.targets[idx_target],
-                                                                                which='next',horizon=24*u.deg).iso,
+                                                                                which='next', horizon=24*u.deg).iso,
                                                date_format)
             set_time_end = datetime.strptime(self.observatory.target_set_time(self.date_range[1],
                                                                               self.targets[idx_target],
-                                                                              which='next',horizon=24*u.deg).iso,
+                                                                              which='next', horizon=24*u.deg).iso,
                                              date_format)
             shift_hours_observation = (set_time_begin.hour +
-                                       set_time_begin.minute/60 - set_time_end.hour - set_time_end.minute/60 )
+                                       set_time_begin.minute/60 - set_time_end.hour - set_time_end.minute/60)
 
         if self.priority['set or rise'][idx_target] == 'rise':
 
             rise_time_begin = datetime.strptime(self.observatory.target_rise_time(self.date_range[0],
                                                                                   self.targets[idx_target],
-                                                                                  which='next',horizon=24*u.deg).iso,
+                                                                                  which='next', horizon=24*u.deg).iso,
                                                 date_format)
             rise_time_end = datetime.strptime(self.observatory.target_rise_time(self.date_range[1],
                                                                                 self.targets[idx_target],
-                                                                                which='next',horizon=24*u.deg).iso,
+                                                                                which='next', horizon=24*u.deg).iso,
                                               date_format)
             shift_hours_observation = (rise_time_end.hour + rise_time_end.minute/60 - rise_time_begin.hour -
                                        rise_time_begin.minute/60)
@@ -1701,7 +1706,7 @@ class Schedules:
         if self.priority['set or rise'][idx_target] == 'both':
             shift_hours_observation = 0
 
-        return shift_hours_observation #hours
+        return shift_hours_observation  # hours
 
     def schedule_blocks(self, day):
         """
@@ -1718,7 +1723,7 @@ class Schedules:
 
         """
 
-        dt_1day=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')
+        dt_1day = Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')
         delta_day = (day - self.date_range[0]).value
 
         if self.idx_second_target is not None:
@@ -1746,10 +1751,13 @@ class Schedules:
                                                day + dt_1day * (0 + 1),
                                                which='nearest')).value) / 2,
                                           format='jd')
-        start_saint_ex = Time(self.observatory.sun_set_time(day, which='nearest',
+        start_saint_ex = Time(self.observatory.sun_set_time(day, which='next',
                                                             horizon=-8.19*u.degree).iso)
         end_saint_ex = Time(self.observatory.sun_rise_time(day, which='next',
                                                            horizon=-8.19 * u.degree).iso)
+        if (start_saint_ex > end_saint_ex) or (end_saint_ex - start_saint_ex).value > 1:
+            sys.exit('ERROR: Problem with start/end of night  on Saint-Ex !!')
+
         if self.telescope == 'Saint-Ex':
             constraints_set_target = self.constraints + [TimeConstraint(start_saint_ex,
                                                                         (start_saint_ex + dur_obs_set_target))]
@@ -1891,16 +1899,18 @@ class Schedules:
                                                day+1,
                                                which='nearest')).value) / 2,
                                           format='jd')
-        start_saint_ex = Time(self.observatory.sun_set_time(day, which='nearest',
+        start_saint_ex = Time(self.observatory.sun_set_time(day, which='next',
                                                             horizon=-8.19 * u.degree).iso)
         end_saint_ex = Time(self.observatory.sun_rise_time(day, which='next',
                                                            horizon=-8.19 * u.degree).iso)
+        if (start_saint_ex > end_saint_ex) or (end_saint_ex - start_saint_ex).value > 1:
+            sys.exit('ERROR: Problem with start/end of night  on Saint-Ex !!')
         if self.telescope == 'Saint-Ex':
             dura = end_saint_ex - start_saint_ex
         else:
             dura = end_between_nautical_civil - start_between_civil_nautical
-        #dura = Time(Time(self.observatory.twilight_morning_nautical(day + dt_1day ,which='nearest')).jd - \
-        #       Time(self.observatory.twilight_evening_nautical(day ,which='next')).jd,format='jd')
+        # dura = Time(Time(self.observatory.twilight_morning_nautical(day + dt_1day ,which='nearest')).jd - \
+        # Time(self.observatory.twilight_evening_nautical(day ,which='next')).jd,format='jd')
         return dura
 
     def info_obs_possible(self,day):
@@ -1956,7 +1966,7 @@ class Schedules:
         """
         constraints = self.constraints + [MoonSeparationConstraint(min=35*u.deg)]
 
-        dt_1day=Time('2018-01-02 00:00:00',scale='utc')-Time('2018-01-01 00:00:00',scale='utc')
+        dt_1day = Time('2018-01-02 00:00:00',scale='utc')-Time('2018-01-01 00:00:00', scale='utc')
 
         start_between_civil_nautical = Time((Time(
             self.observatory.twilight_evening_nautical(day,
@@ -1974,10 +1984,12 @@ class Schedules:
                                                which='nearest')).value) / 2,
                                           format='jd')
 
-        start_saint_ex = Time(self.observatory.sun_set_time(day, which='nearest',
+        start_saint_ex = Time(self.observatory.sun_set_time(day, which='next',
                                                             horizon=-8.19 * u.degree).iso)
         end_saint_ex = Time(self.observatory.sun_rise_time(day, which='next',
                                                            horizon=-8.19 * u.degree).iso)
+        if (start_saint_ex > end_saint_ex) or (end_saint_ex - start_saint_ex).value > 1:
+            sys.exit('ERROR: Problem with start/end of night  on Saint-Ex !!')
         if self.telescope == 'Saint-Ex':
             self.observability_table_day = observability_table(self.constraints, self.observatory, self.targets,
                                                                time_range=Time([start_saint_ex.iso,
@@ -1994,48 +2006,41 @@ class Schedules:
                                              times= Time(start_between_civil_nautical +
                                                          self.night_duration(day).value/2))
 
-        idx_not_visible_mid_night = np.where((is_visible_mid_night==False))
+        idx_not_visible_mid_night = np.where((is_visible_mid_night == False))
 
         self.observability_table_day['ever observable'][idx_not_visible_mid_night[0]] = False
 
         return self.observability_table_day
 
-    def is_constraints_met_first_target(self,t):
+    def is_constraints_met_first_target(self, t):
         """
-            Useful when the moon constrain (< 30°) or the hours constraint (nb_hours_observed>nb_hours_threshold)
-            are not fullfilled anymore and the first target needs to be changed
 
         Parameters
         ----------
-            t: int, days in the month
-            idx_first_target: int, index associated to the first target (with regards to the targets list)
-            idx_set_targets_sorted: list of int, index of all the set target ranked y priority
-            idx_rise_targets_sorted: list of int, index of all the rise target ranked y priority
-            index_prio: list of int, index of all the rise target ranked y priority
+        t
 
         Returns
         -------
-            is_moon_constraint_met_first_target: boolean, say if moon constraint is fullfilled on first target
-            hours_constraint: boolean, say if hour constraint is fullfilled on first target
-            idx_first_target: int, index for the first target (if constraints where already fullfilled the Value
-            is the same as input, else it is a new value for a new target)
 
         """
-        dt_1day=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')
 
-        is_moon_constraint_met_first_target = self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
+        if t == 4:
+            print()
+        dt_1day = Time('2018-01-02 00:00:00', scale='tcg')-Time('2018-01-01 00:00:00', scale='tcg')
+
+        is_moon_constraint_met_first_target = \
+            self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
         hours_constraint_first = self.is_constraint_hours(self.idx_first_target)
 
-        idx_safe=1
-        idx_safe_1rst_set=1
-        idx_safe_1rst_rise=1
-        moon_idx_set_target=0
-        moon_idx_rise_target=0
+        idx_safe = 1
+        idx_safe_1rst_set = 1
+        idx_safe_1rst_rise = 1
+        moon_idx_set_target = 0
+        moon_idx_rise_target = 0
 
         while not (is_moon_constraint_met_first_target & hours_constraint_first):
 
-            before_change_first_target=self.priority[self.idx_first_target]
-            before_change_idx_first_target=self.idx_first_target
+            before_change_first_target = self.priority[self.idx_first_target]
 
             if before_change_first_target['set or rise'] == 'set':
                 moon_idx_set_target += 1
@@ -2043,73 +2048,68 @@ class Schedules:
                     idx_safe_1rst_set += 1
                     self.idx_first_target = self.index_prio[-idx_safe_1rst_set]
                     self.first_target = self.priority[self.idx_first_target]
-                    is_moon_constraint_met_first_target = self.moon_and_visibility_constraint_table ['ever observable'][self.idx_first_target]
+                    is_moon_constraint_met_first_target = \
+                        self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
                     hours_constraint_first = self.is_constraint_hours(self.idx_first_target)
                 else:
-                    self.idx_first_target=self.idx_set_targets_sorted[-moon_idx_set_target]
-                    self.first_target=self.priority[self.idx_first_target]
-                    if self.priority['priority'][self.idx_first_target]!=float('-inf'):
-                        is_moon_constraint_met_first_target = self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
-                        hours_constraint_first=self.is_constraint_hours(self.idx_first_target)
-                    else:
-                        is_moon_constraint_met_first_target = False
-                        hours_constraint_first = False
-
-            if before_change_first_target['set or rise'] == 'rise':
-                moon_idx_rise_target += 1
-                if moon_idx_rise_target >= len(self.idx_rise_targets_sorted):
-                    idx_safe_1rst_rise += 1
-                    self.idx_first_target = self.index_prio[-idx_safe_1rst_rise]
-                    self.first_target = self.priority[self.idx_first_target]
-                    is_moon_constraint_met_first_target = self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
-                    hours_constraint_first = self.is_constraint_hours(self.idx_first_target)
-                else:
-                    self.idx_first_target=self.idx_rise_targets_sorted[-moon_idx_rise_target]
+                    self.idx_first_target = self.idx_set_targets_sorted[-moon_idx_set_target]
                     self.first_target = self.priority[self.idx_first_target]
                     if self.priority['priority'][self.idx_first_target] != float('-inf'):
-                        is_moon_constraint_met_first_target = self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
+                        is_moon_constraint_met_first_target = \
+                            self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
                         hours_constraint_first = self.is_constraint_hours(self.idx_first_target)
                     else:
                         is_moon_constraint_met_first_target = False
                         hours_constraint_first = False
 
+            elif before_change_first_target['set or rise'] == 'rise' and not is_moon_constraint_met_first_target:
+                moon_idx_rise_target += 1
+                if moon_idx_rise_target >= len(self.idx_rise_targets_sorted):
+                    idx_safe_1rst_rise += 1
+                    self.idx_first_target = self.index_prio[-idx_safe_1rst_rise]
+                    self.first_target = self.priority[self.idx_first_target]
+                    is_moon_constraint_met_first_target = \
+                        self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
+                    hours_constraint_first = self.is_constraint_hours(self.idx_first_target)
+                else:
+                    self.idx_first_target = self.idx_rise_targets_sorted[-moon_idx_rise_target]
+                    self.first_target = self.priority[self.idx_first_target]
+                    if self.priority['priority'][self.idx_first_target] != float('-inf'):
+                        is_moon_constraint_met_first_target = \
+                            self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
+                        hours_constraint_first = self.is_constraint_hours(self.idx_first_target)
+                    else:
+                        is_moon_constraint_met_first_target = False
+                        hours_constraint_first = False
 
-            if (before_change_first_target['set or rise'] != 'rise') and (before_change_first_target['set or rise'] != 'set'):
-                idx_safe+=1
-                self.idx_first_target=self.index_prio[-idx_safe]
-                self.first_target=self.priority[self.idx_first_target]
-                is_moon_constraint_met_first_target = self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
-                hours_constraint_first=self.is_constraint_hours(self.idx_first_target)
+            elif (before_change_first_target['set or rise'] != 'rise') and \
+                    (before_change_first_target['set or rise'] != 'set') and not is_moon_constraint_met_first_target:
+                idx_safe += 1
+                self.idx_first_target = self.index_prio[-idx_safe]
+                self.first_target = self.priority[self.idx_first_target]
+                is_moon_constraint_met_first_target = \
+                    self.moon_and_visibility_constraint_table['ever observable'][self.idx_first_target]
+                hours_constraint_first = self.is_constraint_hours(self.idx_first_target)
 
         if is_moon_constraint_met_first_target and hours_constraint_first:
-            is_constraints_met_first_target=True
+            is_constraints_met_first_target = True
         else:
-            is_constraints_met_first_target=False
+            is_constraints_met_first_target = False
         return is_constraints_met_first_target
 
-    def is_constraints_met_second_target(self,t):
+    def is_constraints_met_second_target(self, t):
         """
-            Useful when the moon constrain (< 30°) or the hours constraint (nb_hours_observed>nb_hours_threshold)
-            are not fullfilled anymore and the second target needs to be changed
 
         Parameters
         ----------
-            t: int, days in the month
-            idx_first_target: int, index associated to the first target (with regards to the targets list)
-            idx_second_target: int, index associated to the second target (with regards to the targets list)
-            idx_set_targets_sorted: list of int, index of all the set target ranked y priority
-            idx_rise_targets_sorted: list of int, index of all the rise target ranked y priority
-            index_prio: list of int, index of all the rise target ranked y priority
+        t
 
         Returns
         -------
-            is_moon_constraint_met_second_target: boolean, say if moon constraint is fullfilled on second target
-            hours_constraint: boolean, say if hour constraint is fullfilled on second target
-            idx_second_target: int, index for the second target (if constraints where already fullfilled the Value
-            is the same as input, else it is a new value for a new target)
 
         """
-        dt_1day=Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')
+
+        dt_1day = Time('2018-01-02 00:00:00', scale='tcg')-Time('2018-01-01 00:00:00', scale='tcg')
 
         is_moon_constraint_met_second_target = self.moon_and_visibility_constraint_table['ever observable'][self.idx_second_target]
         hours_constraint_second=self.is_constraint_hours(self.idx_second_target)
@@ -2234,29 +2234,31 @@ class Schedules:
         if self.idx_second_target is not None:
             shift = max(self.shift_hours_observation(self.idx_first_target),self.shift_hours_observation(self.idx_second_target)) /24 #days
         else:
-            shift = self.shift_hours_observation(self.idx_first_target) /24 #days
+            shift = self.shift_hours_observation(self.idx_first_target)/24 #days
 
-        dur_obs_both_target = (self.night_duration(day).value) * u.day
-        dur_obs_set_target = (self.night_duration(day).value/2 - shift/self.date_range_in_days) * u.day #(self.night_duration(day)/(2*u.day))*u.day+1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
-        dur_obs_rise_target = (self.night_duration(day).value/2 + shift/self.date_range_in_days) * u.day#(self.night_duration(day)/(2*u.day))*u.day-1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
+        dur_obs_both_target = self.night_duration(day).value * u.day
+        dur_obs_set_target = (self.night_duration(day).value/2 - shift/self.date_range_in_days) * u.day
+        # (self.night_duration(day)/(2*u.day))*u.day+1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
+        dur_obs_rise_target = (self.night_duration(day).value/2 + shift/self.date_range_in_days) * u.day
+        # (self.night_duration(day)/(2*u.day))*u.day-1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
 
         if self.first_target['set or rise'] == 'set':
-            nb_hours__1rst_old = self.nb_hours[1,self.idx_first_target] #hours
-            a =  dur_obs_set_target.value #in days
+            nb_hours__1rst_old = self.nb_hours[1,self.idx_first_target]  # hours
+            a = dur_obs_set_target.value  # in days
 
         if self.first_target['set or rise'] == 'both':
-            nb_hours__1rst_old = self.nb_hours[1,self.idx_first_target] #hours
-            a  = dur_obs_both_target.value #in days
+            nb_hours__1rst_old = self.nb_hours[1, self.idx_first_target]  # hours
+            a = dur_obs_both_target.value  # in days
 
         if self.first_target['set or rise'] == 'rise':
-            nb_hours__1rst_old = self.nb_hours[1,self.idx_first_target] #hours
-            a = dur_obs_rise_target.value #in days
+            nb_hours__1rst_old = self.nb_hours[1, self.idx_first_target]  # hours
+            a = dur_obs_rise_target.value  # in days
 
         self.nb_hours[0,self.idx_first_target] = nb_hours__1rst_old
-        self.nb_hours[1,self.idx_first_target] = nb_hours__1rst_old +  a *24
-        self.target_table_spc['nb_hours_surved'][self.idx_first_target] = nb_hours__1rst_old +  a *24
+        self.nb_hours[1,self.idx_first_target] = nb_hours__1rst_old + a*24
+        self.target_table_spc['nb_hours_surved'][self.idx_first_target] = nb_hours__1rst_old + a*24
 
-    def update_hours_observed_second(self,day):
+    def update_hours_observed_second(self, day):
         """
             update number of hours observed for the corresponding second target
 
@@ -2272,33 +2274,35 @@ class Schedules:
 
         """
         if self.idx_second_target is not None:
-            shift = max(self.shift_hours_observation(self.idx_first_target),self.shift_hours_observation(self.idx_second_target)) /24 #days
+            shift = max(self.shift_hours_observation(self.idx_first_target),
+                        self.shift_hours_observation(self.idx_second_target))/24  # days
         else:
-            shift = self.shift_hours_observation(self.idx_first_target) /24 #days
-        dur_obs_both_target = (self.night_duration(day).value ) * u.day
-        dur_obs_set_target = (self.night_duration(day).value/2  - shift/self.date_range_in_days)  * u.day #(self.night_duration(day)/(2*u.day))*u.day+1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
-        dur_obs_rise_target = (self.night_duration(day).value/2  + shift/self.date_range_in_days) * u.day #(self.night_duration(day)/(2*u.day))*u.day-1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
-
+            shift = self.shift_hours_observation(self.idx_first_target)/24  # days
+        dur_obs_both_target = self.night_duration(day).value * u.day
+        dur_obs_set_target = (self.night_duration(day).value/2 - shift/self.date_range_in_days) * u.day
+        # (self.night_duration(day)/(2*u.day))*u.day+1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
+        dur_obs_rise_target = (self.night_duration(day).value/2 + shift/self.date_range_in_days) * u.day
+        # (self.night_duration(day)/(2*u.day))*u.day-1*((aa.value/30)*u.hour-t/(aa.value/2)*u.hour)
 
         if self.second_target['set or rise'] == 'rise':
-            nb_hours__2nd_old = self.nb_hours[1,self.idx_second_target] #hours
-            b = dur_obs_rise_target.value #in days
+            nb_hours__2nd_old = self.nb_hours[1, self.idx_second_target]  # hours
+            b = dur_obs_rise_target.value  # in days
         if self.second_target['set or rise'] == 'set':
-            nb_hours__2nd_old = self.nb_hours[1,self.idx_second_target] #hours
-            b =  dur_obs_set_target.value #in days
+            nb_hours__2nd_old = self.nb_hours[1, self.idx_second_target]  # hours
+            b = dur_obs_set_target.value  # in days
         if self.second_target['set or rise'] == 'both':
-            nb_hours__2nd_old = self.nb_hours[1,self.idx_second_target] #hours
-            b = dur_obs_both_target.value #in days
+            nb_hours__2nd_old = self.nb_hours[1, self.idx_second_target]  # hours
+            b = dur_obs_both_target.value  # in days
 
         self.nb_hours[0, self.idx_second_target] = nb_hours__2nd_old
-        self.nb_hours[1, self.idx_second_target] = nb_hours__2nd_old + b *24
-        self.target_table_spc['nb_hours_surved'][self.idx_second_target] =  nb_hours__2nd_old + b *24
+        self.nb_hours[1, self.idx_second_target] = nb_hours__2nd_old + b*24
+        self.target_table_spc['nb_hours_surved'][self.idx_second_target] = nb_hours__2nd_old + b*24
 
-    def make_plan_file(self,day):
+    def make_plan_file(self, day):
         name_all = self.night_block['target']
-        Start_all = self.night_block['start time (UTC)']
-        Finish_all = self.night_block['end time (UTC)']
-        Duration_all = self.night_block['duration (minutes)']
+        start_all = self.night_block['start time (UTC)']
+        finish_all = self.night_block['end time (UTC)']
+        duration_all = self.night_block['duration (minutes)']
         self.update_hours_observed_first(day)
         if self.idx_second_target is not None:
             self.update_hours_observed_second(day)
@@ -2307,17 +2311,17 @@ class Schedules:
             for i, nam in enumerate(name_all):
                 if i == 1:
                     if nam == name_all[i - 1]:
-                        Start_all[i] = Start_all[i - 1]
-                        Duration_all[i] = (Time(Finish_all[i]) - Time(Start_all[i])).value * 24 * 60
+                        start_all[i] = start_all[i - 1]
+                        duration_all[i] = (Time(finish_all[i]) - Time(start_all [i])).value * 24 * 60
                         self.night_block.remove_row(0)
 
                 idx_target = np.where((nam == self.target_table_spc['Sp_ID']))[0]
                 if nam != 'TransitionBlock':
                     file_plan.write(
-                        nam + ' ' + '\"' + Start_all[i] + '\"' + ' ' + '\"' + Finish_all[i] + '\"' + ' ' + self.telescope + ' ' + \
-                        str(np.round(self.nb_hours[0,idx_target[0]], 3)) + '/' + str(
-                            self.target_table_spc['nb_hours_threshold'][idx_target[0]]) + ' ' + \
-                        str(np.round(self.nb_hours[1,idx_target[0]], 3)) + '/' + str(
+                        nam + ' ' + '\"' + start_all [i] + '\"' + ' ' + '\"' + finish_all[i] + '\"' + 
+                        ' ' + self.telescope + ' ' + str(np.round(self.nb_hours[0, idx_target[0]], 3)) + '/' + 
+                        str(self.target_table_spc['nb_hours_threshold'][idx_target[0]]) + ' ' + 
+                        str(np.round(self.nb_hours[1, idx_target[0]], 3)) + '/' + str(
                             self.target_table_spc['nb_hours_threshold'][idx_target[0]]) + '\n')
 
     def reference_table(self):
@@ -2385,7 +2389,8 @@ class Schedules:
                 spt_type = 'M2'
         if round(abs(self.target_table_spc['SpT'][i])) <= 2:
             spt_type = 'M2'
-        elif (round(abs(self.target_table_spc['SpT'][i])) == 12) or (round(abs(self.target_table_spc['SpT'][i])) == 15) \
+        elif (round(abs(self.target_table_spc['SpT'][i])) == 12) \
+                or (round(abs(self.target_table_spc['SpT'][i])) == 15) \
                 or (int(abs(self.target_table_spc['SpT'][i])) == 18):
             spt_type = 'M' + str(round(self.target_table_spc['SpT'][i]) - 10)
         elif round(abs(self.target_table_spc['SpT'][i])) == 10:
@@ -2867,3 +2872,26 @@ def date_range_in_days(date_range):
     date_start = datetime.strptime(date_range[0].value, date_format)
     date_end = datetime.strptime(date_range[1].value, date_format)
     return (date_end - date_start).days
+
+
+def get_target_list_stargate(day):
+    """
+
+    Parameters
+    ----------
+    day
+
+    Returns
+    -------
+
+    """
+    objdate = datetime.strptime(day, '%Y-%m-%d')
+    y = datetime.strftime(objdate,'%Y')
+    m = datetime.strftime(objdate,'%m').lstrip('0')
+    d = datetime.strftime(objdate,'%d').lstrip('0')
+    ftp = FTP('z93vm.ftp.infomaniak.com')
+    ftp.login('z93vm_stargate_updb','TrApPiST-1fgh')
+    # day = Time(day, scale='utc', out_subfmt='date').iso
+    file_name = 'stargate_db_'+y+'-'+m+'-'+d+'.csv'
+    my_file = open('./target_lists/stargate/'+ file_name, 'wb')
+    ftp.retrbinary('RETR ' + file_name, my_file.write, 1024)

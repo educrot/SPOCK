@@ -29,9 +29,7 @@ target_table_spc_follow_up = dataframe.rename(columns={"sp_id": "Sp_ID", "gaia_d
                                                             "period": "P", "period_e": "P_err",
                                                             "duration": "W", "duration_e": "W_err",
                                                             "dec": "DEC", "ra": "RA",
-                                                            "dec_err": "DEC_err", "ra_err": "RA_err",
-
-                                                            })
+                                                            "dec_err": "DEC_err", "ra_err": "RA_err"})
 target_table_spc_follow_up['W'] /= 24
 target_table_spc_follow_up['W_err'] /= 24
 # Read follow up (planet candidates) list
@@ -65,9 +63,11 @@ def charge_observatory(Name):
 
     return observatories
 
+
 def Path_txt_files(telescope):
     Path=os.path.join(path_spock + '/DATABASE',telescope,'Plans_by_date')
     return Path
+
 
 def startup_no_flats(t_now,name,sun_set,date_start,Path):
     date_start=np.datetime64(date_start)
@@ -125,6 +125,7 @@ def startup_no_flats(t_now,name,sun_set,date_start,Path):
             out.write(str00)
         out.write(str5 + 'Obj_' + name + '.txt' + '\n')
         out.write(str00)
+
 
 def startup(t_now,name,sun_set,date_start,Path,telescope):
     date_start=np.datetime64(date_start)
@@ -254,6 +255,7 @@ def startup(t_now,name,sun_set,date_start,Path,telescope):
                 out.write(str5 + 'Obj_' + name + '.txt' + '\n')
                 out.write(str00)
 
+
 def startup_artemis(t_now,name,sun_set,date_start,Path):
     date_start=np.datetime64(date_start)
     sun_set=np.datetime64(sun_set)
@@ -311,9 +313,10 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
         out.write(str5 + 'Obj_' + name + '.txt' + '\n')
         out.write(str00)
 
+
 def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
            ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
-    df = pd.read_csv(target_list_path,delimiter=' ',index_col = False)
+    df = pd.read_csv(target_list_path,delimiter=' ',index_col=False)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
@@ -321,11 +324,11 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
     elif 'Sp' in name:
         if name != 'Sp1837+2030':
             df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
-            #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
+            # idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
             idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
-        df2 = pd.concat([target_table_spc_follow_up,target_table_spc_special],ignore_index=True)
+        df2 = pd.concat([target_table_spc_follow_up, target_table_spc_special], ignore_index=True)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         try:
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
@@ -388,15 +391,16 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             out.write(str2 + str(waitlimit) + '\n')
             out.write(str3)
             out.write(str33 + str(afinterval) + '\n')
-            if autofocus is None:
+            if not autofocus:
                 out.write(str00 + str4)
+            else:
+                out.write(str4)
             out.write(str5 + str(count) + '\n')
             out.write(str6 + str(binning) + '\n')
             out.write(str7 + str(filt) + '\n')
             out.write(str8 + str(exptime) + '\n')
             out.write('#TAG Donuts=on' + '\n')
             if int(dec1) == -0:
-                # print('ici')
                 out.write(name.replace('_2', '') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str(
                     '{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str(
                     '{:02d}'.format(int(dec1))) \
@@ -409,7 +413,6 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                           + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str(
                     '{:05.2f}'.format(abs(dec3))) + '\n')
             if int(dec1) > 0:
-                # print('la')
                 out.write(name.replace('_2', '') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str(
                     '{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str(
                     '{:02d}'.format(int(dec1))) \
@@ -450,10 +453,10 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             #print(c.dec.degree,c.dec.radian)
             for i in range(1,2):
                 out.write(str00 + '\n')
-            out.write(str00 + ' ' + str(name).replace('_2','') + '\n')
+            out.write(str00 + ' ' + str(name).replace('_2', '') + '\n')
             out.write(str00 + '\n')
             out.write(str00 + ' ' + str(gaia_id_target) + '\n')
-            for i in range(1,2):
+            for i in range(1, 2):
                 out.write(str00 + '\n')
             out.write(str1 + str(hour0) + ':' + str(minute0) + '\n')
             if name == "dome_rot":
@@ -473,11 +476,13 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             if name == 'dome_rot':
                 out.write('#nopointing'+'\n')
             out.write(str3)
-            out.write(str33 + str(afinterval) +'\n')
-            if autofocus is None:
+            out.write(str33 + str(afinterval) + '\n')
+            if not autofocus:
                 out.write(str00 + str4)
+            else:
+                out.write(str4)
             if name == 'dome_rot':
-                out.write('#count 1'  + '\n')
+                out.write('#count 1' + '\n')
             else:
                 out.write(str5 + str(count) + '\n')
             out.write(str6 + str(binning) + '\n')
@@ -487,19 +492,17 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write('#TAG Donuts=off' + '\n')
             else:
                 out.write('#TAG Donuts=on'+'\n')
-            if int(dec1)==-0:
-                #print('ici')
+            if int(dec1) == -0:
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                           str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                           '-' + str('{:02d}'.format(int(dec1))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
-            if int(dec1)<0 and int(dec1)!=-0:
+            if int(dec1) < 0 and int(dec1) != -0:
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                           str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                           '-' + str('{:02d}'.format(int(abs(dec1)))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
-            if int(dec1)>0:
-                #print('la')
+            if int(dec1) > 0:
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                           str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                           '+' + str('{:02d}'.format(int(dec1))) \
@@ -517,6 +520,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write(str10 + 'Obj_' + name_2  +'.txt' + '\n')
             out.write(str00 + '\n')
 
+
 def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
                      ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
     df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
@@ -526,15 +530,15 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     elif 'Sp' in name:
         df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
-        #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
+        # idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
-        gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
+        gaia_id_target = df2['Gaia_ID'][int(idx_target)]  # int(df['gaia'][idx_target].values)
     if idx_target is None:
-        df2 = pd.concat([target_table_spc_follow_up,target_table_spc_special],ignore_index=True)
+        df2 = pd.concat([target_table_spc_follow_up, target_table_spc_special], ignore_index=True)
         idx_target = np.where((df2['Sp_ID'] == name))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)]
 
-    date_start=np.datetime64(date_start)
+    date_start = np.datetime64(date_start)
     date_end=np.datetime64(date_end)
     binning=1
     name_file=name + '.txt'
@@ -581,27 +585,27 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         out.write('#chill -60\n')
         out.write(str2 + str(waitlimit) + '\n')
         out.write(str3)
-        out.write(str33 + str(afinterval) +'\n')
-        if autofocus is None:
+        out.write(str33 + str(afinterval) + '\n')
+        if not autofocus:
             out.write(str00 + str4)
+        else:
+            out.write(str4)
         out.write(str5 + str(count) + '\n')
         out.write(str6 + str(binning) + '\n')
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) +'\n')
         out.write(';#TAG Donuts=on'+'\n')
-        if int(dec1)==-0:
-            #print('ici')
+        if int(dec1) == -0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                       str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                       '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
-        if int(dec1)<0 and int(dec1)!=-0:
+        if int(dec1) < 0 and int(dec1) != -0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                       str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                       '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
-        if int(dec1)>0:
-            #print('la')
+        if int(dec1) > 0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                       str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                       '+' + str('{:02d}'.format(int(dec1))) \
@@ -687,27 +691,27 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         out.write('#chill -60\n')
         out.write(str2 + str(waitlimit) + '\n')
         out.write(str3)
-        out.write(str33 + str(afinterval) +'\n')
-        if autofocus is None:
+        out.write(str33 + str(afinterval) + '\n')
+        if not autofocus:
             out.write(str00 + str4)
+        else:
+            out.write(str4)
         out.write(str5 + str(count) + '\n')
         out.write(str6 + str(binning) + '\n')
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) +'\n')
         out.write('#TAG Donuts=on'+'\n')
-        if int(dec1)==-0:
-            #print('ici')
+        if int(dec1) == -0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                       str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                       '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
-        if int(dec1)<0 and int(dec1)!=-0:
+        if int(dec1) < 0 and int(dec1) != -0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                       str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                       '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
-        if int(dec1)>0:
-            #print('la')
+        if int(dec1) > 0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                       str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                       '+' + str('{:02d}'.format(int(dec1))) \
@@ -720,10 +724,10 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
 
+
 def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
                  ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
     df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
-    #print(name)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
@@ -731,9 +735,8 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
     elif 'Sp' in name:
         if name != 'Sp1837+2030':
             df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
-            #idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
             idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
-            gaia_id_target = df2['Gaia_ID'][int(idx_target)] #int(df['gaia'][idx_target].values)
+            gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
         df2 = pd.concat([target_table_spc_special,target_table_spc_follow_up],ignore_index=True)
         try:
@@ -798,8 +801,10 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write(str2 + str(waitlimit) + '\n')
             out.write(str3)
             out.write(str33 + str(afinterval) + '\n')
-            if autofocus is None:
+            if not autofocus:
                 out.write(str00 + str4)
+            else:
+                out.write(str4)
             out.write(str5 + str(count) + '\n')
             out.write(str6 + str(binning) + '\n')
             out.write(str7 + str(filt) + '\n')
@@ -876,8 +881,10 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write(str2 + str(waitlimit) + '\n')
             out.write(str3)
             out.write(str33 + str(afinterval) +'\n')
-            if autofocus is None:
+            if not autofocus:
                 out.write(str00 + str4)
+            else:
+                out.write(str4)
             out.write(str5 + str(count) + '\n')
             out.write(str6 + str(binning) + '\n')
             out.write(str7 + str(filt) + '\n')
@@ -968,22 +975,22 @@ def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,auto
         out.write(str2 + str(waitlimit) + '\n')
         out.write(str3)
         out.write(str33 + str(afinterval) +'\n')
-        if autofocus is None:
+        if not autofocus:
             out.write(str00 + str4)
+        else:
+            out.write(str4)
         out.write(str5 + str(count) + '\n')
         out.write(str6 + str(binning) + '\n')
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) +'\n')
         out.write('#TAG Donuts=on'+'\n')
-        if int(dec1)==-0:
-            #print('ici')
+        if int(dec1) == -0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         if int(dec1)>0:
-            #print('la')
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
@@ -1043,22 +1050,22 @@ def first_target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,a
         out.write(str2 + str(waitlimit) + '\n')
         out.write(str3)
         out.write(str33 + str(afinterval) +'\n')
-        if autofocus is None:
+        if not autofocus:
             out.write(str00 + str4)
+        else:
+            out.write(str4)
         out.write(str5 + str(count) + '\n')
         out.write(str6 + str(binning) + '\n')
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) +'\n')
         out.write(';#TAG Donuts=on'+'\n')
-        if int(dec1)==-0:
-            #print('ici')
+        if int(dec1) == -0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
-        if int(dec1)<0 and int(dec1)!=-0:
+        if int(dec1) < 0 and int(dec1) != -0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
-        if int(dec1)>0:
-            #print('la')
+        if int(dec1) > 0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
         out.write(str00 + '\n')
@@ -1576,9 +1583,9 @@ def flatexo_artemis_morning(Path,t_now,filt, nbu=None, nbz=None, nbr=None, nbi=N
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
 
         if 'Exo' in filt:
-            out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
+            out.write(str(nbExo) + ',' + 'Exo' + ',' + '2' + '\n')
         else:
-            out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
+            out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '2' + '\n')
 
         if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
@@ -1637,18 +1644,21 @@ def flatexo_artemis_evening(Path,t_now,filt, nbu=None,
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
 
         if 'Exo' in filt:
-            out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
+            out.write(str(nbExo) + ',' + 'Exo' + ',' + '2' + '\n')
         else:
-            out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
+            out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '2' + '\n')
 
         if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
-def biasdark(t_now, Path, telescope, texps=None):
+
+def biasdark(t_now, Path, telescope, texps=None,bining_2=False):
     if telescope == 'Saint-Ex':
-        with open(os.path.join(Path, str(t_now), 'Cal_biasdark'+ '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') +'.txt'), 'w') as out:
+        with open(os.path.join(Path, str(t_now), 'Cal_biasdark'+ '_' +
+                                                 datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y')
+                                                 + '.txt'), 'w') as out:
             str00 = ';'
             str1 = '#domeclose \n'
             str2 = '#nopreview \n'
@@ -1659,8 +1669,8 @@ def biasdark(t_now, Path, telescope, texps=None):
             str7 = '#dark \n'
             str8 = '#shutdown \n'
             str9 = 'END'
-            counts = ['9']*(len(texps)+1)
-            binnings = ['1'] * (len(texps)+1)
+            counts = ['9']*(len(texps))
+            binnings = ['1'] * (len(texps))
             out.write(str1)
             out.write(str2)
             out.write(str00 + '\n')
@@ -1668,7 +1678,7 @@ def biasdark(t_now, Path, telescope, texps=None):
             out.write(str00 + '\n')
             out.write(str4 + ','.join([str(counts) for counts in counts]) + '\n')
             out.write(str5 + ','.join([str(binnings) for binnings in binnings]) + '\n')
-            out.write(str6 + '0,' +  ','.join([str(texps) for texps in texps]) + '\n')
+            out.write(str6 + '0,' + ','.join([str(texps) for texps in texps]) + '\n')
             out.write(str7)
             out.write(str8)
             out.write(str00 + '\n')
@@ -1677,28 +1687,37 @@ def biasdark(t_now, Path, telescope, texps=None):
     else:
         with open(os.path.join(Path,str(t_now),'Cal_biasdark.txt'),'w') as out:
             str00=';'
-            str1='#domeclose \n'
-            str2='#nopreview \n'
-            str3=' == bias dark exoplanet =='
-            str4='#count '
-            str5='#binning '
-            str6='#interval '
-            str7='#dark \n'
-            str8='#shutdown \n'
-            str9='END'
+            str1 = '#domeclose \n'
+            str2 = '#nopreview \n'
+            str3 = ' == bias dark exoplanet =='
+            str4 = '#count '
+            str5 = '#binning '
+            str6 = '#interval '
+            str7 = '#dark \n'
+            str8 = '#shutdown \n'
+            str9 = 'END'
+            if bining_2:
+                texps = ['0', '15', '30', '60', '120', '0', '30', '60', '120', '240']
+                counts = ['9'] * (len(texps) + 1)
+                binnings = ['1'] * (int(len(texps)/2)) + ['2'] * (int(len(texps)/2))
+            else:
+                texps = ['0', '15', '30', '60', '120']
+                counts = ['9'] * (len(texps) + 1)
+                binnings = ['1'] * (len(texps) + 1)
             out.write(str1)
             out.write(str2)
             out.write(str00 + '\n')
             out.write(str00 + str3 + '\n')
             out.write(str00 + '\n')
-            out.write(str4 + '9,9,9,9,9' + '\n')
-            out.write(str5 + '1,1,1,1,1' + '\n')
-            out.write(str6 + '0,15,30,60,120' + '\n')
+            out.write(str4 + ','.join([str(counts) for counts in counts]) + '\n')
+            out.write(str5 + ','.join([str(binnings) for binnings in binnings]) + '\n')
+            out.write(str6 + ','.join([str(texps) for texps in texps]) + '\n')
             out.write(str7)
             out.write(str8)
             out.write(str00 + '\n')
             out.write(str00 + str9+ '\n')
             out.write(str00 + '\n')
+
 
 def biasdark_comete(t_now,Path):
     with open(os.path.join(Path,str(t_now),'Cal_biasdark.txt'),'w') as out:
@@ -1726,6 +1745,7 @@ def biasdark_comete(t_now,Path):
         out.write(str00 + str9+ '\n')
         out.write(str00 + '\n')
 
+
 def shutdown(t_now,Path):
     with open(os.path.join(Path,str(t_now),'Cal_shutdown.txt'),'w') as out:
         str00=';'
@@ -1735,3 +1755,63 @@ def shutdown(t_now,Path):
         out.write(str1)
         out.write(str2)
         out.write(str00 + '\n')
+
+
+def haumea(t_now, date_start, date_end, count, filt, exptime,
+           name_2, binning, Path, telescope,autofocus=True):
+    waitlimit = 600
+    date_start = np.datetime64(date_start)
+    date_end = np.datetime64(date_end)
+    hour0 = date_start.astype(object).hour
+    hour0 = '{:02d}'.format(int(hour0))
+    minute0 = date_start.astype(object).minute
+    minute0 = '{:02d}'.format(int(minute0))
+    hour1 = date_end.astype(object).hour
+    hour1 = '{:02d}'.format(int(hour1))
+    minute1 = date_end.astype(object).minute
+    minute1 = '{:02d}'.format(int(minute1))
+    with open(os.path.join(Path, str(t_now), 'Obj_haumea.txt'), 'w') as out:
+        str00 = ';'
+        str1 = '#waituntil 1, '
+        str22 = '#domeopen\n'
+        str2 = '#waitinlimits '
+        str3 = '#nopreview \n'
+        str4 = '#autofocus \n'
+        str5 = '#count '
+        str6 = '#binning '
+        str7 = '#filter '
+        str8 = '#interval '
+        str9 = '#quitat '
+        str10 = '#chain '
+        for i in range(1, 2):
+            out.write(str00 + '\n')
+        out.write(str00 + ' ' + '136108 Haumea' + '\n')
+        out.write(str00 + '\n')
+        for i in range(1, 2):
+            out.write(str00 + '\n')
+        out.write(str1 + pd.to_datetime(str(date_start)).strftime(
+            '%Y/%m/%d %H:%M:%S') + '\n')  # + str(hour0) + ':' + str(minute0) + '\n')
+        out.write(str22)
+        out.write(str2 + str(waitlimit) + '\n')
+        out.write(str3)
+        if not autofocus:
+            out.write(str00 + str4)
+        else:
+            out.write(str4)
+        out.write(str5 + str(count) + '\n')
+        out.write(str6 + str(binning) + '\n')
+        out.write(str7 + str(filt) + '\n')
+        out.write(str8 + str(exptime) + '\n')
+        out.write('D6108    0.25  0.15 K20CH 218.20478  239.04083  122.16594   28.21367  0.1964232  0.00348135  '+
+                  '43.1159298  2 MPO600179  2875  27 1955-2021 0.36 M-v 3Ek Pan        000A (136108) Haumea  ' + '\n')
+        out.write(str(t_now) + '\n')
+        out.write(str00 + '\n')
+        out.write(str9 + str(hour1) + ':' + str(minute1) + '\n')
+        if name_2 is None:
+            out.write(str10 + 'Cal_flatdawn' + '_' +
+                      datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
+        else:
+            out.write(str10 + 'Obj_' + name_2 + '_' +
+                      datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
+        out.write(str00 + '\n')
+
