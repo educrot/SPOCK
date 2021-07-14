@@ -14,7 +14,6 @@ import numpy as np
 import os
 import pandas as pd
 from SPOCK import path_spock
-import SPOCK.short_term_scheduler as SPOCKST
 import SPOCK.ETC as ETC
 import sys
 from tqdm.auto import tqdm

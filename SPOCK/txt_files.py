@@ -2,20 +2,18 @@ from astropy import units as u
 import numpy as np
 import os
 import pandas as pd
-from datetime import datetime
+from datetime import date, timedelta, datetime
 from astroplan import Observer
 from astropy.coordinates import SkyCoord, EarthLocation
 from astropy.time import Time
 import gspread
 from SPOCK import path_spock
 from oauth2client.service_account import ServiceAccountCredentials
-from SPOCK import path_credential_json
+from SPOCK import path_credential_json, target_list_from_stargate_path
 
-startup_time=[]
-hour=[]
-minute=[]
-target_list_path = path_spock + '/target_lists/speculoos_target_list_v6.txt'
-
+startup_time = []
+hour = []
+minute = []
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name(path_credential_json, scope)
@@ -316,16 +314,21 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
 
 def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
            ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
-    df = pd.read_csv(target_list_path,delimiter=' ',index_col=False)
+    df = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=False)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
-    elif 'Sp' in name:
+    elif ('Sp' in name) and ('.0' not in name):
         if name != 'Sp1837+2030':
-            df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
-            # idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
-            idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
+            df2 = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=None)
+            if name != "Sp1633-6808_2":
+                if name.find("_zcut") != -1:
+                    idx_target = np.where((df2['Sp_ID'] == name.replace('_zcut', '')))[0]
+                else:
+                    idx_target = np.where((df2['Sp_ID'] == name.replace('_2', '')))[0]
+            else:
+                idx_target = np.where((df2['Sp_ID'] == name))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
         df2 = pd.concat([target_table_spc_follow_up, target_table_spc_special], ignore_index=True)
@@ -384,7 +387,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             if telescope == 'Artemis':
                 out.write('#chill -60\n')
             if telescope == 'Saint-Ex':
-                out.write('#chill -70\n')
+                out.write(';#chill -70\n')
             else:
                 out.write('#chill -60\n')
 
@@ -442,15 +445,13 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             str8='#interval '
             str9='#quitat '
             str10='#chain '
-            s=''
-            s2=''
-            seq_ra=(str(int(ra1)),'h',str(int(ra2)),'m',str(ra3),'s')
-            seq_dec=(str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
-            s.join( seq_ra )
-            s2.join( seq_dec )
-            #print(s.join( seq_ra ),s2.join( seq_dec ))
-            c = SkyCoord(s.join( seq_ra ),s2.join( seq_dec ),frame='icrs')
-            #print(c.dec.degree,c.dec.radian)
+            s = ''
+            s2 = ''
+            seq_ra = (str(int(ra1)),'h',str(int(ra2)),'m',str(ra3),'s')
+            seq_dec = (str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
+            s.join(seq_ra)
+            s2.join(seq_dec)
+            c = SkyCoord(s.join( seq_ra ),s2.join(seq_dec), frame='icrs')
             for i in range(1,2):
                 out.write(str00 + '\n')
             out.write(str00 + ' ' + str(name).replace('_2', '') + '\n')
@@ -472,6 +473,10 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                     out.write('#chill -60\n')
             if name == 'dome_rot':
                 out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Dome_rot" + '\n')
+            if (name.find('Ch') != -1) and gaia_id_target == 'None':
+                d = Time(t_now).tt.datetime
+                out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Chilean" + r"\ "[0] +
+                          d.strftime("%Y%m%d") + '\n')
             out.write(str2 + str(waitlimit) + '\n')
             if name == 'dome_rot':
                 out.write('#nopointing'+'\n')
@@ -523,13 +528,13 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
 
 def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
                      ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
-    df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
+    df = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=False)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     elif 'Sp' in name:
-        df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
+        df2 = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=None)
         # idx_target = np.where((df['spc'] == name.replace('_2','')))[0]
         idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
         gaia_id_target = df2['Gaia_ID'][int(idx_target)]  # int(df['gaia'][idx_target].values)
@@ -620,7 +625,7 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
 
 def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
                   ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
-    df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
+    df = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=False)
     idx_target = None
     if 'NOI-105435' in name:
         gaia_id_target = 6915818294923863040
@@ -727,15 +732,21 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
 
 def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
                  ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
-    df = pd.read_csv(target_list_path,delimiter = ' ',index_col = False)
+    df = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=False)
     idx_target = None
     if 'Trappist' in name:
         idx_target = np.where((df['Sp_ID'] == 'Sp2306-0502'))[0]
         gaia_id_target = int(df['Gaia_ID'][idx_target].values)
     elif 'Sp' in name:
         if name != 'Sp1837+2030':
-            df2 = pd.read_csv(target_list_path,delimiter=' ',index_col=None)
-            idx_target = np.where((df2['Sp_ID'] == name.replace('_2','')))[0]
+            df2 = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=None)
+            if name != "Sp1633-6808_2":
+                if name.find("_zcut") != -1 :
+                    idx_target = np.where((df2['Sp_ID'] == name.replace('_zcut', '')))[0]
+                else:
+                    idx_target = np.where((df2['Sp_ID'] == name.replace('_2', '')))[0]
+            else:
+                idx_target = np.where((df2['Sp_ID'] == name))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
         df2 = pd.concat([target_table_spc_special,target_table_spc_follow_up],ignore_index=True)
@@ -795,7 +806,7 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             if telescope == 'Artemis':
                 out.write('#chill -60\n')
             if telescope == 'Saint-Ex':
-                out.write('#chill -70\n')
+                out.write(';#chill -70\n')
             else:
                 out.write('#chill -60\n')
             out.write(str2 + str(waitlimit) + '\n')
@@ -875,7 +886,7 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             if telescope == 'Artemis':
                 out.write('#chill -60\n')
             if telescope == 'Saint-Ex':
-                out.write('#chill -70\n')
+                out.write(';#chill -70\n')
             else:
                 out.write('#chill -60\n')
             out.write(str2 + str(waitlimit) + '\n')
@@ -1415,31 +1426,33 @@ def flatexo_saintex(Path, t_now, filt, nbu=None, nbz=None, nbr=None, nbi=None, n
         nbExo=3
     if nbClear is None:
         nbClear=3
-    with open(os.path.join(Path,str(t_now),'Cal_flatexo'+ '_' + datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') +'.txt'),'w') as out:
+    with open(os.path.join(Path, str(t_now), 'Cal_flatexo' + '_' +
+                                           datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') +
+                                           '.txt'), 'w') as out:
         if ('u' in filt) or( 'u\'' in filt):
-            out.write(str(nbu) + ',' + 'u' + ',' + '1' + '\n')
+            out.write(str(nbu) + ',' + 'u\'' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbu) + ',' + 'u' ',' + '1' + '\n')
+            out.write(str00 + str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
 
-        if ('z' in filt) or( 'z\'' in filt):
+        if ('z' in filt) or('z\'' in filt):
             out.write(str(nbz) + ',' + 'z' ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbz) + ',' + 'z' ',' + '1' + '\n')
+            out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
 
-        if ('r' in filt) or( 'r\'' in filt):
-            out.write(str(nbr) + ',' + 'r' + ',' + '1' + '\n')
+        if ('r' in filt) or('r\'' in filt):
+            out.write(str(nbr) + ',' + 'r\'' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbr) + ',' + 'r' ',' + '1' + '\n')
+            out.write(str00 + str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
 
-        if ('i' in filt) or( 'i\'' in filt):
-            out.write(str(nbi) + ',' + 'i' + ',' + '1' + '\n')
+        if ('i' in filt) or('i\'' in filt):
+            out.write(str(nbi) + ',' + 'i\'' + ',' + '1' + '\n')
         else:
-            out.write(str00 +  str(nbi) + ',' + 'i' ',' + '1' + '\n')
+            out.write(str00 + str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
 
-        if ('g' in filt) or( 'g\'' in filt):
-            out.write(str(nbg) + ',' + 'g' + ',' + '1' + '\n')
+        if ('g' in filt) or('g\'' in filt):
+            out.write(str(nbg) + ',' + 'g\'' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbg) + ',' + 'g' + ',' + '1' + '\n')
+            out.write(str00 + str(nbg) + ',' + 'g\'' + ',' + '1' + '\n')
 
         if ('I+z' in filt) or( 'I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
@@ -1497,9 +1510,9 @@ def flatexo_io(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=
             out.write(str00 + str(nbRc) + ',' + 'Rc' + ',' + '1' + '\n')
 
         if ('z' in filt) or ('z\'' in filt):
-            out.write(str(nbz) + ',' + 'z' ',' + '1' + '\n')
+            out.write(str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbz) + ',' + 'z' ',' + '1' + '\n')
+            out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
 
         if ('r' in filt) or ('r\'' in filt):
             out.write(str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
@@ -1533,7 +1546,7 @@ def flatexo_io(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=
 
 
 def flatexo_artemis_morning(Path,t_now,filt, nbu=None, nbz=None, nbr=None, nbi=None, nbg=None,
-                            nbIz=None, nbExo=None, nbClear=None):#u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
+                            nbIz=None, nbExo=None, nbClear=None, nbzcut=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbu is None:
         nbu=7
@@ -1551,6 +1564,8 @@ def flatexo_artemis_morning(Path,t_now,filt, nbu=None, nbz=None, nbr=None, nbi=N
         nbExo=7
     if nbClear is None:
         nbClear=7
+    if nbzcut is None:
+        nbzcut=7
     with open(os.path.join(Path, str(t_now), 'Cal_flatexo_morning.txt'), 'w') as out:
         if ('u' in filt) or ('u\'' in filt):
             out.write(str(nbu) + ',' + 'u' + ',' + '1' + '\n')
@@ -1561,6 +1576,11 @@ def flatexo_artemis_morning(Path,t_now,filt, nbu=None, nbz=None, nbr=None, nbi=N
             out.write(str(nbz) + ',' + 'z' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbz) + ',' + 'z' ',' + '1' + '\n')
+
+        if 'zcut' in filt:
+            out.write(str(nbzcut) + ',' + 'zcut' + ',' + '1' + '\n')
+        else:
+            out.write(str00 + str(nbzcut) + ',' + 'zcut' + ',' + '1' + '\n')
 
         if ('r' in filt) or ('r\'' in filt):
             out.write(str(nbr) + ',' + 'r' + ',' + '1' + '\n')
@@ -1583,9 +1603,9 @@ def flatexo_artemis_morning(Path,t_now,filt, nbu=None, nbz=None, nbr=None, nbi=N
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
 
         if 'Exo' in filt:
-            out.write(str(nbExo) + ',' + 'Exo' + ',' + '2' + '\n')
+            out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '2' + '\n')
+            out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
 
         if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
@@ -1593,8 +1613,10 @@ def flatexo_artemis_morning(Path,t_now,filt, nbu=None, nbz=None, nbr=None, nbi=N
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
 
+
+
 def flatexo_artemis_evening(Path,t_now,filt, nbu=None,
-                            nbz=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
+                            nbz=None, nbr=None, nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None, nbzcut=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbu is None:
         nbu=7
@@ -1612,6 +1634,8 @@ def flatexo_artemis_evening(Path,t_now,filt, nbu=None,
         nbExo=7
     if nbClear is None:
         nbClear=7
+    if nbzcut is None:
+        nbzcut=7
     with open(os.path.join(Path,str(t_now),'Cal_flatexo_evening.txt'),'w') as out:
         if ('u' in filt) or( 'u\'' in filt):
             out.write(str(nbu) + ',' + 'u' + ',' + '1' + '\n')
@@ -1622,6 +1646,11 @@ def flatexo_artemis_evening(Path,t_now,filt, nbu=None,
             out.write(str(nbz) + ',' + 'z' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbz) + ',' + 'z' ',' + '1' + '\n')
+
+        if 'zcut' in filt:
+            out.write(str(nbzcut) + ',' + 'zcut' + ',' + '1' + '\n')
+        else:
+            out.write(str00 + str(nbzcut) + ',' + 'zcut' + ',' + '1' + '\n')
 
         if ('r' in filt) or( 'r\'' in filt):
             out.write(str(nbr) + ',' + 'r' + ',' + '1' + '\n')
@@ -1644,9 +1673,9 @@ def flatexo_artemis_evening(Path,t_now,filt, nbu=None,
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
 
         if 'Exo' in filt:
-            out.write(str(nbExo) + ',' + 'Exo' + ',' + '2' + '\n')
+            out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '2' + '\n')
+            out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
 
         if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
@@ -1685,7 +1714,7 @@ def biasdark(t_now, Path, telescope, texps=None,bining_2=False):
             out.write(str00 + str9 + '\n')
             out.write(str00 + '\n')
     else:
-        with open(os.path.join(Path,str(t_now),'Cal_biasdark.txt'),'w') as out:
+        with open(os.path.join(Path, str(t_now), 'Cal_biasdark.txt'), 'w') as out:
             str00=';'
             str1 = '#domeclose \n'
             str2 = '#nopreview \n'
@@ -1698,12 +1727,12 @@ def biasdark(t_now, Path, telescope, texps=None,bining_2=False):
             str9 = 'END'
             if bining_2:
                 texps = ['0', '15', '30', '60', '120', '0', '30', '60', '120', '240']
-                counts = ['9'] * (len(texps) + 1)
+                counts = ['9'] * len(texps)
                 binnings = ['1'] * (int(len(texps)/2)) + ['2'] * (int(len(texps)/2))
             else:
                 texps = ['0', '15', '30', '60', '120']
-                counts = ['9'] * (len(texps) + 1)
-                binnings = ['1'] * (len(texps) + 1)
+                counts = ['9'] * len(texps)
+                binnings = ['1'] * len(texps)
             out.write(str1)
             out.write(str2)
             out.write(str00 + '\n')
@@ -1792,6 +1821,7 @@ def haumea(t_now, date_start, date_end, count, filt, exptime,
         out.write(str1 + pd.to_datetime(str(date_start)).strftime(
             '%Y/%m/%d %H:%M:%S') + '\n')  # + str(hour0) + ':' + str(minute0) + '\n')
         out.write(str22)
+        out.write('#chill -60\n')
         out.write(str2 + str(waitlimit) + '\n')
         out.write(str3)
         if not autofocus:
@@ -1808,10 +1838,9 @@ def haumea(t_now, date_start, date_end, count, filt, exptime,
         out.write(str00 + '\n')
         out.write(str9 + str(hour1) + ':' + str(minute1) + '\n')
         if name_2 is None:
-            out.write(str10 + 'Cal_flatdawn' + '_' +
-                      datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
+            out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
         else:
-            out.write(str10 + 'Obj_' + name_2 + '_' +
-                      datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') + '.txt' + '\n')
+            out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
+
 

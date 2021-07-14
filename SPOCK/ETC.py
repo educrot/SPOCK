@@ -2,11 +2,11 @@ import os
 import numpy as np
 import sys
 from astropy.io import ascii
-from astropy.table import Table,Column, MaskedColumn
-from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
+from astropy.table import Table
+from SPOCK import path_spock
 
 
-# pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
+#  pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
 
 class etc:
     def __init__(self,mag_val = None,mag_band = None,spt = None,filt = None,airmass = None,moonphase = None,irtf = None,\
@@ -41,35 +41,35 @@ class etc:
 
         """
 
-        ########## CCD
-        self.npix        = 2048 #Number of pixels x
-        self.npiy        = 2048 #Number of pixels y
-        self.mipi        = 13.5 #picelsize
-        #self.gain        = 1.1  #Gain [el/ADU] # SSO
+        # # # # # # # # # #  CCD
+        self.npix        = 2048 # Number of pixels x
+        self.npiy        = 2048 # Number of pixels y
+        self.mipi        = 13.5 # picelsize
+        # self.gain        = 1.1  # Gain [el/ADU] #  SSO
         self.tqe         = 243
-        self.qefac       = 1.0  #coefficient
-        self.d0          = 2e4  #dark_293K
+        self.qefac       = 1.0  # coefficient
+        self.d0          = 2e4  # dark_293K
         self.ron         = 10
-        self.tccd        = temp_ccd  #CCD temperature [degree C] #-60 for SSO/SNO/TS/TN / -70 for Saint-Ex
-        self.binning     = 1    #CCD binning
-        self.tlost       = 10   #read-out & overhead time [s]
+        self.tccd        = temp_ccd  # CCD temperature [degree C] # -60 for SSO/SNO/TS/TN / -70 for Saint-Ex
+        self.binning     = 1    # CCD binning
+        self.tlost       = 10   # read-out & overhead time [s]
 
-        ########## Optics
-        self.m1dia       = 1030 #M1 free aperture [mm]
-        self.m2dia       = 300  #M2 mechanical aperture [mm]
-        self.focrat      = 8.0  #Focal ratio
-        self.mloss       = 10   #system loss [%]
+        # # # # # # # # # #  Optics
+        self.m1dia       = 1030 # M1 free aperture [mm]
+        self.m2dia       = 300  # M2 mechanical aperture [mm]
+        self.focrat      = 8.0  # Focal ratio
+        self.mloss       = 10   # system loss [%]
 
-        ########## Observatory
-        self.alti        = observatory_altitude #Altitude [m]
-        self.num_tel     = 1    #Number of telescopes
+        # # # # # # # # # #  Observatory
+        self.alti        = observatory_altitude # Altitude [m]
+        self.num_tel     = 1    # Number of telescopes
 
-        ########## Light curve
-        self.bin_lc      = 7.2  #Time bin for SNR [min]
-        self.rednoise    = 500.   #Red noise[ppm]
+        # # # # # # # # # #  Light curve
+        self.bin_lc      = 7.2  # Time bin for SNR [min]
+        self.rednoise    = 500.   # Red noise[ppm]
         self.nsigma      = 5.   #
 
-        ########## constants
+        # # # # # # # # # #  constants
 
         self.rsun        = 695800.
         self.rearth      = 6371.
@@ -80,53 +80,53 @@ class etc:
 
         self.c1_file=path_spock + "/SPOCK/files_ETC/coating_1.dat"
         self.c1=ascii.read(self.c1_file, data_start=0)
-        #plt.grid(True)
-        #plt.xlabel("Wavelength [nm]")
-        #plt.ylabel("Efficiency")
-        #plt.plot(c1['col1'],c1['col2'])
-        #plt.show()
-
-        self.c2_file = path_spock + "/SPOCK/files_ETC/coating_2.dat"
-        self.c2 = ascii.read(self.c2_file, data_start=0)
         # plt.grid(True)
         # plt.xlabel("Wavelength [nm]")
         # plt.ylabel("Efficiency")
-        # plt.plot(c2['col1'],c2['col2'])
+        # plt.plot(c1['col1'],c1['col2'])
         # plt.show()
+
+        self.c2_file = path_spock + "/SPOCK/files_ETC/coating_2.dat"
+        self.c2 = ascii.read(self.c2_file, data_start=0)
+        #  plt.grid(True)
+        #  plt.xlabel("Wavelength [nm]")
+        #  plt.ylabel("Efficiency")
+        #  plt.plot(c2['col1'],c2['col2'])
+        #  plt.show()
 
         self.ccd_file=path_spock + "/SPOCK/files_ETC/ccd.dat"
         self.ccd=ascii.read(self.ccd_file, data_start=5)
-        #plt.grid(True)
-        #plt.xlabel("Wavelength [nm]")
-        #plt.ylabel("Efficiency")
-        #plt.plot(ccd['col1'],ccd['col2'])
-        #plt.show()
+        # plt.grid(True)
+        # plt.xlabel("Wavelength [nm]")
+        # plt.ylabel("Efficiency")
+        # plt.plot(ccd['col1'],ccd['col2'])
+        # plt.show()
 
         self.qet_file=path_spock + "/SPOCK/files_ETC/qet.dat"
         self.qet=ascii.read(self.qet_file, data_start=0)
-        #plt.grid(True)
-        #plt.xlabel("Wavelength [nm]")
-        #plt.ylabel("Efficiency")
-        #plt.plot(qet['col1'],qet['col2'])
-        #plt.show()
+        # plt.grid(True)
+        # plt.xlabel("Wavelength [nm]")
+        # plt.ylabel("Efficiency")
+        # plt.plot(qet['col1'],qet['col2'])
+        # plt.show()
 
         self.window_file=path_spock + "/SPOCK/files_ETC/window.dat"
         self.window=ascii.read(self.window_file, data_start=0)
-        #plt.grid(True)
-        #plt.xlabel("Wavelength [nm]")
-        #plt.ylabel("Efficiency")
-        #plt.plot(window['col1'],window['col2'])
-        #plt.show()
+        # plt.grid(True)
+        # plt.xlabel("Wavelength [nm]")
+        # plt.ylabel("Efficiency")
+        # plt.plot(window['col1'],window['col2'])
+        # plt.show()
 
-        #System
+        # System
         self.mloss=1-0.01*self.mloss
         self.surf=(np.pi*(self.m1dia*0.5*1.0e-3)**2)-(np.pi*(self.m2dia*0.5*1.0e-3)**2)
-        self.eape=2*(self.surf/np.pi)**.5    #effective aperture
+        self.eape=2*(self.surf/np.pi)**.5    # effective aperture
 
         self.c1['col2']=self.c1['col2']*self.mloss
         self.c2['col2'] = self.c2['col2']*self.mloss
 
-        #CCD corrections
+        # CCD corrections
         if self.binning > 1:
             self.mipi=self.mipi*self.binning
             self.npix=self.npix/self.binning
@@ -135,16 +135,16 @@ class etc:
         self.pixelscale = self.mipi * 206.265/(self.focrat*self.m1dia)
         self.fov = self.npix*self.pixelscale/60.
 
-        #convert to percent
+        # convert to percent
         self.rednoise=self.rednoise/1.0e6
-        #convert from celsius to K
+        # convert from celsius to K
         self.tccd=self.tccd+273
         dt=(self.tccd-self.tqe)/125.
 
-        #Dark current
+        # Dark current
         self.dark=(self.d0*122*(self.tccd-10)**3)*self.e**(-6400/(self.tccd-10))
 
-        #Correction of ccd response for low temperatures
+        # Correction of ccd response for low temperatures
         self.qet['col2']=(1.-self.qet['col2'])*self.qefac*np.abs(dt)
         self.qet['col2']=(1.-self.qet['col2'])
         if dt < 0.:
@@ -153,12 +153,12 @@ class etc:
         bg_file = path_spock + "/SPOCK/files_ETC/background.dat"
         self.bg = ascii.read(bg_file, data_start=0)
 
-        # plt.xlim(500,510)
+        #  plt.xlim(500,510)
 
-        # plt.plot(self.bg['col1'],self.bg['col6'],self.bg['col1'],self.bg['col5'],self.bg['col1'],
-        # self.bg['col4'],self.bg['col1'],self.bg['col3'],self.bg['col1'],self.bg['col2'])
+        #  plt.plot(self.bg['col1'],self.bg['col6'],self.bg['col1'],self.bg['col5'],self.bg['col1'],
+        #  self.bg['col4'],self.bg['col1'],self.bg['col3'],self.bg['col1'],self.bg['col2'])
         moonph_sin=np.arcsin(self.moonphase)*360/(np.pi)
-        #Moonphase dependence of background
+        # Moonphase dependence of background
         if moonph_sin>=0. and moonph_sin <45.:
             m1=0
             m2=1
@@ -179,7 +179,7 @@ class etc:
             print("moonphase unrealistic")
             print(5/0.)
 
-        #Airmass dependence of background
+        # Airmass dependence of background
         if self.airmass>=1. and self.airmass <1.5:
             l1=2
             l2=3
@@ -200,14 +200,14 @@ class etc:
             print("airmass not supported (1-3)")
             print(5/0.)
 
-        # only use first 5 entries of background.dat!!!
+        #  only use first 5 entries of background.dat!!!
         exdif = np.array(self.bg['col'+str(int(l1))][:5]-self.bg['col'+str(int(l2))][:5])
         backe = self.bg['col'+str(int(l1))][:5]-exdif*((self.airmass-airzero)/0.5)
         exdif = backe[m1]-backe[m2]
 
         #
         self.back = Table(self.ccd)
-        # only use first 5 entries of background.dat!!!
+        #  only use first 5 entries of background.dat!!!
         col2_bck = []
         for i in range(len(self.bg)):
             if i % 5 == 0:
@@ -218,29 +218,29 @@ class etc:
                 col2_bck.append(backe[m1] - exdif * ((moonph_sin - moonzero) / 45.))
 
         self.back['col2'] = col2_bck
-        #plt.grid(True)
-        #plt.xlabel("Wavelength [nm]")
-        #plt.ylabel("Background")
-        #plt.plot(back['col1'],back['col2'])
-        #plt.show()
+        # plt.grid(True)
+        # plt.xlabel("Wavelength [nm]")
+        # plt.ylabel("Background")
+        # plt.plot(back['col1'],back['col2'])
+        # plt.show()
 
         extind_file=path_spock + "/SPOCK/files_ETC/extin.dat"
         self.extind=ascii.read(extind_file, data_start=0)
 
-        #plt.plot(extind['col1'],extind['col6'],extind['col1'],extind['col5'],extind['col1'],extind['col4'], \
-        #         extind['col1'],extind['col3'],extind['col1'],extind['col2'])#,extind['col1'],extin,'o')
+        # plt.plot(extind['col1'],extind['col6'],extind['col1'],extind['col5'],extind['col1'],extind['col4'], \
+        #          extind['col1'],extind['col3'],extind['col1'],extind['col2'])# ,extind['col1'],extin,'o')
 
-        #select right extiction
+        # select right extiction
         self.exdif=self.extind['col'+str(int(l1))]-self.extind['col'+str(int(l2))]
         self.extin=self.extind['col'+str(int(l1))]-self.exdif*((airmass-airzero)/0.5)
 
-        #plt.grid(True)
-        #plt.xlabel("Wavelength [nm]")
-        #plt.ylabel("Extiction")
-        #plt.plot(extind['col1'],extin)
-        #plt.show()
+        # plt.grid(True)
+        # plt.xlabel("Wavelength [nm]")
+        # plt.ylabel("Extiction")
+        # plt.plot(extind['col1'],extin)
+        # plt.show()
 
-        #available spectral types
+        # available spectral types
         self.spectra=Table(names=['type','vmj','vref','rs','file'],
                       data=[['B0','B1','B3','B6','B8', \
                         'A0','A2','A3','A5', \
@@ -278,123 +278,123 @@ class etc:
                           'm0_pickles.dat','m2_pickles.dat','m4_pickles.dat','m5_pickles.dat', \
                           'm6_gl406.dat','m7_gj644c.dat','m8_vb10.dat','m9_den1048.dat', \
                           'l2_kelu1.dat','l5_2mass1507.dat','l8_den0255.dat']])
-        #Changed vref from 10.23 0. for G0 standard star
+        # Changed vref from 10.23 0. for G0 standard star
         spt_sel=np.array(self.spectra['type'].data)
 
-        #get spectral type information
+        # get spectral type information
         try:
             self.i = np.where(self.spt==spt_sel)[0][0]
         except:
             print("spectral type not in list")
-            #print(5/0)
+            # print(5/0)
 
-        #available spectra are in folder Spectra
+        # available spectra are in folder Spectra
         path=path_spock + '/SPOCK/files_ETC/Spectra/'
         spec_file = os.path.join(path,self.spectra['file'][self.i])
         self.spec=ascii.read(spec_file, data_start=0)
-        #plt.grid(True)
-        #plt.xlabel("Wavelength [nm]")
-        #plt.ylabel("Intensity")
-        #plt.title(spectra['file'][i][:-4])
-        #plt.plot(spec['col1'],spec['col2'])
-        #plt.show()
+        # plt.grid(True)
+        # plt.xlabel("Wavelength [nm]")
+        # plt.ylabel("Intensity")
+        # plt.title(spectra['file'][i][:-4])
+        # plt.plot(spec['col1'],spec['col2'])
+        # plt.show()
 
-        # available filters are in folder Filters, check available files
+        #  available filters are in folder Filters, check available files
         path = path_spock + '/SPOCK/files_ETC/Filters/'
         files = []
-        # r=root, d=directories, f = files
+        #  r=root, d=directories, f = files
         for r, d, f in os.walk(path):
             for file in f:
                 files.append(file)
         files = np.sort(files)
-        # convert to lower case
+        #  convert to lower case
         files_low = np.array([x.lower() if isinstance(x, str) else x for x in files])
-        # check, if selceted filter is contained
-        # in_filter_list=np.where(np.char.find(files_low, filt.lower()+'.dat')!=-1)
+        #  check, if selceted filter is contained
+        #  in_filter_list=np.where(np.char.find(files_low, filt.lower()+'.dat')!=-1)
         try:
             in_filter_list = list(files_low).index(filt.lower() + '.dat')
             filter_file = os.path.join(path, files[in_filter_list])
             self.filter = ascii.read(filter_file, data_start=0)
-            # plt.grid(True)
-            # plt.xlabel("Wavelength [nm]")
-            # plt.ylabel("Troughput")
-            # plt.title(filt)
-            # plt.plot(filter['col1'], filter['col2'])
-            # plt.show()
+            #  plt.grid(True)
+            #  plt.xlabel("Wavelength [nm]")
+            #  plt.ylabel("Troughput")
+            #  plt.title(filt)
+            #  plt.plot(filter['col1'], filter['col2'])
+            #  plt.show()
         except ValueError:
             sys.exit("Filter not available")
 
-        #get spectral type information
+        # get spectral type information
         try:
             i=np.where(self.spt==spt_sel)[0][0]
         except:
             print("spectral type not in list")
             print(5/0)
 
-        #frequency instead of wavelength
+        # frequency instead of wavelength
         self.ener=self.h*self.c/(self.spec['col1']*1e-9)
 
-        ####colour correction
+        # # # # colour correction
         if self.mag_band == "V":
-            #do nothing
+            # do nothing
             self.mag_val=self.mag_val+0.
 
         elif self.mag_band == "J":
-            #apply V-J correction for spectral type
+            # apply V-J correction for spectral type
             self.mag_val=self.mag_val+self.spectra['vmj'][self.i]
         else:
-            #ToDo add K-magnitude
+            # ToDo add K-magnitude
             print("Band not implemented")
             print(5/0.)
 
-        #Apply IRTF/UCS flux correction to photomeric standards of M-dwarfs
-        #Standards were obtained with
+        # Apply IRTF/UCS flux correction to photomeric standards of M-dwarfs
+        # Standards were obtained with
         if len(np.where(self.spt==spt_sel[np.where(spt_sel=='M6')[0][0]:])[0]) > 0.0:
             corcal=self.irtf
         else:
             corcal=1.
         self.spec['col2']=self.spec['col2']*corcal
 
-        #Correction factor, accounting the apparent magnitude of the target.
+        # Correction factor, accounting the apparent magnitude of the target.
         self.corflux = 10**((self.spectra['vref'][i]-self.mag_val)/2.5)
 
     def peak_calculation(self,exp_t = 10):
 
-        #Object independend effective troughput of the system
+        # Object independend effective troughput of the system
         self.effi=self.window['col2']*self.ccd['col2']*self.c1['col2']*self.c2['col2']*self.filter['col2']
 
-        #Background collected by system
+        # Background collected by system
         back2=Table(self.back)
         back2['col2'] = np.array(self.back['col2'])*self.effi*exp_t*(5/1000.)*self.surf*self.pixelscale**2
-        tback=sum(back2['col2'])    #Background [el/pixel]
+        tback=sum(back2['col2'])    # Background [el/pixel]
 
-        #print(tback)
-        #Starlight collected by system
+        # print(tback)
+        # Starlight collected by system
         spec2=Table(self.spec)
         spec2['col2']=(self.spec['col2']/self.ener)*self.corflux*self.extin*self.effi*exp_t*(5/1000.)*self.surf
 
         signal=sum(spec2['col2'])
-        #print(signal)
+        # print(signal)
 
-        #light curve calculations
+        # light curve calculations
         bin_lc_c=self.bin_lc*60
-        npbin=bin_lc_c/(exp_t+self.tlost)  #Nexp per bin
-        earthtra=(self.rearth/self.spectra['rs'][self.i])**2    #earth transit depth for spectral type
+        npbin=bin_lc_c/(exp_t+self.tlost)  # Nexp per bin
+        earthtra=(self.rearth/self.spectra['rs'][self.i])**2    # earth transit depth for spectral type
 
-        #sum (I do not really understand this)
-        #lambsum=sum(spec2['col2'])
-        #lambeff=sum(spec2['col1']*spec2['col2'])/lambsum
+        # sum (I do not really understand this)
+        # lambsum=sum(spec2['col2'])
+        # lambeff=sum(spec2['col1']*spec2['col2'])/lambsum
 
         seeing_p=self.seeing/self.pixelscale
-        nape=np.pi*(2*seeing_p)**2    #Npixels in aperture
+        nape=np.pi*(2*seeing_p)**2    # Npixels in aperture
 
-        tdark=self.dark*exp_t      #Dark [el\pixel]
+        tdark=self.dark*exp_t      # Dark [el\pixel]
         tdarkape=tdark*nape
         tbackape=tback*nape
         tronape=nape*self.ron**2
         peak=signal*0.66/(seeing_p)**2
 
-        #scintilations (from model)
+        # scintilations (from model)
         scinti=self.scinfac*((self.eape*100.)**(-0.6666))*self.airmass**(1.75)
         scinti_alt=scinti*self.e**(-self.alti/8000.)
         scinti_exp=scinti_alt/np.sqrt(2*exp_t)
@@ -402,87 +402,87 @@ class etc:
         snr = signal/np.sqrt(signal+tbackape+tronape+tdarkape+scinti2)
         error = 1/snr
 
-        #more (similar) telescopes used?
+        # more (similar) telescopes used?
         if self.num_tel > 1:
             snr=snr*np.sqrt(self.num_tel)
 
-        snrbin = snr*np.sqrt(npbin)       #snr for each bin in the light-curve
+        snrbin = snr*np.sqrt(npbin)       # snr for each bin in the light-curve
         errorbin = 1/snrbin
         errorbin_rn = np.sqrt(errorbin**2 + self.rednoise**2)
-        #planet sensitivity
+        # planet sensitivity
         sensi=np.sqrt(self.nsigma*errorbin_rn/earthtra)
 
         print("Peak [ADU]:\t", peak/self.gain)
         print("Sky [ADU]:\t", tbackape/self.gain)
         peak_ADU = peak/self.gain
         sky_gain = tbackape/self.gain
-        return error
+        return error,errorbin_rn
 
     def exp_time_calculator(self,ADUpeak = None):
-        ##########  Observation
-        # ADUpeak = 33000  # counts in peak desired [ADU]
-        # seeing = 0.95  # effective seeing [arcsec]
-        # airmass = 1.2  # Airmass
-        # num_tel = 1
+        # # # # # # # # # #   Observation
+        #  ADUpeak = 33000  #  counts in peak desired [ADU]
+        #  seeing = 0.95  #  effective seeing [arcsec]
+        #  airmass = 1.2  #  Airmass
+        #  num_tel = 1
 
         peak=ADUpeak*self.gain
 
-        #Object independend effective troughput of the system
+        # Object independend effective troughput of the system
         self.effi = self.window['col2']*self.ccd['col2']*self.c1['col2']*self.c2['col2']*self.filter['col2']
 
-        #Starlight collected by system
+        # Starlight collected by system
         spec2=Table(self.spec)
         spec2['col2']=(self.spec['col2']/self.ener)*self.corflux*self.extin*self.effi*(5/1000.)*self.surf
         signal=sum(spec2['col2'])
 
-        #calculate exposure time from desired peak value
+        # calculate exposure time from desired peak value
         seeing_p=self.seeing/self.pixelscale
-        #peak=self.exp_t*signal*0.66/(seeing_p)**2
+        # peak=self.exp_t*signal*0.66/(seeing_p)**2
 
         exp_t=peak*(seeing_p)**2/(signal*0.66)
-        # print("Exposure [s]:\t",exp_t)
+        #  print("Exposure [s]:\t",exp_t)
 
-        #Background collected by system
+        # Background collected by system
         back2=Table(self.back)
         back2['col2'] = np.array(self.back['col2'])*self.effi*(5/1000.)*self.surf*self.pixelscale**2
-        tback=sum(back2['col2'])*exp_t    #Background [el/pixel]
+        tback=sum(back2['col2'])*exp_t    # Background [el/pixel]
 
-        #light curve calculations
+        # light curve calculations
         bin_lc_c=self.bin_lc*60
-        npbin=bin_lc_c/(exp_t+self.tlost)  #Nexp per bin
+        npbin=bin_lc_c/(exp_t+self.tlost)  # Nexp per bin
 
-        nape=np.pi*(2*seeing_p)**2    #Npixels in aperture
-        earthtra=(self.rearth/self.spectra['rs'][self.i])**2    #earth transit depth for spectral type
+        nape=np.pi*(2*seeing_p)**2    # Npixels in aperture
+        earthtra=(self.rearth/self.spectra['rs'][self.i])**2    # earth transit depth for spectral type
 
-        #sum (I do not really understand this)
+        # sum (I do not really understand this)
 
         lambsum=sum(spec2['col2'])
         lambeff=sum(spec2['col1']*spec2['col2'])/lambsum
 
-        tdark=self.dark*exp_t      #Dark [el\pixel]
+        tdark=self.dark*exp_t      # Dark [el\pixel]
         tdarkape=tdark*nape
         tbackape=tback*nape
         tronape=nape*self.ron**2
 
-        #scintilations
+        # scintilations
         scinti=self.scinfac*((self.eape*100.)**(-0.6666))*self.airmass**(1.75)
         scinti_alt=scinti*self.e**(-self.alti/8000.)
         scinti_exp=scinti_alt/np.sqrt(2*exp_t)
         scinti2=(scinti_exp*signal)**2
         snr = signal/np.sqrt(signal+tbackape+tronape+tdarkape+scinti2)
 
-        #more (similar) telescopes used?
+        # more (similar) telescopes used?
         if self.num_tel > 1:
             snr=snr*np.sqrt(self.num_tel)
 
-        snrbin = snr*np.sqrt(npbin)       #snr for each bin in the light-curve
+        snrbin = snr*np.sqrt(npbin)       # snr for each bin in the light-curve
         errorbin = 1/snrbin
         errorbin_rn = np.sqrt(errorbin**2 + self.rednoise**2)
-        #planet sensitivity
+        # planet sensitivity
         sensi=np.sqrt(self.nsigma*errorbin_rn/earthtra)
 
-        # print("Peak [ADU]:\t", peak/self.gain)
-        # print("Sky [ADU]:\t", tbackape/self.gain)
+        #  print("Peak [ADU]:\t", peak/self.gain)
+        #  print("Sky [ADU]:\t", tbackape/self.gain)
         peak_ADU = peak/self.gain
         sky_ADU =  tbackape/self.gain
         return exp_t, peak_ADU,sky_ADU

@@ -1,32 +1,28 @@
-import chart_studio
-from plotly import graph_objs as go
-import pandas as pd
-from plotly import offline
-from astroplan import Observer
+from astroplan import Observer,FixedTarget
+from astroplan.plots import plot_airmass
+from astroplan.utils import time_grid_from_range
+from astropy.coordinates import SkyCoord, EarthLocation, get_moon
 from astropy.time import Time
 from astropy import units as u
-from astroplan.plots import dark_style_sheet, plot_airmass
-from astroplan import FixedTarget
-import matplotlib.pyplot as plt
-from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
-import numpy as np
-import plotly.figure_factory as ff
-from astroplan.utils import time_grid_from_range
+import chart_studio
 from colorama import Fore
-import os
-import pkg_resources
-import requests
-import SPOCK.long_term_scheduler as SPOCKLT
-import yaml
+from datetime import date, timedelta
 import io
+import matplotlib.pyplot as plt
 from matplotlib.offsetbox import AnchoredText
-from SPOCK  import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
+import numpy as np
+import os
+import pandas as pd
+from plotly import graph_objs as go
+import plotly.figure_factory as ff
+from plotly import offline
+import requests
+from SPOCK import user_portal, pwd_portal, user_chart_studio, pwd_chart_studio, \
+    path_spock, target_list_from_stargate_path
 
-
-
-# pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
 chart_studio.tools.set_credentials_file(username=user_chart_studio, api_key=pwd_chart_studio)
-chart_studio.tools.set_config_file(world_readable=True,sharing='public')
+chart_studio.tools.set_config_file(world_readable=True, sharing='public')
+
 
 def charge_observatories(Name):
     """ charge the observatory
@@ -266,8 +262,8 @@ def gantt_chart_all(target_list=None):
 
     """
     if target_list is None:
-        target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
-    target_table_spc = pd.read_csv(target_list,delimiter=' ')
+        target_list = target_list_from_stargate_path
+    target_table_spc = pd.read_csv(target_list, delimiter=',')
     all_targets = target_table_spc['Sp_ID']
     files = []
     start = []
@@ -404,9 +400,9 @@ def gantt_chart(date_start, date_end, telescope):
     }
     offline.plot(fig,auto_open=True,filename=path_spock + '/SPOCK_Figures/Preview_schedule.html',config=config)
 
-def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_list=None):
-    """
 
+def airmass_altitude_plot_given_target(name_observatory, day, target, path_target_list=None):
+    """
     Parameters
     ----------
     name_observatory : str
@@ -423,21 +419,26 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
 
     """
     if path_target_list is None:
-        path_target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
+        path_target_list = target_list_from_stargate_path
     observatory = charge_observatories(name_observatory)[0]
     delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day, which='next').jd - 0.07, \
                                       observatory.twilight_morning_nautical(day + 1, which='nearest').jd + 0.07, 100),
                           format='jd')
     sun_set = observatory.twilight_evening_nautical(day, which='next').iso
     sun_rise = observatory.twilight_morning_nautical(day + 1, which='nearest').iso
-    target_list = pd.read_csv(path_target_list, delimiter=' ')
+    target_list = pd.read_csv(path_target_list, delimiter=',')
     idx_target_list = list(target_list['Sp_ID']).index(target)
 
-    fig, axs = plt.subplots(1,figsize=(9,7))
+    fig, axs = plt.subplots(1, figsize=(8, 6))
     colors_start_new_target = ['black', 'darkgray', 'lightgray']
 
     dec = target_list['DEC'][idx_target_list]
     ra = target_list['RA'][idx_target_list]
+    # Moon distance
+    t_midnight = Time(sun_rise) - ((Time(sun_rise) - Time(sun_set)) / 2)
+    moon = get_moon(time=t_midnight, location=observatory.location)
+    distance_moon = round(moon.separation(SkyCoord(ra=ra, dec=dec, unit=(u.deg, u.deg))).value, 2)
+
     plot_styles = {'linestyle': '-', 'color': 'k'}
     if name_observatory == 'SSO':
         plot_styles = {'linestyle': '-', 'color': 'skyblue'}
@@ -448,14 +449,76 @@ def airmass_altitude_plot_given_target(name_observatory,day,target,path_target_l
     plot_airmass(FixedTarget(coord=SkyCoord(ra=ra, dec=dec, unit=(u.deg, u.deg)), \
                              name=target), observatory, delta_midnight, brightness_shading=True, altitude_yaxis=True,
                  style_kwargs=plot_styles)
-    #axs.vlines(sun_set, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
-    #axs.vlines(sun_rise, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
+    # axs.vlines(sun_set, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
+    # axs.vlines(sun_rise, 3, 1, linestyle='--', color='orange', alpha=0.9, linewidth=2)
 
     plt.ylabel('Altitude (degrees)')
     plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
-    plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at '
-              + name_observatory,y=-0.01)
-    #plt.title('Visibility plot for target ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")))
+    if distance_moon < 30.:
+        plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at '
+                  + name_observatory + '\n' + r'Moon is at: ' + str(distance_moon) + " degress"
+                  , y=-0.01, color='purple')
+    else:
+        plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at '
+                  + name_observatory + '\n' + r'Moon is at: ' + str(distance_moon) + " degress"
+                  , y=-0.01, color='black')
+    plt.show()
+
+
+def airmass_altitude_plot_nolist(name_observatory, day, target, ra, dec):
+    """
+    Parameters
+    ----------
+    name_observatory : str
+        name of the observatory
+    day  : date
+        date in format  'yyyy-mm-dd'
+    target :  str
+         name of  target
+    path_target_list  : path
+        path of the target  list
+
+    Returns
+    -------
+
+    """
+
+    observatory = charge_observatories(name_observatory)[0]
+    delta_midnight = Time(np.linspace(observatory.twilight_evening_nautical(day, which='next').jd - 0.07,
+                                      observatory.twilight_morning_nautical(day + 1, which='nearest').jd + 0.07, 100),
+                          format='jd')
+    sun_set = observatory.twilight_evening_nautical(day, which='next').iso
+    sun_rise = observatory.twilight_morning_nautical(day + 1, which='nearest').iso
+
+    fig, axs = plt.subplots(1, figsize=(8, 6))
+    colors_start_new_target = ['black', 'darkgray', 'lightgray']
+
+    # Moon distance
+    t_midnight = Time(sun_rise) - ((Time(sun_rise) - Time(sun_set)) / 2)
+    moon = get_moon(time=t_midnight, location=observatory.location)
+    distance_moon = round(float(moon.separation(SkyCoord(ra=ra, dec=dec, unit=(u.deg, u.deg))).value), 2)
+
+    plot_styles = {'linestyle': '-', 'color': 'k'}
+    if name_observatory == 'SSO':
+        plot_styles = {'linestyle': '-', 'color': 'skyblue'}
+    if name_observatory == 'SNO':
+        plot_styles = {'linestyle': '-', 'color': 'teal'}
+    if name_observatory == 'Saint-Ex':
+        plot_styles = {'linestyle': '-', 'color': 'gold'}
+    plot_airmass(FixedTarget(coord=SkyCoord(ra=ra, dec=dec, unit=(u.deg, u.deg)), name=target),
+                 observatory, delta_midnight, brightness_shading=True, altitude_yaxis=True,
+                 style_kwargs=plot_styles)
+
+    plt.ylabel('Altitude (degrees)')
+    plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
+    if distance_moon < 30.:
+        plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at '
+                  + name_observatory + '\n' + r'Moon is at: ' + str(distance_moon) + " degress"
+                  , y=-0.01, color='red')
+    else:
+        plt.title('Visibility  plot for ' + target + ' on the ' + str(day.tt.datetime.strftime("%Y-%m-%d")) + ' at '
+                  + name_observatory + '\n' + r'Moon is at: ' + str(distance_moon) + " degress"
+                  , y=-0.01, color='black')
     plt.show()
 
 
@@ -538,12 +601,13 @@ def coverage(t, p):
 
 
 def getSPClcV2(target, ap = '', pwvCorr = 0, user= user_portal, password= pwd_portal):
-    urlGet ="http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_tls_prep_v2.php?date=*&id=" + target + "&filter=&telescope=&ap=" + str(ap) + "&pwvCorr=" + str(pwvCorr)
+    urlGet = "http://www.mrao.cam.ac.uk/SPECULOOS/portal/get_tls_prep_v2.php?date=*&id=" + target + \
+            "&filter=&telescope=&ap=" + str(ap) + "&pwvCorr=" + str(pwvCorr)
     rGET = requests.get(urlGet, auth=(user, password))
     names = ['TMID-2450000', 'BJDMID-2450000', 'DIFF_FLUX', 'ERROR', 'DIFF_FLUX_PWV',
-    'RA_MOVE', 'DEC_MOVE', 'FWHM', 'PSF_a_5', 'PSF_b_5', 'SKYLEVEL', 'AIRMASS',
-    'EXPOSURE']
-    lc = pd.read_csv(io.StringIO(rGET.text), header=None, names=names, delimiter='\s+',index_col=None)
+             'RA_MOVE', 'DEC_MOVE', 'FWHM', 'PSF_a_5', 'PSF_b_5', 'SKYLEVEL', 'AIRMASS',
+             'EXPOSURE']
+    lc = pd.read_csv(io.StringIO(rGET.text), header=None, names=names, delimiter='\s+', index_col=None)
     lc.reset_index(drop=True)
     return lc
 
@@ -562,32 +626,30 @@ def getSPCdata(target, date, telescope='any', ap=6, user= user_portal, password=
         # read files
         MCMC = pd.read_csv(io.StringIO(rMCMC.text), sep=' ')
         MCMC['JD'] = MCMC['TMID-2450000'] + 2450000
-        targetdf = pd.DataFrame({'TMID-2450000':MCMC['JD'].values,'DIFF_FLUX': MCMC['DIFF_FLUX'].values, 'ERROR': MCMC['ERROR'].values,
-                 'dx_MOVE':MCMC['RA_MOVE'].values,'dy_MOVE':MCMC['DEC_MOVE'].values,'FWHM':MCMC['FWHM'].values,
-                   'FWHMx':MCMC['PSF_a_5'].values,'FWHMy':MCMC['PSF_b_5'].values,'SKYLEVEL':MCMC['SKYLEVEL'].values,
-                               'AIRMASS': MCMC['AIRMASS'].values,'EXPOSURE':MCMC['EXPOSURE'].values})
+        targetdf = pd.DataFrame({'TMID-2450000':MCMC['JD'].values,'DIFF_FLUX': MCMC['DIFF_FLUX'].values,
+                                 'ERROR': MCMC['ERROR'].values,'dx_MOVE':MCMC['RA_MOVE'].values,
+                                 'dy_MOVE':MCMC['DEC_MOVE'].values,'FWHM':MCMC['FWHM'].values,
+                                 'AIRMASS': MCMC['AIRMASS'].values,'EXPOSURE':MCMC['EXPOSURE'].values})
         return targetdf
     except TypeError:
         targetdf = pd.DataFrame({'JD':[],'DIFF_FLUX': [], 'ERROR': [], 'AIRMASS': []})
         return targetdf.reset_index(drop=True)
 
 
-def phase_coverage_given_target(target,pmin,pmax,path_target_list=None,times=None):
-
+def phase_coverage_given_target(target, pmin, pmax, path_target_list=None, times=None):
     if path_target_list is None:
-        path_target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
+        path_target_list = target_list_from_stargate_path
 
-    target_list = pd.read_csv(path_target_list,sep=' ')
+    target_list = pd.read_csv(path_target_list, sep=',')
     idx_target_list = list(target_list['Sp_ID']).index(target)
     if times is None:
         data = getSPClcV2(target=target, ap='', pwvCorr=0)
 
         t = data['BJDMID-2450000']
         t = t.fillna(0)
+        t = np.sort(t)
     else:
         t = times
-
-    # colors_start_new_target = ['black', 'darkgray', 'lightgray']
 
     P_min = pmin
     P_max = pmax
@@ -604,9 +666,8 @@ def phase_coverage_given_target(target,pmin,pmax,path_target_list=None,times=Non
                                      str(round(target_list['nb_hours_surved'][idx_target_list],2)) + ' hours',
                                      loc=3)
 
-        plt.plot(periods, covs, c="silver",label='Effective cov = ' +  str(round(mean_cov,1)) + ' %')
-        plt.plot(periods, covs, ".", c="k",)
-
+        plt.plot(periods, np.array(covs)*100, c="silver",label='Effective cov = ' + str(round(mean_cov,1)) + ' %')
+        plt.plot(periods, np.array(covs)*100, ".", c="k",)
         ax.add_artist(anchored_text)
         plt.ylabel('Phase coverage in %')
         plt.xlabel('Period in days')

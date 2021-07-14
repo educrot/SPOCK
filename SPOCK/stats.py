@@ -1,19 +1,15 @@
 from bs4 import BeautifulSoup
-import requests
 import pandas as pd
 from astropy.time import Time
 from colorama import Fore
 import numpy as np
 from alive_progress import alive_bar
 import os.path, time
-import pkg_resources
 import requests
-import SPOCK.long_term_scheduler as SPOCKLT
-from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock
-import yaml
+from SPOCK import user_portal, pwd_portal, target_list_from_stargate_path
 
-# pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,pwd_chart_studio,path_spock = SPOCKLT._get_files()
-target_list_v6 = pd.read_csv(path_spock + '/target_lists/speculoos_target_list_v6.txt',sep=' ')
+target_list_df = pd.read_csv(target_list_from_stargate_path, sep=',')
+
 
 def read_night_plans_server(telescope,date):
     TargetURL = "http://www.mrao.cam.ac.uk/SPECULOOS/"+telescope+\
@@ -22,7 +18,7 @@ def read_night_plans_server(telescope,date):
     content = resp.text.replace("\n", "")
     open('text_file.txt', 'wb').write(resp.content)
 
-    df =  pd.read_csv('text_file.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
+    df = pd.read_csv('text_file.txt', delimiter=' ', skipinitialspace=True, error_bad_lines=False)
     return df
 
 def read_all_night_plans_server(file):
@@ -63,7 +59,7 @@ def df_all_obs_scheduled(telescope):
 
 def date_night_start_func(df_speculoos,target):
     idx_target = np.where((df_speculoos['target'] == target))[0]
-    ici = np.where((target_list_v6['Sp_ID'] == target))[0]
+    ici = np.where((target_list_df['Sp_ID'] == target))[0]
     if len(idx_target) != 0:
         date_oldest = min(df_speculoos['start time (UTC)'][idx_target])
         date_most_recent = max(df_speculoos['start time (UTC)'][idx_target])
@@ -104,10 +100,10 @@ def run_masterfile():
     date_most_recent_obs = []
     durations_all_obs = []
 
-    idx_all = np.where((np.array([target_list_v6['telescope'][i].find('[]')
-                                  for i in range(len(target_list_v6))]) == -1))[0]
+    idx_all = np.where((np.array([target_list_df['telescope'][i].find('[]')
+                                  for i in range(len(target_list_df))]) == -1))[0]
 
-    for target in target_list_v6['Sp_ID'][idx_all]:
+    for target in target_list_df['Sp_ID'][idx_all]:
         try:
             basic_info = date_night_start_func(df_speculoos,target)
         except UnboundLocalError:
@@ -117,22 +113,22 @@ def run_masterfile():
         date_most_recent_obs.append(basic_info[2])
         durations_all_obs.append(basic_info[3])
 
-    df_masterfile = pd.DataFrame({'Sp_ID': target_list_v6['Sp_ID'][idx_all], 'RA': target_list_v6['RA'][idx_all],
-                       'DEC': target_list_v6['DEC'][idx_all], 'telescope': target_list_v6['telescope'][idx_all],
-                       'Program': target_list_v6['Program'][idx_all],
-                       'nb_hours_surved': target_list_v6['nb_hours_surved'][idx_all],
+    df_masterfile = pd.DataFrame({'Sp_ID': target_list_df['Sp_ID'][idx_all], 'RA': target_list_df['RA'][idx_all],
+                       'DEC': target_list_df['DEC'][idx_all], 'telescope': target_list_df['telescope'][idx_all],
+                       'Program': target_list_df['Program'][idx_all],
+                       'nb_hours_surved': target_list_df['nb_hours_surved'][idx_all],
                        'all_dates_scheduled':date_night_start_each_target,
                        'all_durations_scheduled':durations_all_obs,
                        'oldest_obs':date_oldest_obs,'most_recent_obs':date_most_recent_obs,
-                       'Filter_spc': target_list_v6['Filter_spc'][idx_all],
-                       'texp_spc': target_list_v6['texp_spc'][idx_all],
-                       'Ms': target_list_v6['Ms'][idx_all], 'Rs': target_list_v6['Rs'][idx_all],
-                       'SpT': target_list_v6['SpT'][idx_all]})
+                       'Filter_spc': target_list_df['Filter_spc'][idx_all],
+                       'texp_spc': target_list_df['texp_spc'][idx_all],
+                       'Ms': target_list_df['Ms'][idx_all], 'Rs': target_list_df['Rs'][idx_all],
+                       'SpT': target_list_df['SpT'][idx_all]})
 
     df_masterfile.to_csv('/Users/elsaducrot/spock_2/SPOCK_files/spock_stats_masterfile.csv',sep=',',index=None)
 
+
 def info_on_Sp_target(target):
-    target_list_v6 = pd.read_csv(path_spock + '/target_lists/speculoos_target_list_v6.txt', sep=' ')
-    a = target_list_v6.where((target_list_v6['Sp_ID'] == target))
+    a = target_list_df.where((target_list_df['Sp_ID'] == target))
     a = a.dropna()
     return a

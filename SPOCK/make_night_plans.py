@@ -5,11 +5,10 @@ from astropy.table import Table
 from astroplan import Observer, FixedTarget
 from astropy.time import Time
 from colorama import Fore
-import SPOCK.txt_files as SPOCKtxt
-from SPOCK.txt_files import startup, startup_no_flats, Path_txt_files, flatexo_gany, flatexo_io, \
+from .txt_files import startup, startup_no_flats, Path_txt_files, flatexo_gany, flatexo_io, \
     flatexo_euro, first_target_offset, flatexo_artemis_morning, flatexo_artemis_evening, startup_artemis,\
     flatexo_saintex
-from SPOCK.txt_files import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, \
+from .txt_files import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, \
     flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy import units as u
@@ -19,7 +18,7 @@ import ast
 from SPOCK import path_spock
 pd.set_option('display.max_columns', 50)
 
-#initialisation
+# initialisation
 index={}
 ra1={}
 dec1={}
@@ -100,7 +99,7 @@ def dome_rotation(day_of_night,telescope):
                                         frame='altaz', location=paranal.location)
         if (coords.alt.value < 50):
             print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK +
-                  ' not possible at that time because of altitude constraint, adding 20 degrees altitude')
+                  'dome rotation not possible at that time because of altitude constraint, adding 20 degrees altitude')
             coords_dome_rotation = SkyCoord(alt=coords.alt + 20 * u.deg, az=(coords.az.value - 180) * u.deg,
                                             obstime=start_dome_rot, frame='altaz', location=paranal.location)
 
@@ -175,14 +174,14 @@ def make_np(t_now, nb_jours, tel):
     dt = Time('2018-01-02 00:00:00',scale='tcg')-Time('2018-01-01 00:00:00',scale='tcg')  # 1 day
 
     for nb_day in range(0,nb_jours):
-        t_now=Time(t0+ nb_day*dt, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
+        t_now = Time(t0+ nb_day*dt, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
         Path = path_spock + '/DATABASE'
-        p=os.path.join(Path,str(telescope),'Plans_by_date',str(t_now))
+        p = os.path.join(Path,str(telescope),'Plans_by_date',str(t_now))
         if not os.path.exists(p):
             os.makedirs(p)
 
         scheduler_table = Table.read(path_spock + '/DATABASE/' + str(telescope) + '/Archive_night_blocks' +
-                                     '/night_blocks_'+ str(telescope) +'_' + str(t_now)+'.txt', format='ascii')
+                                     '/night_blocks_'+ str(telescope) + '_' + str(t_now)+'.txt', format='ascii')
 
         if (tel == 'Io') or tel == ('Europa') or (tel == 'Ganymede') or (tel == 'Callisto'):
             scheduler_table = dome_rotation(telescope=tel, day_of_night=t_now) # Intentional dome rotation to
@@ -209,7 +208,7 @@ def make_np(t_now, nb_jours, tel):
             print()
 
         for i in range(0,len(scheduler_table)):
-            if name[i]!='TransitionBlock':
+            if name[i] != 'TransitionBlock':
                 conf = ast.literal_eval(config[i])
                 filt.append(conf['filt'])
                 texp.append(conf['texp'])
@@ -270,7 +269,7 @@ def make_np(t_now, nb_jours, tel):
                         filt[i] = filt[i].replace('\'', '')
                         if nam == 'haumea':
                             SPOCKtxt.haumea(t_now,date_start[i],date_end[i], count, filt='Exo', exptime=240,
-                                            name_2=name[i+1], binning=2, Path=Path, telescope='Artemis')
+                                            name_2=name[i+1], binning=1, Path=Path, telescope='Artemis')
                         else:
                             first_target(t_now, nam, date_start[i], date_end[i], waitlimit, afinterval, autofocus,count,
                                          filt[i], texp[i], ra1[i], ra2[i],ra3[i], dec1[i], dec2[i], dec3[i], name[i+1],
@@ -299,7 +298,7 @@ def make_np(t_now, nb_jours, tel):
                         filt[i] = filt[i].replace('\'', '')
                         if nam == 'haumea':
                             SPOCKtxt.haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
-                                            name_2=None, binning=2, Path=Path, telescope='Artemis')
+                                            name_2=None, binning=1, Path=Path, telescope='Artemis')
                         else:
                             target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,
                                filt[i].replace('\'',''),texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],None,
@@ -314,7 +313,7 @@ def make_np(t_now, nb_jours, tel):
                     if i < (len(name)-1):
                         if nam == 'haumea':
                             SPOCKtxt.haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
-                                            name_2=name[i+1], binning=2, Path=Path, telescope='Artemis')
+                                            name_2=name[i+1], binning=1, Path=Path, telescope='Artemis')
                         else:
                             target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,filt[i],
                                texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],Path,telescope=telescope)
@@ -340,7 +339,7 @@ def make_np(t_now, nb_jours, tel):
                         filt[i] = filt[i].replace('\'', '')
                         if nam == 'haumea':
                             SPOCKtxt.haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
-                                            name_2=None, binning=2, Path=Path, telescope='Artemis')
+                                            name_2=None, binning=1, Path=Path, telescope='Artemis')
                         else:
                             target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,
                                filt[i].replace('\'',''),texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],
@@ -355,7 +354,7 @@ def make_np(t_now, nb_jours, tel):
                     if i < (len(name)-1):
                         if nam == 'haumea':
                             SPOCKtxt.haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
-                                            name_2=name[i+1], binning=2, Path=Path, telescope='Artemis')
+                                            name_2=name[i+1], binning=1, Path=Path, telescope='Artemis')
                         else:
                             target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,
                                filt[i],texp[i],ra1[i],ra2[i],ra3[i],dec1[i],dec2[i],dec3[i],name[i+1],
@@ -381,9 +380,9 @@ def make_np(t_now, nb_jours, tel):
             biasdark(t_now,Path,telescope,texps=list_texps)
         else:
             if np.any(name == 'haumea'):
-                biasdark(t_now, Path, telescope,bining_2=True)
+                biasdark(t_now, Path, telescope)
             else:
-                biasdark(t_now, Path, telescope, bining_2=False)
+                biasdark(t_now, Path, telescope)
 
         p2 = os.path.join(path_spock + '/DATABASE', str(telescope), 'Zip_files', str(t_now))
         shutil.make_archive(p2, 'zip', p)

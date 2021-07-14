@@ -17,7 +17,6 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from eScheduler.spe_schedule import SPECULOOSScheduler, Schedule, ObservingBlock, Transitioner
 import functools
 from functools import reduce
-from ftplib import FTP
 import gspread
 import numpy as np
 import os
@@ -32,18 +31,15 @@ import subprocess
 import sys
 import time
 from tqdm.auto import tqdm
-from SPOCK import pwd_appcs,pwd_HUB,user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,\
-    pwd_chart_studio,path_spock
-import SPOCK.short_term_scheduler as SPOCKST
-
-iers.IERS_A_URL  = 'https://datacenter.iers.org/data/9/finals2000A.all' #'http://maia.usno.navy.mil/ser7/finals2000A.all'#'ftp://cddis.gsfc.nasa.gov/pub/products/iers/finals2000A.all'
+from SPOCK import user_portal,pwd_portal,pwd_appcs,pwd_SNO_Reduc1,user_chart_studio,\
+    pwd_chart_studio,path_spock, target_list_from_stargate_path
+import SPOCK.ETC as ETC
+iers.IERS_A_URL = 'https://datacenter.iers.org/data/9/finals2000A.all'  # 'http://maia.usno.navy.mil/ser7/finals2000A.all'#'ftp://cddis.gsfc.nasa.gov/pub/products/iers/finals2000A.all'
 ssl._create_default_https_context = ssl._create_unverified_context
 
-
-import SPOCK.ETC as ETC
-from SPOCK.make_night_plans import make_np
-import SPOCK.upload_night_plans as SPOCKunp
-
+from .make_night_plans import make_np
+from .upload_night_plans import upload_np_artemis, upload_np_saint_ex, upload_np_io, upload_np_gany, upload_np_euro,\
+    upload_np_calli, upload_np_tn, upload_np_ts
 
 def get_hours_files_sno(username='speculoos', password=pwd_SNO_Reduc1):
     """ get nb hours obs on SNO
@@ -365,7 +361,7 @@ def target_list_good_coord_format(path_target_list):
 
 
     """
-    df = pd.read_csv(path_target_list, delimiter=' ')
+    df = pd.read_csv(path_target_list, delimiter=',')
     target_table_spc = Table.from_pandas(df)
     targets = [FixedTarget(coord=SkyCoord(ra=target_table_spc['RA'][i]* u.degree,
                                           dec=target_table_spc['DEC'][i] * u.degree),
@@ -647,10 +643,10 @@ def save_schedule(save, over_write, date_range, telescope):
             destination = path_spock + '/DATABASE/' + telescope + '/'
             destination_2 = path_spock + '/DATABASE/' + telescope + '/' + 'Archive_night_blocks/'
             if over_write:
-                dest = shutil.copy(source, destination)
+                # dest = shutil.copy(source, destination)
                 dest2 = shutil.copy(source, destination_2)
-                print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been over-written to ' +
-                      '\"' + destination + '\"' )
+                # print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been over-written to ' +
+                #       '\"' + destination + '\"' )
                 print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + '\"' + source + '\"' + ' has been copied to ' + '\"' +
                       destination_2 + '\"')
             if not over_write:
@@ -703,21 +699,21 @@ def upload_plans(day, nb_days, telescope):
 
     """
     if telescope.find('Callisto') is not -1:
-        SPOCKunp.upload_np_calli(day, nb_days)
+        upload_np_calli(day, nb_days)
     if telescope.find('Ganymede') is not -1:
-        SPOCKunp.upload_np_gany(day, nb_days)
+        upload_np_gany(day, nb_days)
     if telescope.find('Io') is not -1:
-        SPOCKunp.upload_np_io(day, nb_days)
+        upload_np_io(day, nb_days)
     if telescope.find('Europa') is not -1:
-        SPOCKunp.upload_np_euro(day, nb_days)
+        upload_np_euro(day, nb_days)
     if telescope.find('Artemis') is not -1:
-        SPOCKunp.upload_np_artemis(day, nb_days)
+        upload_np_artemis(day, nb_days)
     if telescope.find('TS_La_Silla') is not -1:
-        SPOCKunp.upload_np_ts(day, nb_days)
+        upload_np_ts(day, nb_days)
     if telescope.find('TN_Oukaimeden') is not -1:
-        SPOCKunp.upload_np_tn(day, nb_days)
+        upload_np_tn(day, nb_days)
     if telescope.find('Saint-Ex') is not -1:
-        SPOCKunp.upload_np_saint_ex(day, nb_days)
+        upload_np_saint_ex(day, nb_days)
 
     # ------------------- update archive date by date plans folder  ------------------
 
@@ -866,7 +862,7 @@ class Schedules:
             list as long as the target list
 
         """
-        nb_hours_threshold = [100]* len(self.target_table_spc)
+        nb_hours_threshold = [100] * len(self.target_table_spc)
         return nb_hours_threshold
 
     @property
@@ -953,24 +949,26 @@ class Schedules:
         if date_range is not None:
             self.date_range = Time(date_range)
         self.strategy = 'continuous'
-        self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
+        # self.target_list = path_spock + '/target_lists/speculoos_target_list_v6.txt'
+        self.target_list = target_list_from_stargate_path
         self.constraints = [AtNightConstraint()]
-        df = pd.read_csv(self.target_list, delimiter=' ')
+        df = pd.read_csv(self.target_list, delimiter=',')
         self.target_table_spc = Table.from_pandas(df)
         self.targets = target_list_good_coord_format(self.target_list)
 
-        last_mod = time.ctime(os.path.getmtime(self.target_list))
-        now = datetime.now()
-        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-        time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"), format='datetime') - \
-                                  Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"),
-                                       format='datetime')).value * 24
-        # self.update_nb_hours_all()
-        if abs(time_since_last_update) > 24:  # in hours
-            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Updating the number of hours observed')
-            self.update_nb_hours_all()
-        if self.date_range[1] <= self.date_range[0]:
-            sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
+        # --- UNCOMMENT IF YOU USE LOCAL FILE FOR TARGET LIST (NOT STARGATE) ---
+        # last_mod = time.ctime(os.path.getmtime(self.target_list))
+        # now = datetime.now()
+        # current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        # time_since_last_update = (Time(datetime.strptime(last_mod, "%a %b %d %H:%M:%S %Y"), format='datetime') - \
+        #                           Time(datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S"),
+        #                                format='datetime')).value * 24
+        # # self.update_nb_hours_all()
+        # if abs(time_since_last_update) > 24:  # in hours
+        #     print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Updating the number of hours observed')
+        #     self.update_nb_hours_all()
+        # if self.date_range[1] <= self.date_range[0]:
+        #     sys.exit(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' end date inferior to start date')
 
     def update_nb_hours_all(self, user=user_portal, password=pwd_portal):
         # *********** TRAPPIST ***********
@@ -979,8 +977,8 @@ class Schedules:
         # *********** SSO & SNO ***********
         self.update_telescope_from_server()  # get hours SSO
         TargetURL = "http://www.mrao.cam.ac.uk/SPECULOOS/reports/SurveyTotal"
-        target_list = pd.read_csv(self.target_list, delimiter=' ')
-        target_list['telescope'] =  ['None'] * len(target_list['telescope'])
+        target_list = pd.read_csv(self.target_list, delimiter=',')
+        target_list['telescope'] = ['None'] * len(target_list['telescope'])
         resp = requests.get(TargetURL, auth=(user, password))
         content = resp.text.replace("\n", "")
         open(path_spock + '/survey_hours/SurveyTotal.txt', 'wb').write(resp.content)
@@ -1075,8 +1073,8 @@ class Schedules:
 
         target_list.to_csv(self.target_list, sep=' ', index=False)
         target_list.to_csv(path_spock + '/target_lists/speculoos_target_list_v6_sep_coma.csv', sep=',')
-        subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", path_spock + '/target_lists/speculoos_target_list_v6.txt',
-                          'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/target_lists/'])
+        # subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", path_spock + '/target_lists/speculoos_target_list_v6.txt',
+        #                   'speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/spock_files/target_lists/'])
 
     def get_hours_files_trappist(self):
         scope = ['https://spreadsheets.google.com/feeds',
@@ -1101,7 +1099,7 @@ class Schedules:
 
     def update_nb_hours_sno(self):
         get_hours_files_sno()
-        target_list = pd.read_csv(self.target_list, delimiter=' ')
+        target_list = pd.read_csv(self.target_list, delimiter=',')
         df = pd.read_csv(path_spock + '/survey_hours/ObservationHours.txt', delimiter=',')
         sno_in_targetlist, targetlist_in_sno = index_list1_list2(df['Target'], target_list['Sp_ID'])
         target_list['nb_hours_surved'][sno_in_targetlist] = df[' Observation Hours '][targetlist_in_sno]
@@ -1112,7 +1110,7 @@ class Schedules:
             get_hours_files_sno()
         except TimeoutError:
             print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' Are on the Liege  VPN ?')
-        target_list = pd.read_csv(self.target_list, delimiter=' ')
+        target_list = pd.read_csv(self.target_list, delimiter=',')
         df = pd.read_csv(path_spock + '/survey_hours/ObservationHours.txt', delimiter=',')
         sno_in_targetlist, targetlist_in_sno = index_list1_list2(df['Target'], target_list['Sp_ID'])
         df_tel = ['Artemis'] * len(df['Target'][targetlist_in_sno])
@@ -1121,7 +1119,7 @@ class Schedules:
 
     def update_nb_hours_from_server(self,user = 'educrot',password=pwd_portal):
         TargetURL = "http://www.mrao.cam.ac.uk/SPECULOOS/reports/SurveyTotal"
-        target_list = pd.read_csv(self.target_list, delimiter=' ')
+        target_list = pd.read_csv(self.target_list, delimiter=',')
         resp = requests.get(TargetURL, auth=(user, password))
         content = resp.text.replace("\n", "")
         open(path_spock + '/survey_hours/SurveyTotal.txt', 'wb').write(resp.content)
@@ -1135,7 +1133,7 @@ class Schedules:
 
     def update_telescope_from_server(self, user='educrot', password=pwd_portal):
         TargetURL = "http://www.mrao.cam.ac.uk/SPECULOOS/reports/SurveyByTelescope"
-        target_list = pd.read_csv(self.target_list, delimiter=' ')
+        target_list = pd.read_csv(self.target_list, delimiter=',')
         resp = requests.get(TargetURL, auth=(user, password))
         content = resp.text.replace("\n", "")
         open(path_spock + '/survey_hours/SurveyByTelescope.txt', 'wb').write(resp.content)
@@ -1208,6 +1206,7 @@ class Schedules:
                     self.first_target = self.priority[self.idx_first_target]
                     self.first_target_by_day.append(self.first_target)
                     self.idx_first_target_by_day.append(self.idx_first_target)
+                    self.update_hours_observed_first(day)
 
                 if not self.is_constraints_met_first_target(t):
                     print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK +
@@ -1217,6 +1216,8 @@ class Schedules:
                     self.second_target = self.priority[self.idx_second_target]
                     self.second_target_by_day.append(self.second_target)
                     self.idx_second_target_by_day.append(self.idx_second_target)
+                    self.update_hours_observed_second(day)
+
 
                 if self.idx_second_target is None:
                     print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' no second target')
@@ -1224,6 +1225,7 @@ class Schedules:
                 self.night_block = self.schedule_blocks(day)
 
                 if self.read_locked_target:
+                    import SPOCK.short_term_scheduler as SPOCKST
                     schedule_short = SPOCKST.Schedules()
                     schedule_short.load_parameters()
                     schedule_short.day_of_night = day
@@ -1870,10 +1872,11 @@ class Schedules:
             is_hours_constraint_met_target: boolean, say the hour constraint is ok or not
 
         """
-        nb_hours_observed = self.target_table_spc['nb_hours_surved']
+        # nb_hours_observed = self.target_table_spc['nb_hours_surved']
         is_hours_constraint_met_target = True
-        a=(1-self.target_table_spc['nb_hours_threshold'][idx_target]/(self.target_table_spc['nb_hours_threshold'][idx_target]+10))
-        if a < 1E-5:
+        a = (1-self.target_table_spc['nb_hours_surved'][idx_target]/
+             (self.target_table_spc['nb_hours_threshold'][idx_target]+10))
+        if a < 5E-2:
             is_hours_constraint_met_target = False
         return is_hours_constraint_met_target
 
@@ -2024,8 +2027,8 @@ class Schedules:
 
         """
 
-        if t == 4:
-            print()
+        # if t == 4:
+        #     print()
         dt_1day = Time('2018-01-02 00:00:00', scale='tcg')-Time('2018-01-01 00:00:00', scale='tcg')
 
         is_moon_constraint_met_first_target = \
@@ -2206,7 +2209,7 @@ class Schedules:
                     if self.first_target['set or rise'] == 'both':
                         self.idx_second_target = self.idx_first_target
                         self.second_target = self.first_target
-                        #is_moon_constraint_met_second_target = self.is_moon_and_visibility_constraint(t)
+                        # is_moon_constraint_met_second_target = self.is_moon_and_visibility_constraint(t)
                         is_moon_constraint_met_second_target = self.moon_and_visibility_constraint_table['ever observable'][self.idx_second_target]
                         hours_constraint_second = self.is_constraint_hours(self.idx_second_target)
 
@@ -2232,9 +2235,10 @@ class Schedules:
 
         """
         if self.idx_second_target is not None:
-            shift = max(self.shift_hours_observation(self.idx_first_target),self.shift_hours_observation(self.idx_second_target)) /24 #days
+            shift = max(self.shift_hours_observation(self.idx_first_target),
+                        self.shift_hours_observation(self.idx_second_target)) /24  # days
         else:
-            shift = self.shift_hours_observation(self.idx_first_target)/24 #days
+            shift = self.shift_hours_observation(self.idx_first_target)/24  # days
 
         dur_obs_both_target = self.night_duration(day).value * u.day
         dur_obs_set_target = (self.night_duration(day).value/2 - shift/self.date_range_in_days) * u.day
@@ -2298,31 +2302,31 @@ class Schedules:
         self.nb_hours[1, self.idx_second_target] = nb_hours__2nd_old + b*24
         self.target_table_spc['nb_hours_surved'][self.idx_second_target] = nb_hours__2nd_old + b*24
 
-    def make_plan_file(self, day):
-        name_all = self.night_block['target']
-        start_all = self.night_block['start time (UTC)']
-        finish_all = self.night_block['end time (UTC)']
-        duration_all = self.night_block['duration (minutes)']
-        self.update_hours_observed_first(day)
-        if self.idx_second_target is not None:
-            self.update_hours_observed_second(day)
-        file_txt = 'plan.txt'
-        with open(file_txt, 'a') as file_plan:
-            for i, nam in enumerate(name_all):
-                if i == 1:
-                    if nam == name_all[i - 1]:
-                        start_all[i] = start_all[i - 1]
-                        duration_all[i] = (Time(finish_all[i]) - Time(start_all [i])).value * 24 * 60
-                        self.night_block.remove_row(0)
-
-                idx_target = np.where((nam == self.target_table_spc['Sp_ID']))[0]
-                if nam != 'TransitionBlock':
-                    file_plan.write(
-                        nam + ' ' + '\"' + start_all [i] + '\"' + ' ' + '\"' + finish_all[i] + '\"' + 
-                        ' ' + self.telescope + ' ' + str(np.round(self.nb_hours[0, idx_target[0]], 3)) + '/' + 
-                        str(self.target_table_spc['nb_hours_threshold'][idx_target[0]]) + ' ' + 
-                        str(np.round(self.nb_hours[1, idx_target[0]], 3)) + '/' + str(
-                            self.target_table_spc['nb_hours_threshold'][idx_target[0]]) + '\n')
+    # def make_plan_file(self, day):
+    #     name_all = self.night_block['target']
+    #     start_all = self.night_block['start time (UTC)']
+    #     finish_all = self.night_block['end time (UTC)']
+    #     duration_all = self.night_block['duration (minutes)']
+    #     self.update_hours_observed_first(day)
+    #     if self.idx_second_target is not None:
+    #         self.update_hours_observed_second(day)
+    #     file_txt = 'plan.txt'
+    #     with open(file_txt, 'a') as file_plan:
+    #         for i, nam in enumerate(name_all):
+    #             if i == 1:
+    #                 if nam == name_all[i - 1]:
+    #                     start_all[i] = start_all[i - 1]
+    #                     duration_all[i] = (Time(finish_all[i]) - Time(start_all [i])).value * 24 * 60
+    #                     self.night_block.remove_row(0)
+    #
+    #             idx_target = np.where((nam == self.target_table_spc['Sp_ID']))[0]
+    #             if nam != 'TransitionBlock':
+    #                 file_plan.write(
+    #                     nam + ' ' + '\"' + start_all [i] + '\"' + ' ' + '\"' + finish_all[i] + '\"' +
+    #                     ' ' + self.telescope + ' ' + str(np.round(self.nb_hours[0, idx_target[0]], 3)) + '/' +
+    #                     str(self.target_table_spc['nb_hours_threshold'][idx_target[0]]) + ' ' +
+    #                     str(np.round(self.nb_hours[1, idx_target[0]], 3)) + '/' + str(
+    #                         self.target_table_spc['nb_hours_threshold'][idx_target[0]]) + '\n')
 
     def reference_table(self):
         """
@@ -2382,7 +2386,7 @@ class Schedules:
             self.telescope = telescope
         if day is None:
             print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Not using moon phase in ETC')
-        # moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
+        # moon_phase = round(moon_illumination(day), 2)
         if round(abs(self.target_table_spc['SpT'][i])) <= 9:
             spt_type = 'M' + str(round(abs(self.target_table_spc['SpT'][i])))
             if spt_type == 'M3':
@@ -2416,20 +2420,20 @@ class Schedules:
             if 0 < filt_idx <= 3:
                 print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Change filter to avoid saturation!!')
                 filt_ = filters[filt_idx]
-                print(filt_)
+                # print(filt_)
 
             if self.telescope == 'Saint-Ex':
-                print(day)
-                moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
+                # print(day)
+                moon_phase = round(moon_illumination(day), 2)
                 if float(self.target_table_spc['J'][i]) != 0.:
                     a = (ETC.etc(mag_val=float(self.target_table_spc['J'][i]), mag_band='J', spt=spt_type,
                                  filt=filt_, airmass=1.1, moonphase=moon_phase, irtf=0.8, num_tel=1,
-                                 seeing=1.0, gain=3.48, temp_ccd=-70, observatory_altitude=2780))
+                                 seeing=0.7, gain=3.48, temp_ccd=-70, observatory_altitude=2780))
                 else:
                     if (float(self.target_table_spc['J'][i]) == 0.) and (float(self.target_table_spc['V'][i]) != 0.):
                         a = (ETC.etc(mag_val=float(self.target_table_spc['V'][i]), mag_band='V', spt=spt_type,
                                      filt=filt_, airmass=1.1, moonphase=moon_phase, irtf=0.8, num_tel=1,
-                                     seeing=1.0, gain=3.48, temp_ccd=-70, observatory_altitude=2780))
+                                     seeing=0.7, gain=3.48, temp_ccd=-70, observatory_altitude=2780))
                     else:
                         sys.exit('ERROR: You must precise Vmag or Jmag for this target')
                 texp = a.exp_time_calculator(ADUpeak=30000)[0]
@@ -2519,8 +2523,8 @@ class Schedules:
         saintex_texp = np.zeros(len(self.target_table_spc))
         ts_texp = np.zeros(len(self.target_table_spc))
         tn_texp = np.zeros(len(self.target_table_spc))
-        for i in range(1242,len(self.target_table_spc)):
-            print(i, self.target_table_spc['Sp_ID'][i])
+        for i in range(len(self.target_table_spc)):
+            # print(i, self.target_table_spc['Sp_ID'][i])
             sso_texp[i] = self.exposure_time(day, i, 'Io')
             sno_texp[i] = self.exposure_time(day, i, 'Artemis')
             saintex_texp[i] = self.exposure_time(day, i, 'Saint-Ex')
@@ -2562,14 +2566,14 @@ class Schedules:
             self.priority['priority'][idx_observed_trappist] = 0
         elif (self.telescope == 'Io') or (self.telescope == 'Europa') or \
                 (self.telescope == 'Ganymede') or (self.telescope == 'Callisto'):
-            #self.priority['priority'][idx_observed_trappist] = 0
+            # self.priority['priority'][idx_observed_trappist] = 0
             self.priority['priority'][idx_observed_saintex] = 0
             self.priority['priority'][idx_observed_SNO] = 0
             for i in range(len(idx_observed_SSO)):
                 if self.target_table_spc['telescope'][idx_observed_SSO][i] != '':
                     if self.telescope not in self.target_table_spc['telescope'][idx_observed_SSO][i]:
                         self.priority['priority'][idx_observed_SSO[i]] = 0
-        print()
+        # print()
 
 
 def read_night_block(telescope, day):
@@ -2590,14 +2594,10 @@ def read_night_block(telescope, day):
                  telescope + '_' + day_fmt + '.txt'
 
     if os.path.exists(path_local):
-        day_fmt = Time(day, scale='utc', out_subfmt='date').tt.datetime.strftime("%Y-%m-%d")
-        scheduler_table = Table.read(
-            path_spock + '/DATABASE/' + str(telescope) + '/Archive_night_blocks' + '/night_blocks_' + str(telescope) +
-            '_' + str(
-                day_fmt) + '.txt',
-            format='ascii')
+        scheduler_table = Table.read(path_local,format='ascii')
     else:
-        nightb_url = "http://www.mrao.cam.ac.uk/SPECULOOS/" + telescope + '/schedule/Archive_night_blocks/night_blocks_' + \
+        nightb_url = "http://www.mrao.cam.ac.uk/SPECULOOS/" + telescope + \
+                     '/schedule/Archive_night_blocks/night_blocks_' + \
                      telescope + '_' + day_fmt + '.txt'
         nightb = requests.get(nightb_url, auth=(user_portal, pwd_portal))
 
@@ -2874,24 +2874,3 @@ def date_range_in_days(date_range):
     return (date_end - date_start).days
 
 
-def get_target_list_stargate(day):
-    """
-
-    Parameters
-    ----------
-    day
-
-    Returns
-    -------
-
-    """
-    objdate = datetime.strptime(day, '%Y-%m-%d')
-    y = datetime.strftime(objdate,'%Y')
-    m = datetime.strftime(objdate,'%m').lstrip('0')
-    d = datetime.strftime(objdate,'%d').lstrip('0')
-    ftp = FTP('z93vm.ftp.infomaniak.com')
-    ftp.login('z93vm_stargate_updb','TrApPiST-1fgh')
-    # day = Time(day, scale='utc', out_subfmt='date').iso
-    file_name = 'stargate_db_'+y+'-'+m+'-'+d+'.csv'
-    my_file = open('./target_lists/stargate/'+ file_name, 'wb')
-    ftp.retrbinary('RETR ' + file_name, my_file.write, 1024)

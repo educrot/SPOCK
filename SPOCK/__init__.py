@@ -1,7 +1,7 @@
 __all__ = ['long_term_scheduler','short_term_scheduler','make_night_plans','plots_scheduler',
            'txt_files','upload_night_plans','stats','SPECULOOSScheduler','pwd_appcs','pwd_HUB','user_portal',
            'pwd_portal','pwd_appcs','pwd_SNO_Reduc1','user_chart_studio','pwd_chart_studio','path_spock',
-           'path_credential_json']
+           'path_credential_json','login_stargate','pwd_stargate']
 
 __version__ = "0.0.1"
 
@@ -9,7 +9,10 @@ import pkg_resources
 import os
 import requests
 import yaml
+from ftplib import FTP
 from colorama import Fore
+from datetime import date, timedelta, datetime
+import pandas as pd
 
 
 def _get_files():
@@ -32,6 +35,8 @@ def _get_files():
             pwd_chart_studio = Inputs['pwd_chart_studio'][0]
             path_spock = Inputs['path_spock'][0]
             path_credential_json = Inputs['credential_json'][0]
+            login_stargate = Inputs['login_stargate'][0]
+            pwd_stargate = Inputs['pwd_stargate'][0]
 
         # ************************ Create database ************************
 
@@ -39,6 +44,8 @@ def _get_files():
                             'TS_La_Silla', 'TN_Oukaimeden']
         if not os.path.exists(path_spock + '/target_lists'):
             os.makedirs(path_spock + '/target_lists')
+        if not os.path.exists(path_spock + '/target_lists/stargate'):
+            os.makedirs(path_spock + '/target_lists/stargate')
         if not os.path.exists(path_spock + '/survey_hours'):
             os.makedirs(path_spock + '/survey_hours')
         if not os.path.exists(path_spock + '/DATABASE'):
@@ -60,31 +67,91 @@ def _get_files():
             if not os.path.exists(path_spock + '/DATABASE/' + tel + '/Zip_files'):
                 os.makedirs(path_spock + '/DATABASE/' + tel + '/Zip_files')
 
-        # ************************ Read target lists from server ************************
-        target_lists = ['speculoos_target_list_v6.txt', 'target_list_special.txt', 'target_transit_follow_up.txt']
-        for t_list in target_lists:
-            target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/target_lists/" + t_list
-            resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
-            content = resp.text.replace("\n", "")
-            open(path_spock + '/target_lists/' + t_list, 'wb').write(resp.content)
-
-        survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt',
-                        'ObservationHours.txt','SurveyTotal.txt']
-        for file in survey_hours:
-            target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/survey_hours/" + file
-            resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
-            content = resp.text.replace("\n", "")
-            open(path_spock + '/survey_hours/' + file, 'wb').write(resp.content)
+        # ********* Read target lists from server ******** UNCOMMENT IF NOT USING STARGATE  AND WG6 ***
+        # target_lists = ['speculoos_target_list_v6.txt', 'target_list_special.txt', 'target_transit_follow_up.txt']
+        # for t_list in target_lists:
+        #     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/target_lists/" + t_list
+        #     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
+        #     content = resp.text.replace("\n", "")
+        #     open(path_spock + '/target_lists/' + t_list, 'wb').write(resp.content)
+        #
+        # survey_hours = ['ObservationHours_Saint-Ex.txt', 'ObservationHours_TRAPPIST.txt',
+        #                 'ObservationHours.txt','SurveyTotal.txt']
+        # for file in survey_hours:
+        #     target_list_url = "http://www.mrao.cam.ac.uk/SPECULOOS/spock_files/survey_hours/" + file
+        #     resp = requests.get(target_list_url, auth=(user_portal, pwd_portal))
+        #     content = resp.text.replace("\n", "")
+        #     open(path_spock + '/survey_hours/' + file, 'wb').write(resp.content)
 
         return pwd_appcs, pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_chart_studio,\
-               pwd_chart_studio, path_spock,path_credential_json
+               pwd_chart_studio, path_spock,path_credential_json, login_stargate, pwd_stargate
 
         # **********************************************************************************************************
     else:
         print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No file '+ 'passwords.csv')
 
+def get_target_list_stargate(day,path):
+    """
 
-pwd_appcs,pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_chart_studio, pwd_chart_studio, path_spock, path_credential_json = _get_files()
+    Parameters
+    ----------
+    day
+
+    Returns
+    -------
+
+    """
+    objdate = datetime.strptime(day, '%Y-%m-%d')
+    y = datetime.strftime(objdate,'%Y')
+    m = datetime.strftime(objdate,'%m').lstrip('0')
+    d = datetime.strftime(objdate,'%d').lstrip('0')
+    ftp = FTP('z93vm.ftp.infomaniak.com')
+    ftp.login(login_stargate,pwd_stargate)
+    # day = Time(day, scale='utc', out_subfmt='date').iso
+    file_name = 'stargate_db_'+y+'-'+m+'-'+d+'.csv'
+    my_file = open(path + '/target_lists/stargate/' + file_name, 'wb')
+    ftp.retrbinary('RETR ' + file_name, my_file.write,8*1024)
+    print(Fore.GREEN + 'INFO: ' + Fore.BLACK + 'Downloading target list from STARGATE.')
+    # time.sleep(5)  # wait for the file to fully download
+    return file_name
+
+
+def change_fmt_stargate_TL(file_name):
+    """
+
+    Parameters
+    ----------
+    file_name
+
+    Returns
+    -------
+
+    """
+    # change columns names
+    df = pd.read_csv(path_spock + '/target_lists/stargate/' + file_name, delimiter=';')
+    df = df.rename(columns={'spc': 'Sp_ID', 'ra': 'RA', 'dc': 'DEC', 'gaia': 'Gaia_ID', 'obstime': 'nb_hours_surved',
+                            'program.1': 'Program', 'spt': 'SpT', 'mag_j': 'J'})
+    df['nb_hours_surved'] = df['nb_hours_surved'].fillna(0)
+    df['texp_spc'] = [0] * len(df['Sp_ID'])
+    df['Filter_spc'] = ['I+z'] * len(df['Sp_ID'])
+    df['texp_trap'] = [0] * len(df['Sp_ID'])
+    df['Filter_trap'] = ['I+z'] * len(df['Sp_ID'])
+    df['telescope'] = [''] * len(df['Sp_ID'])
+    df['nb_hours_threshold'] = [100] * len(df['Sp_ID'])
+    df.loc[df.Program == 1, 'nb_hours_threshold'] = 200
+    df['SNR_TESS_temp'] = [0]*len(df['SNR_JWST_HZ_tr'])
+    df['SNR_Spec_temp'] = [0]*len(df['SNR_JWST_HZ_tr'])
+    df['SNR_JWST_HZ_tr'] = df['SNR_JWST_HZ_tr'].fillna(0)
+    df['SNR_TESS_temp'] = df['SNR_TESS_temp'].fillna(0)
+    df['SNR_Spec_temp'] = df['SNR_Spec_temp'].fillna(0)
+    df.to_csv(path_spock + '/target_lists/stargate/' + 'TL_spock_' + file_name, sep=',', index=None)
+    return path_spock + '/target_lists/stargate/' + 'TL_spock_' + file_name
+
+pwd_appcs,pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_chart_studio, pwd_chart_studio, path_spock, path_credential_json, login_stargate, pwd_stargate = _get_files()
+
+today = date.today() - timedelta(days=1)
+today = today.strftime("%Y-%m-%d")
+target_list_from_stargate_path = change_fmt_stargate_TL(get_target_list_stargate(today,path_spock))
 
 
 from .long_term_scheduler import *
