@@ -12,7 +12,7 @@ planification of observation of the SPECULOOS telescopes. The project SPECULOOS 
 searches for potentially habitable exoplanets around the smallest and coolest stars
 of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4259452/fr/speculoos>`_.
 
-Schedule targets on several criteria:
+*SPOCK* allows you to schedule SPECULOOS core program targets on several criteria:
 
 *  Visibility of the target
 
@@ -21,6 +21,8 @@ Schedule targets on several criteria:
 *  Number of hours already performed
 
 *  Coordination between different site
+
+as well as external program targets (planetary candidates, eclipsing binaries, complex rotators, etc)
 
 Documentation SPOCK
 ---------------------
@@ -39,9 +41,6 @@ Installation
     You must be part of the SPECULOOS consortium to use *SPOCK*.
 
 
-OSX
----
-
 Install *SPOCK* locally::
 
     git clone https://github.com/educrot/SPOCK.git
@@ -52,11 +51,7 @@ Install *SPOCK* locally::
 
 
 
-Contributing
+More about *SPOCK*
 ---------------------
 
-Suggestions are welcome and feel free to open an issue if you see a bug.
-
-
-License
----------------------
+*SPOCK* is presented in more details in `Sebastian et al. 2020 <http://arxiv.org/abs/2011.02069>`_.
