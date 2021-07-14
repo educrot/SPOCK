@@ -30,7 +30,7 @@ To use *SPOCK* you will need to be part of the SPECULOOS consortium and have acc
 
 Then follow the procedure:
 
-1. the first step is to add a *password.csv* file in the folder: *your_SPOCK_path//SPOCK/*.
+1. the first step is to add a *password.csv* file in the folder: *your_SPOCK_path/SPOCK/*.
 
 2. the second step is to connect to the Liège VPN to have access to all functions of *SPOCK*
 
