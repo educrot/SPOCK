@@ -1,0 +1,284 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Long-term scheduling"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here we present the long-term scheduling module. The long-term scheduling module of spock has been concived to optimizing the planifification of targets on the SPECULOOS telescopes (SSO, SNO, Saint-Ex, TS, TN) and follow the strategy decided by the consortium. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "**Note:** Before you insert new observations and upload them please make sure you have informed the SPECULOOS consortium \n",
+    "\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Make schedules "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To create the <span style=\"background-color:lightyellow\"><font color='orangered'> **night_blocks** </font></span> for a date range. The only information needed are: \n",
+    "\n",
+    "+ the name of the site, ex: `obs_name = 'SSO'`\n",
+    "\n",
+    "+ the name of the telescope (because there can be several telescope per site), ex: `telescope ='Io'`\n",
+    "\n",
+    "+ date range as a list, ex: `date_range = ['2021-08-01 15:00:00','2021-08-02 15:00:00']`\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Then you only have to run the following lines of code:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "870cb835ae1b4d06b4326c5c411a476a",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "HBox(children=(FloatProgress(value=0.0, description='Updating hours of obs ', max=1.0, style=ProgressStyle(des…"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\u001b[33mWARNING: \u001b[30m No plans in your local file for  Europa on the 2021-08-01\n",
+      "\u001b[33mWARNING: \u001b[30m No plans in your local file for  Ganymede on the 2021-08-01\n",
+      "\u001b[33mWARNING: \u001b[30m No plans in your local file for  Callisto on the 2021-08-01\n",
+      "\u001b[33mWARNING: \u001b[30m No plans in your local file for  Artemis on the 2021-08-01\n",
+      "\u001b[33mWARNING: \u001b[30m No plans in your local file for  Saint-Ex on the 2021-08-01\n",
+      "\u001b[33mWARNING: \u001b[30m No plans in your local file for  TS_La_Silla on the 2021-08-01\n",
+      "\u001b[33mWARNING: \u001b[30m No plans in your local file for  TN_Oukaimeden on the 2021-08-01\n",
+      "\n"
+     ]
+    },
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "a9de6ff362b64302975254209cd61917",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "HBox(children=(FloatProgress(value=0.0, description='Scheduling ', max=1.0, style=ProgressStyle(description_wi…"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\u001b[32mINFO: \u001b[30m day is :  2021-08-01 15:00:00.000\n",
+      "\u001b[32mINFO: \u001b[30m Not using moon phase in ETC\n",
+      "\u001b[33mWARNING: \u001b[30m Change filter to avoid saturation!!\n",
+      "\u001b[33mWARNING: \u001b[30m Change filter to avoid saturation!!\n",
+      "\u001b[32mINFO: \u001b[30m Not using moon phase in ETC\n",
+      "\u001b[32mINFO: \u001b[30m First target is 'set'\n",
+      "\n",
+      "\n",
+      "\u001b[32mINFO: \u001b[30m no transition block\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "import SPOCK.long_term_scheduler as SPOCKLT\n",
+    "from astropy.time import Time\n",
+    "\n",
+    "schedule = SPOCKLT.Schedules()\n",
+    "schedule.observatory_name = 'SSO'\n",
+    "schedule.telescope = 'Io'\n",
+    "schedule.load_parameters(date_range=['2021-08-01 15:00:00','2021-08-02 15:00:00'])\n",
+    "\n",
+    "\n",
+    "schedule.make_schedule(Altitude_constraint = 28, Moon_constraint = 30)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<i>Table length=2</i>\n",
+       "<table id=\"table4660872472\" class=\"table-striped table-bordered table-condensed\">\n",
+       "<thead><tr><th>target</th><th>start time (UTC)</th><th>end time (UTC)</th><th>duration (minutes)</th><th>ra (h)</th><th>ra (m)</th><th>ra (s)</th><th>dec (d)</th><th>dec (m)</th><th>dec (s)</th><th>configuration</th></tr></thead>\n",
+       "<thead><tr><th>str15</th><th>str23</th><th>str23</th><th>float64</th><th>str32</th><th>str32</th><th>str32</th><th>str32</th><th>str32</th><th>str32</th><th>object</th></tr></thead>\n",
+       "<tr><td>Sp1845-6357</td><td>2021-08-01 22:56:20.017</td><td>2021-08-02 04:44:00.017</td><td>347.66666666666674</td><td>18.0</td><td>45.0</td><td>8.664480000022934</td><td>-63.0</td><td>-57.0</td><td>-47.46239999999375</td><td>{&apos;filt&apos;: &apos;i&apos;, &apos;texp&apos;: &apos;20&apos;}</td></tr>\n",
+       "<tr><td>Sp2331-2749</td><td>2021-08-02 04:44:20.017</td><td>2021-08-02 10:40:00.017</td><td>355.66666666666663</td><td>23.0</td><td>31.0</td><td>21.752880000023254</td><td>-27.0</td><td>-49.0</td><td>-49.60559999999447</td><td>{&apos;filt&apos;: &apos;I+z&apos;, &apos;texp&apos;: &apos;28&apos;}</td></tr>\n",
+       "</table>"
+      ],
+      "text/plain": [
+       "<Table length=2>\n",
+       "   target       start time (UTC)    ...         configuration        \n",
+       "   str15             str23          ...             object           \n",
+       "----------- ----------------------- ... -----------------------------\n",
+       "Sp1845-6357 2021-08-01 22:56:20.017 ...   {'filt': 'i', 'texp': '20'}\n",
+       "Sp2331-2749 2021-08-02 04:44:20.017 ... {'filt': 'I+z', 'texp': '28'}"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "display(schedule.night_block_by_day[0])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Save schedules"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To save the schedules that just has been created you just need to use the function `save_schedule`. You'll just need to specify the name of the telescope and the data range for which you would like to save the schedule."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\u001b[32mINFO:  \u001b[30m\"/Users/elsaducrot/spock_2/night_blocks_propositions/night_blocks_Io_2021-08-01.txt\" has been copied to \"/Users/elsaducrot/spock_2/DATABASE/Io/Archive_night_blocks/\"\n"
+     ]
+    }
+   ],
+   "source": [
+    "SPOCKLT.save_schedule(save=True, over_write=True, \n",
+    "                      date_range=schedule.date_range, telescope=schedule.telescope)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Make ACP plans"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\u001b[32mINFO: \u001b[30m Path exists and is:  /Users/elsaducrot/spock_2/DATABASE/Io/night_blocks_Io_2021-08-01.txt\n",
+      "\u001b[33mWARNING: \u001b[30m not possible at that time because of altitude constraint, adding 20 degrees altitude\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "SPOCKLT.make_plans(day=schedule.date_range[0], nb_days=schedule.date_range_in_days, \n",
+    "                   telescope=schedule.telescope)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Upload plans on telescope's control computer + Cambridge archive"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "-----> 2021-08-01 Plans uploaded on the Cambridge server\n",
+      "-----> 2021-08-01 Night plans uploaded on the Cambridge server\n",
+      "-----> 2021-08-01 Zip Plans_by_dates folder uploaded on the Cambridge server\n",
+      "-----> 2021-08-01 Zip Plans_by_dates folder uploaded on the HUB for Io\n"
+     ]
+    }
+   ],
+   "source": [
+    "SPOCKLT.upload_plans(day=schedule.date_range[0], nb_days=schedule.date_range_in_days,\n",
+    "                     telescope=schedule.telescope)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
