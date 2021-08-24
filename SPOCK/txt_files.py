@@ -473,7 +473,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                     out.write('#chill -60\n')
             if name == 'dome_rot':
                 out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Dome_rot" + '\n')
-            if (name.find('Ch') != -1) and gaia_id_target == 'None':
+            if (name.find('Ch') != -1) or (name.find('ch') != -1) and gaia_id_target == 'None':
                 d = Time(t_now).tt.datetime
                 out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Chilean" + r"\ "[0] +
                           d.strftime("%Y%m%d") + '\n')

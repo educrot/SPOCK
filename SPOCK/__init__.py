@@ -90,7 +90,7 @@ def _get_files():
     else:
         print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No file '+ 'passwords.csv')
 
-def get_target_list_stargate(day,path):
+def get_target_list_stargate(day):
     """
 
     Parameters
@@ -109,7 +109,7 @@ def get_target_list_stargate(day,path):
     ftp.login(login_stargate,pwd_stargate)
     # day = Time(day, scale='utc', out_subfmt='date').iso
     file_name = 'stargate_db_'+y+'-'+m+'-'+d+'.csv'
-    my_file = open(path + '/target_lists/stargate/' + file_name, 'wb')
+    my_file = open('./target_lists/stargate/' + file_name, 'wb')
     ftp.retrbinary('RETR ' + file_name, my_file.write,8*1024)
     print(Fore.GREEN + 'INFO: ' + Fore.BLACK + 'Downloading target list from STARGATE.')
     # time.sleep(5)  # wait for the file to fully download
@@ -151,7 +151,7 @@ pwd_appcs,pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_char
 
 today = date.today() - timedelta(days=1)
 today = today.strftime("%Y-%m-%d")
-target_list_from_stargate_path = change_fmt_stargate_TL(get_target_list_stargate(today,path_spock))
+target_list_from_stargate_path = change_fmt_stargate_TL(get_target_list_stargate(today))
 
 
 from .long_term_scheduler import *

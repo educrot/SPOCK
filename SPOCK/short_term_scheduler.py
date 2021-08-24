@@ -1,6 +1,6 @@
 #!/anaconda3/bin/python3.6
 from astropy.time import Time
-from astropy.table import unique,Table, vstack
+from astropy.table import unique, Table, vstack
 from astropy import units as u
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 from astroplan.utils import time_grid_from_range
@@ -828,16 +828,22 @@ class Schedules:
                             self.end_of_observation.iso):
                         
                         print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' situation 7')
-                        self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
-                        self.scheduled_table['duration (minutes)'] = \
-                            (Time(self.scheduled_table['end time (UTC)'][i]) 
-                             - Time(self.scheduled_table['start time (UTC)'][i])).value * 24 * 60
 
-                        self.SS1_night_blocks['end time (UTC)'][0] = \
-                            self.end_of_observation.iso
-                        self.SS1_night_blocks['duration (minutes)'][0] = \
-                            (Time(self.SS1_night_blocks['end time (UTC)'][0]) - 
-                             Time(self.SS1_night_blocks['start time (UTC)'][0])).value * 24*60
+                        if self.SS1_night_blocks['start time (UTC)'][0] > self.scheduled_table['end time (UTC)'][i]:
+                            print(Fore.GREEN + 'INFO: ' + Fore.BLACK +
+                                  ' situation 7a, no change made to initial schedule')
+                        else:
+                            print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' situation 7b')
+                            self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
+                            self.scheduled_table['duration (minutes)'] = \
+                                (Time(self.scheduled_table['end time (UTC)'][i])
+                                 - Time(self.scheduled_table['start time (UTC)'][i])).value * 24 * 60
+
+                            self.SS1_night_blocks['end time (UTC)'][0] = \
+                                self.end_of_observation.iso
+                            self.SS1_night_blocks['duration (minutes)'][0] = \
+                                (Time(self.SS1_night_blocks['end time (UTC)'][0]) -
+                                 Time(self.SS1_night_blocks['start time (UTC)'][0])).value * 24*60
 
                     elif (self.SS1_night_blocks['end time (UTC)'][0] <=
                           self.end_of_observation.iso):
