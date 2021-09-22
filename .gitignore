@@ -6,53 +6,53 @@ survey_hours/
 
 target_lists/
 
-DATABASE/Io/Archive_night_blocks
+DATABASE/Io/Archive_night_blocks/
 
-DATABASE/Europa/Archive_night_blocks
+DATABASE/Europa/Archive_night_blocks/
 
-DATABASE/Ganymede/Archive_night_blocks
+DATABASE/Ganymede/Archive_night_blocks/
 
-DATABASE/Callisto/Archive_night_blocks
+DATABASE/Callisto/Archive_night_blocks/
 
-DATABASA/TS_La_Silla/Archive_night_blocks
+DATABASA/TS_La_Silla/Archive_night_blocks/
 
-DATABASE/TN_Oukaimeden/Archive_night_blocks
+DATABASE/TN_Oukaimeden/Archive_night_blocks/
 
-DATABASE/Saint-Ex/Archive_night_blocks
+DATABASE/Saint-Ex/Archive_night_blocks/
 
-DATABASE/Artemis/Archive_night_blocks
+DATABASE/Artemis/Archive_night_blocks/
 
-DATABASE/Io/Plans_by_date
+DATABASE/Io/Plans_by_date/
 
-DATABASE/Europa/Plans_by_date
+DATABASE/Europa/Plans_by_date/
 
-DATABASE/Ganymede/Plans_by_date
+DATABASE/Ganymede/Plans_by_date/
 
-DATABASE/Callisto/Plans_by_date
+DATABASE/Callisto/Plans_by_date/
 
-DATABASA/TS_La_Silla/Plans_by_date
+DATABASA/TS_La_Silla/Plans_by_date/
 
-DATABASE/TN_Oukaimeden/Plans_by_date
+DATABASE/TN_Oukaimeden/Plans_by_date/
 
-DATABASE/Saint-Ex/Plans_by_date
+DATABASE/Saint-Ex/Plans_by_date/
 
-DATABASE/Artemis/Plans_by_date
+DATABASE/Artemis/Plans_by_date/
 
-DATABASE/Io/Zip_files
+DATABASE/Io/Zip_files/
 
-DATABASE/Europa/Zip_files
+DATABASE/Europa/Zip_files/
 
-DATABASE/Ganymede/Zip_files
+DATABASE/Ganymede/Zip_files/
 
-DATABASE/Callisto/Zip_files
+DATABASE/Callisto/Zip_files/
 
-DATABASA/TS_La_Silla/Zip_files
+DATABASA/TS_La_Silla/Zip_files/
 
-DATABASE/TN_Oukaimeden/Zip_files
+DATABASE/TN_Oukaimeden/Zip_files/
 
-DATABASE/Saint-Ex/Zip_files
+DATABASE/Saint-Ex/Zip_files/
 
-DATABASE/Artemis/Zip_files
+DATABASE/Artemis/Zip_files/
 
 DATABASE/Io/Locked_obs/*.txt
 
