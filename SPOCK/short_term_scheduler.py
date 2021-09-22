@@ -245,6 +245,9 @@ class Schedules:
             self.target_table_spc['texp_spc'][idx_first_target], self.target_table_spc['Filter_spc'][idx_first_target] = \
                 self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_first_target],
                                    target_list=self.target_table_spc)
+        if self.telescope == 'Artemis':
+            self.target_table_spc['Filter_spc'][idx_first_target] = \
+                self.target_table_spc['Filter_spc'][idx_first_target].replace('\'', '')
         blocks = []
         a = ObservingBlock(self.targets[idx_first_target], dur_mon_target, -1,
                            constraints=constraints_monitoring_target,
@@ -351,11 +354,13 @@ class Schedules:
         idx_to_insert_target = int(np.where((self.target_table_spc['Sp_ID'] == input_name))[0])
         if self.target_table_spc['texp_spc'][idx_to_insert_target] == 0 \
                 or self.target_table_spc['texp_spc'][idx_to_insert_target] == "00":
-            self.target_table_spc['texp_spc'][idx_to_insert_target] = \
-                self.target_table_spc['texp_spc'][idx_to_insert_target], \
-                self.target_table_spc['Filter_spc'][idx_to_insert_target] =\
+            self.target_table_spc['texp_spc'][idx_to_insert_target], \
+            self.target_table_spc['Filter_spc'][idx_to_insert_target] = \
                 self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_to_insert_target],
                                    target_list=self.target_table_spc)
+        if self.telescope == 'Artemis':
+            self.target_table_spc['Filter_spc'][idx_to_insert_target] = \
+                self.target_table_spc['Filter_spc'][idx_to_insert_target].replace('\'', '')
         observable = is_observable(constraints_special_target, self.observatory, self.targets[idx_to_insert_target],
                                    time_range=(start, end))
         if observable:
@@ -396,9 +401,13 @@ class Schedules:
                                       TimeConstraint(self.start_of_observation,self.end_of_observation)]
         idx_first_target = int(np.where((self.target_table_spc["Sp_ID"] == input_name))[0])
         if int(self.target_table_spc['texp_spc'][idx_first_target]) == 0:
-            self.target_table_spc['texp_spc'][idx_first_target], self.target_table_spc['Filter_spc'][idx_first_target] = \
+            self.target_table_spc['texp_spc'][idx_first_target], \
+            self.target_table_spc['Filter_spc'][idx_first_target] = \
                 self.exposure_time(input_name=self.target_table_spc['Sp_ID'][idx_first_target],
                                    target_list=self.target_table_spc)
+        if self.telescope == 'Artemis':
+            self.target_table_spc['Filter_spc'][idx_first_target] = \
+                self.target_table_spc['Filter_spc'][idx_first_target].replace('\'', '')
         blocks = []
         a = ObservingBlock(self.targets[idx_first_target], dur_obs_both_target, -1,
                            constraints=constraints_special_target,
@@ -488,6 +497,8 @@ class Schedules:
                             df['texp_spc'][idx_first_target], df['Filter_spc'][idx_first_target] = self.exposure_time(
                                 input_name=df['Sp_ID'][idx_first_target], target_list=self.target_table_spc_follow_up,
                                 day=self.day_of_night)
+                        if self.telescope == 'Artemis':
+                            df['texp_spc'][idx_first_target] = df['texp_spc'][idx_first_target].replace('\'', '')
                         a = ObservingBlock(self.targets_follow_up[idx_first_target], dur_obs_transit_target, -1,
                                            constraints=constraints_transit_target,
                                            configuration={"filt": str(df['Filter_spc'][idx_first_target]),
@@ -1131,6 +1142,9 @@ class Schedules:
                 filt_ = 'r'
 
             filt_idx += 1
+
+            if self.telescope == 'Artemis':
+                filt_ = filt_.replace('\'', '')
 
         target_list['Filter_spc'][i] = filt_
 

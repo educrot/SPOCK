@@ -497,25 +497,29 @@ class schedules:
         if day is None:
             print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Not using moon phase in ETC')
         # moon_phase = round(moon_illumination(Time(day.iso, out_subfmt='date')), 2)
-        if round(float(self.target_table_spc['SpT'][i])) <= 9:
-            spt_type = 'M' + str(round(float(self.target_table_spc['SpT'][i])))
-            if spt_type == 'M3':
+        try:
+            if round(float(self.target_table_spc['SpT'][i])) <= 9:
+                spt_type = 'M' + str(round(float(self.target_table_spc['SpT'][i])))
+                if spt_type == 'M3':
+                    spt_type = 'M2'
+            if round(float(self.target_table_spc['SpT'][i])) <= 2:
                 spt_type = 'M2'
-        if round(float(self.target_table_spc['SpT'][i])) <= 2:
-            spt_type = 'M2'
-        elif (round(float(self.target_table_spc['SpT'][i])) == 12) or (round(float(self.target_table_spc['SpT'][i])) == 15)\
-                or (int(float(self.target_table_spc['SpT'][i])) == 18):
-            spt_type = 'M' + str(round(self.target_table_spc['SpT'][i]) - 10)
-        elif round(float(self.target_table_spc['SpT'][i])) == 10:
-            spt_type = 'M9'
-        elif round(float(self.target_table_spc['SpT'][i])) == 11:
-            spt_type = 'L2'
-        elif round(float(self.target_table_spc['SpT'][i])) == 13:
-            spt_type = 'L2'
-        elif round(float(self.target_table_spc['SpT'][i])) == 14:
-            spt_type = 'L5'
-        elif round(float(self.target_table_spc['SpT'][i])) > 14:
-            spt_type = 'L8'
+            elif (round(float(self.target_table_spc['SpT'][i])) == 12) or (round(float(self.target_table_spc['SpT'][i])) == 15)\
+                    or (int(float(self.target_table_spc['SpT'][i])) == 18):
+                spt_type = 'M' + str(round(self.target_table_spc['SpT'][i]) - 10)
+            elif round(float(self.target_table_spc['SpT'][i])) == 10:
+                spt_type = 'M9'
+            elif round(float(self.target_table_spc['SpT'][i])) == 11:
+                spt_type = 'L2'
+            elif round(float(self.target_table_spc['SpT'][i])) == 13:
+                spt_type = 'L2'
+            elif round(float(self.target_table_spc['SpT'][i])) == 14:
+                spt_type = 'L5'
+            elif round(float(self.target_table_spc['SpT'][i])) > 14:
+                spt_type = 'L8'
+
+        except ValueError:
+            spt_type = self.target_table_spc['SpT'][i]
         filt_ = str(self.target_table_spc['Filter_spc'][i])
         if (filt_ == 'z\'') or (filt_ == 'r\'') or (filt_ == 'i\'') or (filt_ == 'g\''):
             filt_ = filt_.replace('\'', '')

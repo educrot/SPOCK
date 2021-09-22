@@ -547,9 +547,9 @@ def reverse_observability(observatory, targets, constraints, time_ranges):
     start_fmt = Time(time_ranges[0][0].iso , out_subfmt = 'date').iso
     end_fmt = Time(time_ranges[len(time_ranges)-1][1].iso , out_subfmt = 'date').iso
 
-    if os.path.exists(path_spock + '/SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' +
+    if os.path.exists(path_spock + '/SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' + start_fmt + '_' +
                       end_fmt + '_' + str(len(targets)) + '.csv'):
-        name_file = path_spock + '/SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' +  start_fmt + '_' + \
+        name_file = path_spock + '/SPOCK_files/reverse_Obs_' + str(observatory.name) + '_' + start_fmt + '_' + \
                     end_fmt + '_' + str(len(targets)) + '.csv'
         reverse_df1 = pd.read_csv(name_file, delimiter=',')
         return reverse_df1
@@ -1839,8 +1839,8 @@ class Schedules:
 
         SS1_night_blocks = seq_schedule_SS1.to_table()
         name_all = SS1_night_blocks['target']
-        name=[]
-        for i,nam in enumerate(name_all):
+        name = []
+        for i, nam in enumerate(name_all):
             name.append(nam)
         return SS1_night_blocks
 
@@ -2497,6 +2497,8 @@ class Schedules:
                 filt_ = 'r'
 
             filt_idx += 1
+            if self.telescope == 'Artemis':
+                filt_ = filt_.replace('\'', '')
 
         self.target_table_spc['Filter_spc'][i] = filt_
 

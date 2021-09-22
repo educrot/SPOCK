@@ -291,7 +291,7 @@ class etc:
         # available spectra are in folder Spectra
         path=path_spock + '/SPOCK/files_ETC/Spectra/'
         spec_file = os.path.join(path,self.spectra['file'][self.i])
-        self.spec=ascii.read(spec_file, data_start=0)
+        self.spec = ascii.read(spec_file, data_start=0)
         # plt.grid(True)
         # plt.xlabel("Wavelength [nm]")
         # plt.ylabel("Intensity")
@@ -326,7 +326,7 @@ class etc:
 
         # get spectral type information
         try:
-            i=np.where(self.spt==spt_sel)[0][0]
+            i = np.where(self.spt==spt_sel)[0][0]
         except:
             print("spectral type not in list")
             print(5/0)
