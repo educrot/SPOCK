@@ -8,6 +8,8 @@ import chart_studio
 from colorama import Fore
 from datetime import date, timedelta
 import io
+import json
+from json.decoder import JSONDecodeError
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import AnchoredText
 import numpy as np
@@ -17,8 +19,11 @@ from plotly import graph_objs as go
 import plotly.figure_factory as ff
 from plotly import offline
 import requests
+from requests.auth import HTTPBasicAuth
+import sys
 from SPOCK import user_portal, pwd_portal, user_chart_studio, pwd_chart_studio, \
     path_spock, target_list_from_stargate_path
+import SPOCK.short_term_scheduler as SPOCKST
 
 chart_studio.tools.set_credentials_file(username=user_chart_studio, api_key=pwd_chart_studio)
 chart_studio.tools.set_config_file(world_readable=True, sharing='public')
@@ -636,18 +641,77 @@ def getSPCdata(target, date, telescope='any', ap=6, user= user_portal, password=
         return targetdf.reset_index(drop=True)
 
 
-def phase_coverage_given_target(target, pmin, pmax, path_target_list=None, times=None):
+def get_all_LCS(gaia_id_target, fix_expt=None):
+    times = []
+    diff_fluxes = []
+    exposures = []
+    dates = []
+
+    user = 'educrot'
+    password = '9UCExnjwes'
+    url = "http://www.mrao.cam.ac.uk/SPECULOOS/speculoos-portal/php/get_observations.php"
+    res = requests.get(url, auth=HTTPBasicAuth(user_portal, pwd_portal))
+    cache = json.loads(res.content)
+
+    for i in range(len(cache[0])):
+        if cache[0][i]["gaia_id"] == str(gaia_id_target):
+            print(Fore.GREEN + 'INFO:  ' + Fore.BLACK + "Downloading LC of " + cache[0][i]["sp_id"] +
+                  " on " + cache[0][i]["telescope"] + " the " + str(cache[0][i]["date"]))
+            url = "http://www.mrao.cam.ac.uk/SPECULOOS/portal-night-data/" + str(cache[0][i]["telescope"]) + \
+                  '_' + str(cache[0][i]["date"]) + '_' + str(cache[0][i]["filter"]) + '_' + str(gaia_id_target) + '_' + \
+                  str(cache[0][i]["sp_id"].split(" ")[0]) + '.json'
+            res = requests.get(url, auth=HTTPBasicAuth(user_portal, pwd_portal))
+            try:
+                data = json.loads(res.content)
+                # counts = collections.Counter(exposures)
+                if fix_expt is None:
+                    times.append(data['environment']['BJD-OBS'])
+                    diff_fluxes.append(data["stars"][str(data['best_ap'])][0]['DIFF_FLUX'])
+                    exposures.append(data['environment']['EXPOSURE'])
+                    dates.append(data['date'])
+                else:
+                    if data['environment']['EXPOSURE'] == fix_expt:
+                        times.append(data['environment']['BJD-OBS'])
+                        diff_fluxes.append(data["stars"][str(data['best_ap'])][0]['DIFF_FLUX'])
+                        exposures.append(data['environment']['EXPOSURE'])
+                        dates.apppend(data['date'])
+                        print(exposures)
+            except json.decoder.JSONDecodeError:
+                print(Fore.RED + 'ERROR:  ' + Fore.BLACK + "Can not download LC of " + cache[0][i]["sp_id"] +
+                      " on " + cache[0][i]["telescope"] + " the " + str(cache[0][i]["date"]))
+                pass
+
+    time = np.sort(np.concatenate(times))
+    diff_flux = np.concatenate(diff_fluxes)
+    return time, diff_flux, exposures, dates, str(cache[0][i]["sp_id"].split(" ")[0])
+
+
+def phase_coverage_given_target(target, pmin, pmax, fix_expt=None, path_target_list=None, times=None):
     if path_target_list is None:
         path_target_list = target_list_from_stargate_path
+    schedules_st = SPOCKST.Schedules()
+    schedules_st.load_parameters()
+    target_list_follow_up = schedules_st.target_table_spc_follow_up
+    target_list_follow_up = target_list_follow_up.sort_values(by="Sp_ID")
+    target_list_speculoos = pd.read_csv(path_target_list, sep=',')
+    target_list_speculoos = target_list_speculoos.sort_values(by="Sp_ID")
 
-    target_list = pd.read_csv(path_target_list, sep=',')
-    idx_target_list = list(target_list['Sp_ID']).index(target)
+    all_targets = pd.DataFrame({'Sp_ID': pd.concat([target_list_follow_up['Sp_ID'],
+                                                   target_list_speculoos["Sp_ID"]]),
+                                "Gaia_ID": pd.concat([target_list_follow_up['Gaia_ID'],
+                                                     target_list_speculoos["Gaia_ID"]])})
+    all_targets.reset_index(inplace=True)
+
+    idx_target_list = list(all_targets['Sp_ID']).index(target)
     if times is None:
-        data = getSPClcV2(target=target, ap='', pwvCorr=0)
-
-        t = data['BJDMID-2450000']
-        t = t.fillna(0)
-        t = np.sort(t)
+        # data = getSPClcV2(target=target, ap='', pwvCorr=0)
+        #
+        # t = data['BJDMID-2450000']
+        # t = t.fillna(0)
+        # t = np.sort(t)
+        t, diff_flux, exposures, dates, target_name = get_all_LCS(
+            gaia_id_target=all_targets['Gaia_ID'][idx_target_list],
+            fix_expt=fix_expt)
     else:
         t = times
 
@@ -659,21 +723,37 @@ def phase_coverage_given_target(target, pmin, pmax, path_target_list=None, times
         covs = [coverage(t, period) for period in periods]
         mean_cov = np.mean(covs)*100
         fig, ax = plt.subplots(1, figsize=(9, 7))
-        anchored_text = AnchoredText(r'$SNR_{JWST}$ = ' +
-                                     str(round(target_list['SNR_JWST_HZ_tr'][idx_target_list],3))
-                                     + "\n" +
-                                     "Hours observed = " +
-                                     str(round(target_list['nb_hours_surved'][idx_target_list],2)) + ' hours',
-                                     loc=3)
+        if target[0:2] == "Sp":
+            anchored_text = AnchoredText(r'$SNR_{JWST}$ = ' +
+                                         str(round(target_list_speculoos['SNR_JWST_HZ_tr'][idx_target_list], 3))
+                                         + "\n" +
+                                         "Hours observed = " +
+                                         str(round(target_list_speculoos['nb_hours_surved'][idx_target_list], 2)) +
+                                         ' hours',  loc=3)
+            ax.add_artist(anchored_text)
 
-        plt.plot(periods, np.array(covs)*100, c="silver",label='Effective cov = ' + str(round(mean_cov,1)) + ' %')
+        plt.plot(periods, np.array(covs)*100, c="silver", label='Effective cov = ' + str(round(mean_cov, 1)) + ' %')
         plt.plot(periods, np.array(covs)*100, ".", c="k",)
-        ax.add_artist(anchored_text)
         plt.ylabel('Phase coverage in %')
         plt.xlabel('Period in days')
         plt.legend(fontsize=16)
         plt.grid(color='gainsboro', linestyle='-', linewidth=1, alpha=0.3)
-        plt.title(r'Phase coverage for ' + target + ' with periods $\in$ ' + str(pmin) + ' - ' + str(pmax))
+        plt.title(r'Phase coverage for ' + target + r'with periods $\in$' + str(pmin) + ' - ' + str(pmax))
         plt.show()
+        print(Fore.YELLOW + 'WARNING:  ' + Fore.BLACK + ' If  you feel the coverage is not consistent with ' +
+              'the number of hours observed check if the exposure' +
+              'time has been changed along the observations. ')
+
+        # exposure time vs dates
+        if len(dates) > 10:
+            plt.figure(figsize=(int(len(dates) / 4), 7))
+        else:
+            plt.figure(figsize=(8, 7))
+        plt.plot(dates, exposures, 'H', color='goldenrod', alpha=0.8)
+        plt.ylabel('Exposure time (seconds)')
+        plt.xticks(rotation=70)
+        plt.xlabel('Dates', )
+        plt.show()
+
     except ValueError:
         print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No data for this target ! ')

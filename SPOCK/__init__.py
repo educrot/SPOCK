@@ -101,7 +101,7 @@ def get_target_list_stargate(day):
     -------
 
     """
-    objdate = datetime.strptime(day, '%Y-%m-%d')
+    objdate = datetime.strptime(day, '%Y-%m-%d') #- timedelta(days=1)
     y = datetime.strftime(objdate,'%Y')
     m = datetime.strftime(objdate,'%m').lstrip('0')
     d = datetime.strftime(objdate,'%d').lstrip('0')
