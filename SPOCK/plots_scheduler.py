@@ -665,16 +665,16 @@ def get_all_LCS(gaia_id_target, fix_expt=None):
                 data = json.loads(res.content)
                 # counts = collections.Counter(exposures)
                 if fix_expt is None:
-                    times.append(data['environment']['BJD-OBS'])
+                    times.append(np.array(data['environment']['BJD-OBS']))
                     diff_fluxes.append(data["stars"][str(data['best_ap'])][0]['DIFF_FLUX'])
                     exposures.append(data['environment']['EXPOSURE'])
                     dates.append(data['date'])
                 else:
                     if data['environment']['EXPOSURE'] == fix_expt:
-                        times.append(data['environment']['BJD-OBS'])
+                        times.append(np.array(data['environment']['BJD-OBS']))
                         diff_fluxes.append(data["stars"][str(data['best_ap'])][0]['DIFF_FLUX'])
                         exposures.append(data['environment']['EXPOSURE'])
-                        dates.apppend(data['date'])
+                        dates.append(data['date'])
                         print(exposures)
             except json.decoder.JSONDecodeError:
                 print(Fore.RED + 'ERROR:  ' + Fore.BLACK + "Can not download LC of " + cache[0][i]["sp_id"] +
@@ -683,7 +683,7 @@ def get_all_LCS(gaia_id_target, fix_expt=None):
 
     time = np.sort(np.concatenate(times))
     diff_flux = np.concatenate(diff_fluxes)
-    return time, diff_flux, exposures, dates, str(cache[0][i]["sp_id"].split(" ")[0])
+    return time, diff_flux, exposures, dates, str(cache[0][i]["sp_id"].split(" ")[0]), times
 
 
 def phase_coverage_given_target(target, pmin, pmax, fix_expt=None, path_target_list=None, times=None):
@@ -709,7 +709,7 @@ def phase_coverage_given_target(target, pmin, pmax, fix_expt=None, path_target_l
         # t = data['BJDMID-2450000']
         # t = t.fillna(0)
         # t = np.sort(t)
-        t, diff_flux, exposures, dates, target_name = get_all_LCS(
+        t, diff_flux, exposures, dates, target_name, times = get_all_LCS(
             gaia_id_target=all_targets['Gaia_ID'][idx_target_list],
             fix_expt=fix_expt)
     else:
@@ -746,14 +746,131 @@ def phase_coverage_given_target(target, pmin, pmax, fix_expt=None, path_target_l
 
         # exposure time vs dates
         if len(dates) > 10:
-            plt.figure(figsize=(int(len(dates) / 4), 7))
+            plt.figure(figsize=(int(len(dates) / 4), 4))
         else:
             plt.figure(figsize=(8, 7))
         plt.plot(dates, exposures, 'H', color='goldenrod', alpha=0.8)
+        plt.ylim(min(exposures)-1, max(exposures)+1)
         plt.ylabel('Exposure time (seconds)')
-        plt.xticks(rotation=70)
+        plt.xticks(rotation=60)
         plt.xlabel('Dates', )
         plt.show()
 
     except ValueError:
         print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No data for this target ! ')
+
+
+def phase_coverage(period, times, midpoint=0, binning=0.005):
+    _times = np.array(
+        [
+            ((time - (np.round((time - midpoint) / period) * period)) - midpoint)
+            / period
+            for time in times
+        ]
+    )
+    _stacked_times = np.hstack(_times)
+    bin_points = len(
+        binning_for_cov(np.ones(len(_stacked_times)), _stacked_times, binning / period)[0]
+    )
+    total_bin_points = len(np.arange(-0.5, 0.5, binning / period))
+    return bin_points / total_bin_points
+
+
+def plot_polar_phase_coverage(midpoint, period, _times, r, d):
+    R = 1 * d  # 5*(period/(2*np.pi))
+
+    times = np.array([np.array([np.min(t), np.max(t)]) for t in _times])
+
+    length = [(np.max(t) - np.min(t)) / period for t in times]
+    offseted_times = np.array(
+        [
+            ((time - (np.round((time - midpoint) / period) * period)) - midpoint)
+            / period
+            for time in times
+        ]
+    )
+    fig, ax1 = plt.subplots(figsize=(4, 4))
+    plt.pie([1], colors=['#016CA000'], radius=r)
+
+    for l, t in zip(length, offseted_times):
+        plot_slice(t[0], l, R=R)
+
+    my_circle = plt.Circle((0, 0), R - 0.3, color='white')
+    planet = plt.Circle((-np.cos(2 * np.pi * (-midpoint / period) + np.pi / 2) * (R - .15),
+                         (R - .15) * np.sin(2 * np.pi * (midpoint / period) + np.pi / 2)), 0.1,
+                        facecolor='black', edgecolor='black')
+    star = plt.Circle((0, 0), 0.5, facecolor='brown', edgecolor='brown', alpha=0.5)
+    p = plt.gcf()
+    p.gca().add_artist(my_circle)
+    p.gca().add_artist(star)
+    p.gca().add_artist(planet)
+    # plt.legend([my_circle],['For Period ' + str(round(period,2)) + ' days'],loc=4, fontsize = 'x-large')
+    plt.autoscale()
+    return phase_coverage(np.abs(period), _times)
+
+
+def plot_slice(offset, width, color='#016CA050', R=3):
+    size = 1
+    plt.pie([width * 100, 100 - width * 100], colors=[color, [0, 0, 0, 0]], counterclock=False,
+            startangle=90 - offset * 360, radius=R, \
+            wedgeprops=dict(width=size))
+
+
+def binning_for_cov(
+        flux,
+        jd,
+        bin_size,
+        error=None,
+        std=False,
+        mean_method=np.mean,
+        mean_error_method=lambda l: np.sqrt(np.sum(np.power(l, 2))) / len(l), ):
+    # TODO: take the middle of the binned time
+    bins = np.arange(np.min(jd), np.max(jd), bin_size)
+    d = np.digitize(jd, bins)
+
+    final_bins = []
+    binned_flux = []
+    if error is not None:
+        binned_error = []
+    _std = []
+
+    for i in range(1, np.max(d) + 1):
+        s = np.where(d == i)
+        if len(s[0]) > 0:
+            try:
+                flux[s[0]]
+            except:
+                t = 8
+            binned_flux.append(mean_method(flux[s[0]]))
+            final_bins.append(np.mean(jd[s[0]]))
+            _std.append(np.std(flux[s[0]]) / np.sqrt(len(s[0])))
+            if error is not None:
+                binned_error.append(mean_error_method(error[s[0]]))
+        # else:
+        #     np.delete(bins, np.where(bins == bins[i])[0])
+        #     print("deleted {}".format(np.where(bins == bins[i])))
+
+    if std:
+        return final_bins, binned_flux, np.array(_std)
+    elif error is not None and type(error) in [np.array, np.ndarray, list]:
+        return final_bins, binned_flux, binned_error
+    else:
+        return final_bins, binned_flux
+
+
+def plot_annulus_phase_covered(times, period, target_name, t0):
+    planet_pos = (t0 - min(np.concatenate(times))) % period
+    cov = plot_polar_phase_coverage(midpoint=planet_pos, period=period, _times=times, r=1.5, d=3)
+    plt.title('For period ' + str(period) + ' days ' + '\n coverage is ' + str(cov) + "%", fontsize=18, y=-0.2)
+    # plt.savefig('phase_coverage_' + str(period) + '_' + str(target_name) + '.png', bbox_inches='tight')
+
+
+def phase_folded_LC(t, diff_flux, period, t0, x_lim_phase=0.02):
+    x_fold = (t - t0 + 0.5 * period) % period - 0.5 * period
+    plt.subplots(1, figsize=(8, 5))
+    plt.errorbar(x_fold, diff_flux, fmt='.', alpha=0.5,)
+    plt.vlines(t0,0.98,1.02,'r',alpha=0.3,zorder=3)
+    plt.title("Phase folded on period " + str(period) + " days")
+    plt.ylim(0.98, 1.02)
+    plt.xlim(-x_lim_phase, x_lim_phase)
+    plt.show()

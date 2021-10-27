@@ -17,6 +17,8 @@ import pandas as pd
 
 def _get_files():
     data_path = pkg_resources.resource_filename('SPOCK', 'credentials/')
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
     filename_pwd = os.path.join(data_path, 'passwords.csv')
     print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Please add password.csv file in: ' + data_path)
     if os.path.exists(filename_pwd):
@@ -90,6 +92,7 @@ def _get_files():
     else:
         print(Fore.RED + 'ERROR:  ' + Fore.BLACK + ' No file '+ 'passwords.csv')
 
+
 def get_target_list_stargate(day):
     """
 
@@ -109,7 +112,7 @@ def get_target_list_stargate(day):
     ftp.login(login_stargate,pwd_stargate)
     # day = Time(day, scale='utc', out_subfmt='date').iso
     file_name = 'stargate_db_'+y+'-'+m+'-'+d+'.csv'
-    my_file = open('./target_lists/stargate/' + file_name, 'wb')
+    my_file = open(path_spock + '/target_lists/stargate/' + file_name, 'wb')
     ftp.retrbinary('RETR ' + file_name, my_file.write,8*1024)
     print(Fore.GREEN + 'INFO: ' + Fore.BLACK + 'Downloading target list from STARGATE.')
     # time.sleep(5)  # wait for the file to fully download
