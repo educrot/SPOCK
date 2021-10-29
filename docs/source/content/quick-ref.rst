@@ -56,7 +56,6 @@ observations related to SPECULOOS external programs.
     save_schedule
     make_plans
     upload_plans
-    make_docx_schedule
 
 Plots
 ----------
