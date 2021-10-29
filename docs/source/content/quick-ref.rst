@@ -1,10 +1,10 @@
 .. _quick-ref:
 
 Quick reference
-===============
+==================
 
 Long term scheduling
---------------------
+-----------------------
 
 *SPOCK* has a module :mod:`SPOCK.long_term_scheduler` that contains all the  required
 functions and classes to create appropriate plans (in the form of night blocks sequences) for the SPECULOOS telescopes.
