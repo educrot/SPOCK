@@ -5,7 +5,7 @@
     You must be part of the SPECULOOS consortium  to download *SPOCK*.
 
 Installation
-============
+===============
 
 Please follow the instructions below to install the package
 

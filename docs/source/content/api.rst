@@ -1,11 +1,3 @@
-.. _api:
-
-***
-API
-***
-
-SPOCK
-------------------
-
-.. automodule:: SPOCK.long_term_scheduler
+.. autoclass:: SPOCK.long_term_scheduler
     :members:
+    :inherited-members:
