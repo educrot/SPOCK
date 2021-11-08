@@ -41,7 +41,7 @@ Installation
     You must be part of the SPECULOOS consortium to use *SPOCK*.
 
 
-Install *SPOCK* locally:
+Install *SPOCK* locally::
 
     git clone https://github.com/educrot/SPOCK.git
     cd spock
