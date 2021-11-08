@@ -8,9 +8,8 @@ Installation
 
 Please follow the instructions below to install the package
 
-Install *SPOCK* locally:
+Install *SPOCK* locally::
 
-.. code-block:: sh
     git clone https://github.com/educrot/SPOCK.git
     cd spock
     python setup.py install
@@ -40,9 +39,7 @@ Contact Elsa Ducrot for more details (educrot@uliege.be)
 Upgrading
 -------------
 
-- In a terminal in *SPOCK* source code folder:
-
-.. code-block:: sh
+- In a terminal in *SPOCK* source code folder::
 
     git stash
     git pull
