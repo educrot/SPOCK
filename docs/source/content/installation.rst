@@ -10,11 +10,11 @@ Please follow the instructions below to install the package
 
 Install *SPOCK* locally:
 
-Install *SPOCK* locally::
-
+.. code-block:: sh
     git clone https://github.com/educrot/SPOCK.git
     cd spock
     python setup.py install
+
 
 Using *SPOCK*
 ---------------
@@ -40,10 +40,13 @@ Contact Elsa Ducrot for more details (educrot@uliege.be)
 Upgrading
 -------------
 
-- In a terminal in *SPOCK* source code folder::
-    git clone https://github.com/educrot/SPOCK.git
-    cd spock
-    python setup.py install
+- In a terminal in *SPOCK* source code folder:
+
+.. code-block:: sh
+
+    git stash
+    git pull
+
 
 More details on *SPOCK*
 --------------------------
