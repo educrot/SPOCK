@@ -1,4 +1,3 @@
-
 SPOCK
 =======
 *SPOCK* (Speculoos Observatories sChedule maker) is a python package developed to handle
