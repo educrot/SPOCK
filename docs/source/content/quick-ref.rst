@@ -9,7 +9,7 @@ Long term scheduling
 *SPOCK* has a module :mod:`SPOCK.long_term_scheduler` that contains all the  required
 functions and classes to create appropriate plans (in the form of night blocks sequences) for the SPECULOOS telescopes.
 This module is suited for SPECULOOS core program targets,
-see `Sebastian et al. 2020 <http://arxiv.org/abs/2011.02069>`_` for details on this target list.
+see `Sebastian et al. 2020 <http://arxiv.org/abs/2011.02069>`_ for details on this target list.
 
 .. currentmodule:: SPOCK.long_term_scheduler
 
@@ -60,7 +60,7 @@ observations related to SPECULOOS external programs.
 Plots
 ----------
 
-*SPOCK* also has a module :mod:`SPOCK.plots_scheduler` that contain`` all the  required
+*SPOCK* also has a module :mod:`SPOCK.plots_scheduler` that contain all the  required
 functions to show visibility plots or gantt charts, useful to keep track of scheduled observations and/or target observability.
 
 .. currentmodule:: SPOCK.plots_scheduler
