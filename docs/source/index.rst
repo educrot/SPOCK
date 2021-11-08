@@ -13,8 +13,6 @@ of the solar neighborhood `Link to site <https://www.speculoos.uliege.be/cms/c_4
 
    content/installation
    content/quick-ref
-   content/api
-
 
 .. toctree::
    :caption: SPOCKApp
