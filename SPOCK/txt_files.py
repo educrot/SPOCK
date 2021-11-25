@@ -517,12 +517,12 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write('#dir'+ '\n')
             out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
             if name_2 is None:
-                # if telescope == 'Callisto':
-                #     out.write(str10 + 'Cal_biasdark.txt' + '\n')
-                # else:
+                if telescope == 'Artemis':
+                    out.write(str10 + 'Cal_biasdark.txt' + '\n')
+                else:
                     out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
             else:
-                out.write(str10 + 'Obj_' + name_2  +'.txt' + '\n')
+                out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
             out.write(str00 + '\n')
 
 
@@ -889,6 +889,10 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
                 out.write(';#chill -70\n')
             else:
                 out.write('#chill -60\n')
+            if (name.find('Ch') != -1) or (name.find('ch') != -1) and gaia_id_target == 'None':
+                d = Time(t_now).tt.datetime
+                out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Chilean" + r"\ "[0] +
+                          d.strftime("%Y%m%d") + '\n')
             out.write(str2 + str(waitlimit) + '\n')
             out.write(str3)
             out.write(str33 + str(afinterval) +'\n')
@@ -902,7 +906,6 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write(str8 + str(exptime) +'\n')
             out.write('#TAG Donuts=on'+'\n')
             if int(dec1)==-0:
-                #print('ici')
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) +
                           ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) +
                           '\t' + '-' + str('{:02d}'.format(int(dec1))) \
@@ -920,7 +923,10 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write(str00 + '\n')
             out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
             if name_2 is None:
-                out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
+                if telescope == 'Artemis':
+                    out.write(str10 + 'Cal_biasdark.txt' + '\n')
+                else:
+                    out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
             else:
                 out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
             out.write(str00 + '\n')

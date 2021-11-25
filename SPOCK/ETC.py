@@ -401,6 +401,7 @@ class etc:
         scinti2=(scinti_exp*signal)**2
         snr = signal/np.sqrt(signal+tbackape+tronape+tdarkape+scinti2)
         error = 1/snr
+        print("SNR: ", snr)
 
         # more (similar) telescopes used?
         if self.num_tel > 1:
@@ -479,10 +480,10 @@ class etc:
         errorbin = 1/snrbin
         errorbin_rn = np.sqrt(errorbin**2 + self.rednoise**2)
         # planet sensitivity
-        sensi=np.sqrt(self.nsigma*errorbin_rn/earthtra)
+        sensi  =np.sqrt(self.nsigma*errorbin_rn/earthtra)
 
         #  print("Peak [ADU]:\t", peak/self.gain)
         #  print("Sky [ADU]:\t", tbackape/self.gain)
         peak_ADU = peak/self.gain
-        sky_ADU =  tbackape/self.gain
+        sky_ADU = tbackape/self.gain
         return exp_t, peak_ADU,sky_ADU
