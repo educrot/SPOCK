@@ -1,0 +1,22 @@
+;
+; Sp0102-3737
+;
+; 4989399774745144448
+;
+#waituntil 1, 23:38
+#domeopen
+#chill -60
+#waitinlimits 600
+#nopreview 
+;#afinterval 60
+;#autofocus 
+#count 5000
+#binning 1
+#filter I+z
+#interval 22
+#TAG Donuts=on
+Sp0102-3737	01 02 51.45	-37 37 43.77
+;
+#quitat 03:48
+#chain Obj_Sp0215-3040.txt
+;

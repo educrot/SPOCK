@@ -313,6 +313,8 @@ def upload_np_saint_ex(t_now, nb_days):
         # Plans by date
         path_database_plans = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
                                            'Saint-Ex', 'schedule', 'Plans_by_date')
+        #path_database_plans_SAINT-EX_prince = os.path.join('speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/',
+        #                                   'Saint-Ex', 'schedule', 'Plans_by_date')
         path_plans = os.path.join(path_spock + '/DATABASE/', 'Saint-Ex','Plans_by_date/', str(t_now))
         subprocess.Popen(["sshpass", "-p", pwd_appcs, "scp", "-r", path_plans, path_database_plans])
         print('----->', t_now, 'Plans uploaded on the Cambridge server')

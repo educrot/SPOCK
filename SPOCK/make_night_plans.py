@@ -37,9 +37,9 @@ def make_scheduled_table(telescope,day_of_night):
         os.path.exists(os.path.join(Path, telescope, 'Archive_night_blocks',
                                     'night_blocks_' + telescope + '_' + day_of_night.tt.datetime[0].strftime(
                                         "%Y-%m-%d") + '.txt'))
-        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Path exists and is: ', os.path.join(Path, telescope, 'night_blocks_' + telescope + '_' +
-                                                         day_of_night.tt.datetime[0].strftime(
-                                                             "%Y-%m-%d") + '.txt'))
+        print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Path exists and is: ',
+              os.path.join(Path, telescope, 'night_blocks_' + telescope + '_' +
+                           day_of_night.tt.datetime[0].strftime( "%Y-%m-%d") + '.txt'))
     except TypeError:
         os.path.exists(os.path.join(Path, telescope, 'Archive_night_blocks',
                                     'night_blocks_' + telescope + '_' + day_of_night.tt.datetime.strftime(
@@ -182,7 +182,7 @@ def make_np(t_now, nb_jours, tel):
             os.makedirs(p)
 
         scheduler_table = Table.read(path_spock + '/DATABASE/' + str(telescope) + '/Archive_night_blocks' +
-                                     '/night_blocks_'+ str(telescope) + '_' + str(t_now)+'.txt', format='ascii')
+                                     '/night_blocks_' + str(telescope) + '_' + str(t_now)+'.txt', format='ascii')
 
         if (tel == 'Io') or tel == ('Europa') or (tel == 'Ganymede') or (tel == 'Callisto'):
             scheduler_table = dome_rotation(telescope=tel, day_of_night=t_now) # Intentional dome rotation to

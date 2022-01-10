@@ -37,6 +37,7 @@ target_table_spc_special = dataframe.rename(columns={"spc": "Sp_ID", "gaia": "Ga
                                                   "ra": "RA", "dec_err": "DEC_err", "ra_err": "RA_err",
                                                   "mag_j": "J", "V_mag": "V"})
 
+
 def charge_observatory(Name):
     observatories = []
     if 'SSO' in str(Name):
@@ -403,12 +404,16 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             out.write(str7 + str(filt) + '\n')
             out.write(str8 + str(exptime) + '\n')
             out.write('#TAG Donuts=on' + '\n')
-            if int(dec1) == -0:
-                out.write(name.replace('_2', '') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str(
-                    '{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str(
-                    '{:02d}'.format(int(dec1))) \
-                          + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str(
-                    '{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+            if str(dec1) == '-0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+            if str(dec1) == '0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t'
+                         + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
             if int(dec1) < 0 and int(dec1) != -0:
                 out.write(name.replace('_2', '') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str(
                     '{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str(
@@ -497,12 +502,17 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 out.write('#TAG Donuts=off' + '\n')
             else:
                 out.write('#TAG Donuts=on'+'\n')
-            if int(dec1) == -0:
+            if str(dec1) == '-0.0':
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                           str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                           '-' + str('{:02d}'.format(int(dec1))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
-            if int(dec1) < 0 and int(dec1) != -0:
+            if str(dec1) == '0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t'
+                         + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+            if int(dec1) < 0 and str(dec1) != '-0.0':
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
                           str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
                           '-' + str('{:02d}'.format(int(abs(dec1)))) \
@@ -600,10 +610,15 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) +'\n')
         out.write(';#TAG Donuts=on'+'\n')
-        if int(dec1) == -0:
+        if str(dec1) == '-0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+        if str(dec1) == '0.0':
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
-                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
-                      '-' + str('{:02d}'.format(int(dec1))) \
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t'
+                     + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
         if int(dec1) < 0 and int(dec1) != -0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
@@ -622,6 +637,7 @@ def target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,autofoc
         else:
             out.write(str10 + 'Obj_' + name_2 + '.txt' + '\n')
         out.write(str00 + '\n')
+
 
 def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
                   ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path):
@@ -706,10 +722,15 @@ def target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) +'\n')
         out.write('#TAG Donuts=on'+'\n')
-        if int(dec1) == -0:
+        if str(dec1) == '-0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+        if str(dec1) == '0.0':
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
-                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
-                      '-' + str('{:02d}'.format(int(dec1))) \
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t'
+                     + str('{:02d}'.format(int(dec1))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
         if int(dec1) < 0 and int(dec1) != -0:
             out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
@@ -821,13 +842,16 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write(str7 + str(filt) + '\n')
             out.write(str8 + str(exptime) + '\n')
             out.write('#TAG Donuts=on' + '\n')
-            if int(dec1) == -0:
-                # print('ici')
-                out.write(name.replace('_2', '') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str(
-                    '{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str(
-                    '{:02d}'.format(int(dec1))) \
-                          + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str(
-                    '{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+            if str(dec1) == '-0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+            if str(dec1) == '0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t'
+                         + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
             if int(dec1) < 0 and int(dec1) != -0:
                 out.write(name.replace('_2', '') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str(
                     '{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str(
@@ -905,10 +929,15 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
             out.write(str7 + str(filt) + '\n')
             out.write(str8 + str(exptime) +'\n')
             out.write('#TAG Donuts=on'+'\n')
-            if int(dec1)==-0:
-                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) +
-                          ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) +
-                          '\t' + '-' + str('{:02d}'.format(int(dec1))) \
+            if str(dec1) == '-0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+            if str(dec1) == '0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t'
+                         + str('{:02d}'.format(int(dec1))) \
                  + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
             if int(dec1)<0 and int(dec1)!=-0:
                 out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
@@ -1001,9 +1030,16 @@ def first_target_offset(t_now,name,date_start,date_end,waitlimit,afinterval,auto
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) +'\n')
         out.write('#TAG Donuts=on'+'\n')
-        if int(dec1) == -0:
-            out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
-             + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
+        if str(dec1) == '-0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+        if str(dec1) == '0.0':
+            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t'
+                     + str('{:02d}'.format(int(dec1))) \
+             + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
         if int(dec1)<0 and int(dec1)!=-0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')
@@ -1076,9 +1112,16 @@ def first_target_no_DONUTS(t_now,name,date_start,date_end,waitlimit,afinterval,a
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) +'\n')
         out.write(';#TAG Donuts=on'+'\n')
-        if int(dec1) == -0:
-            out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(dec1))) \
-             + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n') #8*np.cos(c.dec.radian)
+        if str(dec1) == '-0.0':
+                out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                          str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' +
+                          '-' + str('{:02d}'.format(int(dec1))) \
+                 + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
+        if str(dec1) == '0.0':
+            out.write(name.replace('_2','') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' +
+                      str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t'
+                     + str('{:02d}'.format(int(dec1))) \
+             + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')  # 8*np.cos(c.dec.radian)
         if int(dec1) < 0 and int(dec1) != -0:
             out.write(name + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str('{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '-' + str('{:02d}'.format(int(abs(dec1)))) \
              + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str('{:05.2f}'.format(abs(dec3))) + '\n')

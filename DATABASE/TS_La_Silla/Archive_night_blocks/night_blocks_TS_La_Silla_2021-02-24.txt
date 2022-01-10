@@ -1,0 +1,2 @@
+target "start time (UTC)" "end time (UTC)" "duration (minutes)" "ra (h)" "ra (m)" "ra (s)" "dec (d)" "dec (m)" "dec (s)" configuration
+Sp1042-2416 "2021-02-25 00:25:40.019" "2021-02-25 09:39:20.019" 553.6666666666666 10.0 42.0 41.3657760000109 -24.0 -16.0 -4.101600000000758 "{'filt=I+z', 'texp=28'}"

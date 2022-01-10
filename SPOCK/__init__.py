@@ -86,7 +86,7 @@ def _get_files():
         #     open(path_spock + '/survey_hours/' + file, 'wb').write(resp.content)
 
         return pwd_appcs, pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_chart_studio,\
-               pwd_chart_studio, path_spock,path_credential_json, login_stargate, pwd_stargate
+               pwd_chart_studio, path_spock, path_credential_json, login_stargate, pwd_stargate
 
         # **********************************************************************************************************
     else:

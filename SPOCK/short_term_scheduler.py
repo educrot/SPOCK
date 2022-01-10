@@ -1540,15 +1540,15 @@ def prediction(name, ra, dec, timing, period, duration, start_date, ntr):
 
     df['Observable SSO'] = observable_sso[0]
 
-    df['Hours observable SSO (h)'] = observable_sso_table['fraction of time observable'] * 24*u.hour
+    df['Hours observable SSO (h)'] = observable_sso_table['fraction of time observable'] * 24#*u.hour
 
     df['Observable SNO'] = observable_sno[0]
 
-    df['Hours observable SNO (h)'] = observable_sno_table['fraction of time observable'] * 24*u.hour
+    df['Hours observable SNO (h)'] = observable_sno_table['fraction of time observable'] * 24#*u.hour
 
     df['Observable Saint-Ex'] = observable_saintex[0]
 
-    df['Hours observable Saint-Ex (h)'] = observable_saint_ex_table['fraction of time observable'] * 24*u.hour
+    df['Hours observable Saint-Ex (h)'] = observable_saint_ex_table['fraction of time observable'] * 24#*u.hour
 
     df['Observable TN Oukaimeden'] = observable_tn_oukaimeden[0]
 
