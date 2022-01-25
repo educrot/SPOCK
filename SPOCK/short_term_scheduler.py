@@ -1033,9 +1033,8 @@ class Schedules:
                     spt_type = 'M2'
             if round(float(abs(target_list['SpT'][i]))) <= 2:
                 spt_type = 'M2'
-            elif (round(float(abs(target_list['SpT'][i]))) == 12) or (round(float(abs(target_list['SpT'][i]))) == 15)\
-                    or (round(float(abs(target_list['SpT'][i])) == 18)):
-                spt_type = 'M' + str(round(target_list['SpT'][i])) - 10
+            elif round(float(abs(target_list['SpT'][i]))) == 12:
+                spt_type = 'L2'
             elif round(float(abs(target_list['SpT'][i]))) == 10:
                 spt_type = 'M9'
             elif round(float(abs(target_list['SpT'][i]))) == 11:

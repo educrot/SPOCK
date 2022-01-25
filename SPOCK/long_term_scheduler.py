@@ -1780,21 +1780,21 @@ class Schedules:
                                                                  end_between_nautical_civil)]
 
         blocks = []
-        if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
-            if self.telescope == 'Saint-Ex':
-                self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(day=day,
-                                                                                              i=self.idx_first_target)
-            else:
-                self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(day=None,
-                                                                                              i=self.idx_first_target)
+        #if self.target_table_spc['texp_spc'][self.idx_first_target] == 0:
+        if self.telescope == 'Saint-Ex':
+            self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(day=day,
+                                                                                          i=self.idx_first_target)
+        else:
+            self.target_table_spc['texp_spc'][self.idx_first_target] = self.exposure_time(day=None,
+                                                                                          i=self.idx_first_target)
 
-        if (self.idx_second_target is not None) and self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
-            if self.telescope == 'Saint-Ex':
-                self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(day=day,
-                                                                                               i=self.idx_second_target)
-            else:
-                self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(day=None,
-                                                                                               i=self.idx_second_target)
+        #if (self.idx_second_target is not None) and self.target_table_spc['texp_spc'][self.idx_second_target] == 0:
+        if self.telescope == 'Saint-Ex':
+            self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(day=day,
+                                                                                           i=self.idx_second_target)
+        else:
+            self.target_table_spc['texp_spc'][self.idx_second_target] = self.exposure_time(day=None,
+                                                                                           i=self.idx_second_target)
 
         if self.first_target['set or rise'] == 'set':
             print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' First target is \'set\'')
@@ -2386,27 +2386,43 @@ class Schedules:
             self.telescope = telescope
         if day is None:
             print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Not using moon phase in ETC')
+
         # moon_phase = round(moon_illumination(day), 2)
-        if round(abs(self.target_table_spc['SpT'][i])) <= 9:
-            spt_type = 'M' + str(round(abs(self.target_table_spc['SpT'][i])))
-            if spt_type == 'M3':
+
+        try:
+            spectral_type = round(float(self.target_table_spc['SpT'][i].data.data[0]))
+        except AttributeError:
+            try:
+                spectral_type = round(float(self.target_table_spc['SpT'][i]))
+            except ValueError:
+                spectral_type = self.target_table_spc['SpT'][i].values[0]
+        except NotImplementedError:
+            try:
+                spectral_type = round(float(self.target_table_spc['SpT'][i]))
+            except ValueError:
+                spectral_type = self.target_table_spc['SpT'][i].values[0]
+        if not isinstance(spectral_type, str):
+            if round(float(abs(self.target_table_spc['SpT'][i]))) <= 9:
+                spt_type = 'M' + str(round(float(abs(self.target_table_spc['SpT'][i]))))
+                if spt_type == 'M3':
+                    spt_type = 'M2'
+            if round(float(abs(self.target_table_spc['SpT'][i]))) <= 2:
                 spt_type = 'M2'
-        if round(abs(self.target_table_spc['SpT'][i])) <= 2:
-            spt_type = 'M2'
-        elif (round(abs(self.target_table_spc['SpT'][i])) == 12) \
-                or (round(abs(self.target_table_spc['SpT'][i])) == 15) \
-                or (int(abs(self.target_table_spc['SpT'][i])) == 18):
-            spt_type = 'M' + str(round(self.target_table_spc['SpT'][i]) - 10)
-        elif round(abs(self.target_table_spc['SpT'][i])) == 10:
-            spt_type = 'M9'
-        elif round(abs(self.target_table_spc['SpT'][i])) == 11:
-            spt_type = 'L2'
-        elif round(abs(self.target_table_spc['SpT'][i])) == 13:
-            spt_type = 'L2'
-        elif round(abs(self.target_table_spc['SpT'][i])) == 14:
-            spt_type = 'L5'
-        elif round(abs(self.target_table_spc['SpT'][i])) > 14:
-            spt_type = 'L8'
+            elif round(float(abs(self.target_table_spc['SpT'][i]))) == 12:
+                spt_type = 'L2'
+            elif round(float(abs(self.target_table_spc['SpT'][i]))) == 10:
+                spt_type = 'M9'
+            elif round(float(abs(self.target_table_spc['SpT'][i]))) == 11:
+                spt_type = 'L2'
+            elif round(float(abs(self.target_table_spc['SpT'][i]))) == 13:
+                spt_type = 'L2'
+            elif round(float(abs(self.target_table_spc['SpT'][i]))) == 14:
+                spt_type = 'L5'
+            elif round(float(abs(self.target_table_spc['SpT'][i]))) > 14:
+                spt_type = 'L8'
+        else:
+            spt_type = spectral_type
+
         filt_ = str(self.target_table_spc['Filter_spc'][i])
         if (filt_ == 'z\'') or (filt_ == 'r\'') or (filt_ == 'i\'') or (filt_ == 'g\''):
             filt_ = filt_.replace('\'', '')
@@ -2420,10 +2436,8 @@ class Schedules:
             if 0 < filt_idx <= 3:
                 print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + ' Change filter to avoid saturation!!')
                 filt_ = filters[filt_idx]
-                # print(filt_)
 
             if self.telescope == 'Saint-Ex':
-                # print(day)
                 moon_phase = round(moon_illumination(day), 2)
                 if float(self.target_table_spc['J'][i]) != 0.:
                     a = (ETC.etc(mag_val=float(self.target_table_spc['J'][i]), mag_band='J', spt=spt_type,
