@@ -1341,9 +1341,9 @@ def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nb
             out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
 
         if 'zcut' in filt:
-            out.write(str(nbz) + ',' + 'zcut' ',' + '1' + '\n')
+            out.write(str(nbzcut) + ',' + 'zcut' ',' + '1' + '\n')
         else:
-            out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
+            out.write(str00 + str(nbzcut) + ',' + 'z\'' ',' + '1' + '\n')
 
         if ('V' in filt) or ('V\'' in filt):
             out.write(str(nbV) + ',' + 'V' + ',' + '1' + '\n')
