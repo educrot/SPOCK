@@ -1330,11 +1330,6 @@ def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nb
     if nbClear is None:
         nbClear=3
     with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
-        if ('u' in filt) or ('u\'' in filt):
-            out.write(str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
-        else:
-            out.write(str00 + str(nbu) + ',' + 'u\'' ',' + '1' + '\n')
-
         if ('B' in filt) or ('B\'' in filt):
             out.write(str(nbB) + ',' + 'B' + ',' + '1' + '\n')
         else:
@@ -1353,7 +1348,7 @@ def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nb
         if ('V' in filt) or ('V\'' in filt):
             out.write(str(nbV) + ',' + 'V' + ',' + '1' + '\n')
         else:
-            out.write(str00 +  str(nbV) + ',' + 'V' + ',' + '1' + '\n')
+            out.write(str00 + str(nbV) + ',' + 'V' + ',' + '1' + '\n')
 
         if ('r' in filt) or ('r\'' in filt):
             out.write(str(nbr) + ',' + 'r\'' ',' + '1' + '\n')
@@ -1363,7 +1358,7 @@ def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nb
         if ('i' in filt) or ('i\'' in filt):
             out.write(str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
         else:
-            out.write(str00 +  str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
+            out.write(str00 + str(nbi) + ',' + 'i\'' ',' + '1' + '\n')
 
         if ('g' in filt) or ('g\'' in filt):
             out.write(str(nbg) + ',' + 'g\'' ',' + '1' + '\n')
