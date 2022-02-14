@@ -376,7 +376,7 @@ def make_np(t_now, nb_jours, tel):
                                Path, telescope=telescope)
 
         if telescope.find('Callisto') is not -1:
-            flatexo_calli(Path,t_now,filt,nbu=3,nbB=3,nbz=3,nbV=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)
+            flatexo_calli(Path,t_now,filt,nbB=3,nbz=3,nbzcut=7,nbV=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)
         if telescope.find('Ganymede') is not -1:
             flatexo_gany(Path,t_now,filt,nbOIII=3,nbHa=3,nbSII=3,nbz=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)
         if telescope.find('Io') is not -1:
