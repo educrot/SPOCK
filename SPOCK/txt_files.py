@@ -1306,15 +1306,15 @@ def flatexo_gany(Path,t_now,filt, nbOIII=None, nbHa=None, nbSII=None, nbz=None, 
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
 
 
-def flatexo_calli(Path,t_now,filt, nbu=None, nbB=None, nbz=None, nbV=None, nbr=None, nbi=None, nbg=None,
+def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nbr=None, nbi=None, nbg=None,
                   nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
-    if nbu is None:
-        nbu=3
     if nbB is None:
         nbB=3
     if nbz is None:
         nbz=3
+    if nbzcut is None:
+        nbzcut=3
     if nbV is None:
         nbV=3
     if nbr is None:
@@ -1342,6 +1342,11 @@ def flatexo_calli(Path,t_now,filt, nbu=None, nbB=None, nbz=None, nbV=None, nbr=N
 
         if ('z' in filt) or ('z\'' in filt):
             out.write(str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
+        else:
+            out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
+
+        if 'zcut' in filt:
+            out.write(str(nbz) + ',' + 'zcut' ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
 

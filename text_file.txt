@@ -1,7 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html><head>
-<title>404 Not Found</title>
-</head><body>
-<h1>Not Found</h1>
-<p>The requested URL /SPECULOOS/Saint-Ex/schedule/Archive_night_blocks/night_blocks_Saint-Ex_2021-12-13.txt was not found on this server.</p>
-</body></html>
+target "start time (UTC)" "end time (UTC)" "duration (minutes)" "ra (h)" "ra (m)" "ra (s)" "dec (d)" "dec (m)" "dec (s)" configuration
+Sp0720-0846 "2022-02-11 19:32:20.009" "2022-02-12 01:16:20.009" 344.00000000000006 7.0 20.0 3.250080000006861 -8.0 -46.0 -49.09079999999989 "{'filt': 'I+z', 'texp': '25'}"
+Sp1253+4034 "2022-02-12 01:16:40.009" "2022-02-12 07:08:20.009" 351.6666666666667 12.0 53.0 12.506160000006332 40.0 34.0 2.686800000006997 "{'filt': 'I+z', 'texp': '75'}"
