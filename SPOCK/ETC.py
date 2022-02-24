@@ -52,7 +52,7 @@ class etc:
         self.ron         = 10
         self.tccd        = temp_ccd  # CCD temperature [degree C] # -60 for SSO/SNO/TS/TN / -70 for Saint-Ex
         self.binning     = 1    # CCD binning
-        self.tlost       = 10   # read-out & overhead time [s]
+        self.tlost       = 8   # read-out & overhead time [s]
 
         # # # # # # # # # #  Optics
         self.m1dia       = 1030 # M1 free aperture [mm]
@@ -65,7 +65,7 @@ class etc:
         self.num_tel     = 1    # Number of telescopes
 
         # # # # # # # # # #  Light curve
-        self.bin_lc      = 7.2  # Time bin for SNR [min]
+        self.bin_lc      = 10  # Time bin for SNR [min]
         self.rednoise    = 500.   # Red noise[ppm]
         self.nsigma      = 5.   #
 
@@ -401,7 +401,6 @@ class etc:
         scinti2=(scinti_exp*signal)**2
         snr = signal/np.sqrt(signal+tbackape+tronape+tdarkape+scinti2)
         error = 1/snr
-        print("SNR: ", snr)
 
         # more (similar) telescopes used?
         if self.num_tel > 1:
@@ -415,9 +414,11 @@ class etc:
 
         print("Peak [ADU]:\t", peak/self.gain)
         print("Sky [ADU]:\t", tbackape/self.gain)
+        print("Error bin:\t", errorbin_rn)
+        print("Error:\t", error)
         peak_ADU = peak/self.gain
         sky_gain = tbackape/self.gain
-        return error,errorbin_rn
+        return error, errorbin_rn
 
     def exp_time_calculator(self,ADUpeak = None):
         # # # # # # # # # #   Observation
