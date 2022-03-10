@@ -323,7 +323,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
     elif ('Sp' in name) and ('.0' not in name):
         if name != 'Sp1837+2030':
             df2 = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=None)
-            if name != "Sp1633-6808_2":
+            if name not in ["Sp1633-6808_2","Sp0933-4353_2","Sp1953+4424_2"]:
                 if name.find("_zcut") != -1:
                     idx_target = np.where((df2['Sp_ID'] == name.replace('_zcut', '')))[0]
                 else:
@@ -761,8 +761,8 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
     elif 'Sp' in name:
         if name != 'Sp1837+2030':
             df2 = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=None)
-            if name != "Sp1633-6808_2":
-                if name.find("_zcut") != -1 :
+            if name not in ["Sp1633-6808_2","Sp0933-4353_2","Sp1953+4424_2"]:
+                if name.find("_zcut") != -1:
                     idx_target = np.where((df2['Sp_ID'] == name.replace('_zcut', '')))[0]
                 else:
                     idx_target = np.where((df2['Sp_ID'] == name.replace('_2', '')))[0]
@@ -770,7 +770,7 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
                 idx_target = np.where((df2['Sp_ID'] == name))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
     if idx_target is None:
-        df2 = pd.concat([target_table_spc_special,target_table_spc_follow_up],ignore_index=True)
+        df2 = pd.concat([target_table_spc_special, target_table_spc_follow_up], ignore_index=True)
         try:
             idx_target = np.where((df2['Sp_ID'] == name))[0]
             gaia_id_target = df2['Gaia_ID'][int(idx_target)]
