@@ -6,8 +6,6 @@ survey_hours/
 
 target_lists/
 
-DATABASE/Saint-Ex/*.zip
-
 DATABASE/Io/Archive_night_blocks/
 
 DATABASE/Europa/Archive_night_blocks/
@@ -75,6 +73,7 @@ DATABASE/TN_Oukaimeden/Locked_obs/*.txt
 DATABASE/Saint-Ex/Locked_obs/*.txt
 
 DATABASE/Artemis/Locked_obs/*.txt
+
 
 
 .DS_STORE
