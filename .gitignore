@@ -6,6 +6,20 @@ survey_hours/
 
 target_lists/
 
+DATABASE/Io/*.txt
+
+DATABASE/Europa/*.txt
+
+DATABASE/Ganymede/*.txt
+
+DATABASE/Callisto/*.txt
+
+DATABASE/Artemis/*.txt
+
+DATABASE/Saint-Ex/*.txt
+
+DATABASE/Saint-Ex/*.zip
+
 DATABASE/Io/Archive_night_blocks/
 
 DATABASE/Europa/Archive_night_blocks/
@@ -35,6 +49,10 @@ DATABASA/TS_La_Silla/Plans_by_date/
 DATABASE/TN_Oukaimeden/Plans_by_date/
 
 DATABASE/Saint-Ex/Plans_by_date/
+
+DATABASE/Saint-Ex/Plans_Saint-Ex/
+
+DATABASE/Saint-Ex/Plans_Saint-Ex.zip
 
 DATABASE/Artemis/Plans_by_date/
 
