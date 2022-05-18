@@ -9,7 +9,7 @@ from .txt_files import startup, startup_no_flats, Path_txt_files, flatexo_gany, 
     flatexo_euro, first_target_offset, flatexo_artemis_morning, flatexo_artemis_evening, startup_artemis,\
     flatexo_saintex
 from .txt_files import first_target,target, flatdawn, biasdark, shutdown, flatexo_calli, \
-    flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis
+    flatdawn_no_flats, target_no_DONUTS, target_offset, biasdark_comete, flatdawn_artemis, haumea
 from astropy.coordinates import SkyCoord, get_sun, AltAz, EarthLocation
 from astropy import units as u
 import pandas as pd
@@ -269,7 +269,7 @@ def make_np(t_now, nb_jours, tel):
                     if i == 0 and telescope.find('Artemis') is not -1:
                         filt[i] = filt[i].replace('\'', '')
                         if nam == 'haumea':
-                            SPOCKtxt.haumea(t_now,date_start[i],date_end[i], count, filt='Exo', exptime=240,
+                            haumea(t_now,date_start[i],date_end[i], count, filt='Exo', exptime=240,
                                             name_2=name[i+1], binning=1, Path=Path, telescope='Artemis')
                         else:
                             first_target(t_now, nam, date_start[i], date_end[i], waitlimit, afinterval, autofocus,count,
@@ -300,7 +300,7 @@ def make_np(t_now, nb_jours, tel):
                     if i == (len(name)-1) and telescope.find('Artemis') is not -1:
                         filt[i] = filt[i].replace('\'', '')
                         if nam == 'haumea':
-                            SPOCKtxt.haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
+                            haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
                                             name_2=None, binning=1, Path=Path, telescope='Artemis')
                         else:
                             target(t_now,nam,date_start[i],date_end[i],waitlimit,afinterval, autofocus,count,
@@ -314,9 +314,9 @@ def make_np(t_now, nb_jours, tel):
                         flatdawn(t_now,date_end[i],sun_rise_san_pedro.iso,Path,telescope)
 
                     if (i > 0) and (i < (len(name)-1)):
-                        # if nam == 'haumea':
-                        #     SPOCKtxt.haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
-                        #                     name_2=name[i+1], binning=1, Path=Path, telescope='Artemis')
+                        if nam == 'haumea':
+                            haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
+                                            name_2=name[i+1], binning=1, Path=Path, telescope='Artemis')
                         if telescope == "Artemis":
                             if filt[i] == "z\'":
                                 filt[i] = filt[i].replace('\'', '')
@@ -347,14 +347,14 @@ def make_np(t_now, nb_jours, tel):
 
                     if i == (len(name)-1) and telescope.find('Artemis') is not -1:
                         filt[i] = filt[i].replace('\'', '')
-                        # if nam == 'haumea':
-                        #     SPOCKtxt.haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
-                        #                     name_2=None, binning=1, Path=Path, telescope='Artemis')
-                        # else:
-                        target(t_now, nam, date_start[i], date_end[i], waitlimit, afinterval, autofocus, count,
-                               filt[i], texp[i], ra1[i], ra2[i], ra3[i], dec1[i], dec2[i], dec3[i],
-                               None, Path, telescope=telescope)
-                        flatdawn_artemis(t_now, date_end[i], sun_rise_teide.iso, Path)
+                        if nam == 'haumea':
+                            haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
+                                            name_2=None, binning=1, Path=Path, telescope='Artemis')
+                        else:
+                            target(t_now, nam, date_start[i], date_end[i], waitlimit, afinterval, autofocus, count,
+                                   filt[i], texp[i], ra1[i], ra2[i], ra3[i], dec1[i], dec2[i], dec3[i],
+                                   None, Path, telescope=telescope)
+                            flatdawn_artemis(t_now, date_end[i], sun_rise_teide.iso, Path)
 
                     if i == (len(name)-1) and telescope.find('Saint-Ex') is not -1:
                         target(t_now, nam, date_start[i], date_end[i], waitlimit, afinterval, autofocus, count,
@@ -367,27 +367,27 @@ def make_np(t_now, nb_jours, tel):
                             filt[i] = filt[i].replace('\'', '')
                         else:
                             filt[i] = filt[i]
-                        # if nam == 'haumea':
-                        #     SPOCKtxt.haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
-                        #                     name_2=name[i+1], binning=1, Path=Path, telescope='Artemis')
-                        # else:
-                        target(t_now, nam, date_start[i], date_end[i], waitlimit, afinterval, autofocus, count,
-                               filt[i], texp[i], ra1[i], ra2[i], ra3[i], dec1[i], dec2[i], dec3[i], name[i+1],
-                               Path, telescope=telescope)
+                        if nam == 'haumea':
+                            haumea(t_now, date_start[i],date_end[i], count, filt='Exo', exptime=240,
+                                            name_2=name[i+1], binning=1, Path=Path, telescope='Artemis')
+                        else:
+                            target(t_now, nam, date_start[i], date_end[i], waitlimit, afinterval, autofocus, count,
+                                   filt[i], texp[i], ra1[i], ra2[i], ra3[i], dec1[i], dec2[i], dec3[i], name[i+1],
+                                   Path, telescope=telescope)
 
         if telescope.find('Callisto') is not -1:
-            flatexo_calli(Path,t_now,filt,nbB=3,nbz=3,nbzcut=7,nbV=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)
+            flatexo_calli(Path, t_now, filt)
         if telescope.find('Ganymede') is not -1:
-            flatexo_gany(Path,t_now,filt,nbOIII=3,nbHa=3,nbSII=3,nbz=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)
+            flatexo_gany(Path, t_now, filt)
         if telescope.find('Io') is not -1:
-            flatexo_io(Path,t_now,filt,nbu=3,nbHa=3,nbRc=3,nbz=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)
+            flatexo_io(Path, t_now, filt)
         if telescope.find('Europa') is not -1:
-            flatexo_euro(Path,t_now,filt,nbRc=3,nbB=3,nbz=3,nbV=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=3,nbClear=3)
+            flatexo_euro(Path, t_now, filt)
         if telescope.find('Artemis') is not -1:
-            flatexo_artemis_evening(Path,t_now,filt,nbu=3,nbz=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=7,nbClear=3)
-            flatexo_artemis_morning(Path,t_now,filt,nbu=3,nbz=3,nbr=3,nbi=3,nbg=3,nbIz=7,nbExo=7,nbClear=3)
+            flatexo_artemis_evening(Path, t_now, filt)
+            flatexo_artemis_morning(Path, t_now, filt)
         if telescope.find('Saint-Ex') is not -1:
-            flatexo_saintex(Path, t_now, filt, nbu=3, nbz=3, nbr=3, nbi=3, nbg=3, nbIz=9, nbExo=3, nbClear=3)
+            flatexo_saintex(Path, t_now, filt)
 
         if telescope.find('Saint-Ex') is not -1:
             list_texps = [texp[i] for i in range(len(texp))]
@@ -401,4 +401,3 @@ def make_np(t_now, nb_jours, tel):
 
         p2 = os.path.join(path_spock + '/DATABASE', str(telescope), 'Zip_files', str(t_now))
         shutil.make_archive(p2, 'zip', p)
-

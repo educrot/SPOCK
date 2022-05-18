@@ -1157,7 +1157,7 @@ class Schedules:
         observed_targets_SNO = []
         observed_targets_TS = []
         observed_targets_TN = []
-        for i in tqdm(range(self.date_range_in_days),desc="Updating hours of obs "):
+        for i in tqdm(range(self.date_range_in_days), desc="Updating hours of obs "):
             pass
             date = self.date_range[0] + i
             day_fmt = Time(date.iso, out_subfmt='date').iso
@@ -1303,6 +1303,7 @@ class Schedules:
                 self.first_target = self.priority[self.idx_first_target]
 
         for i in range(1, abs(idx_init_first)+len(self.index_prio)):
+            print(self.targets[self.idx_first_target].name)
             rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t,
                                                                   self.targets[self.idx_first_target],
                                                                   which='next',
@@ -1501,7 +1502,12 @@ class Schedules:
             idx_prog2 = np.where((self.target_table_spc['Program'] == 2))
             idx_prog3 = np.where((self.target_table_spc['Program'] == 3))
             self.priority['priority'][idx_prog0] *= 0.1
-            self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**15
+
+            if self.telescope == "Callisto":
+                self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_SPIRIT'][idx_prog1]**15
+            else:
+                self.priority['priority'][idx_prog1] *= 10 * self.target_table_spc['SNR_JWST_HZ_tr'][idx_prog1]**15
+
             self.priority['priority'][idx_prog2] *= 10 * self.target_table_spc['SNR_TESS_temp'][idx_prog2]**5
             self.priority['priority'][idx_prog3] *= 10 * self.target_table_spc['SNR_Spec_temp'][idx_prog3]**0
             self.priority['priority'][idx_on_going] *= \

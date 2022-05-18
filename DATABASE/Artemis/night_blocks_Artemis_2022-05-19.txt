@@ -1,0 +1,2 @@
+target "start time (UTC)" "end time (UTC)" "duration (minutes)" "ra (h)" "ra (m)" "ra (s)" "dec (d)" "dec (m)" "dec (s)" configuration
+TOI-2015 "2022-05-19 20:33:00.012" "2022-05-20 05:31:20.012" 538.3333333333333 15.0 28.0 31.836720000014367 27.0 21.0 39.862800000003915 "{'filt': 'I+z', 'texp': '10'}"

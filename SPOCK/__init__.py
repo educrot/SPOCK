@@ -13,7 +13,9 @@ from ftplib import FTP
 from colorama import Fore
 from datetime import date, timedelta, datetime
 import pandas as pd
-
+import sys
+sys.path.append("/Users/ed268546/Documents/scripts/exoplanets_basics/")
+import useful_functions
 
 def _get_files():
     data_path = pkg_resources.resource_filename('SPOCK', 'credentials/')
@@ -147,6 +149,12 @@ def change_fmt_stargate_TL(file_name):
     df['SNR_JWST_HZ_tr'] = df['SNR_JWST_HZ_tr'].fillna(0)
     df['SNR_TESS_temp'] = df['SNR_TESS_temp'].fillna(0)
     df['SNR_Spec_temp'] = df['SNR_Spec_temp'].fillna(0)
+    df["SNR_SPIRIT"] = [0]*len(df)
+    df["texp_spirit"] = [0]*len(df)
+    df_spirit = pd.read_csv("/Users/ed268546/Documents/codes/SPOCK/SPIRIT/target_precision_df_1.2seeing_andorSPC_-60_I+z_pirtSPC_-60_real_zYJ_final_upgraded_2022-05-17T120501.csv", sep=',')
+    idx_list1_in_list2, idx_list2_in_list1 = useful_functions.index_list1_list2(df_spirit["Sp_ID"], df["Sp_ID"])
+    df["SNR_SPIRIT"][idx_list1_in_list2] = df_spirit["SNR_1"][idx_list2_in_list1]
+    df["texp_spirit"][idx_list1_in_list2] = df_spirit["exp_time_2"][idx_list2_in_list1]
     df.to_csv(path_spock + '/target_lists/stargate/' + 'TL_spock_' + file_name, sep=',', index=None)
     return path_spock + '/target_lists/stargate/' + 'TL_spock_' + file_name
 

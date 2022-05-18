@@ -1235,25 +1235,25 @@ def flatexo_gany(Path,t_now,filt, nbOIII=None, nbHa=None, nbSII=None, nbz=None, 
                  nbIz=None, nbExo=None, nbClear=None):
     str00=';'
     if nbOIII is None:
-        nbOIII=3
+        nbOIII = 5
     if nbHa is None:
-        nbHa=3
+        nbHa = 5
     if nbSII is None:
-        nbSII=3
+        nbSII = 5
     if nbz is None:
-        nbz=3
+        nbz = 5
     if nbr is None:
-        nbr=3
+        nbr = 5
     if nbi is None:
-        nbi=3
+        nbi = 5
     if nbg is None:
-        nbg=3
+        nbg = 5
     if nbIz is None:
-        nbIz=3
+        nbIz=7
     if nbExo is None:
-        nbExo=3
+        nbExo = 5
     if nbClear is None:
-        nbClear=3
+        nbClear = 5
     with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
         if 'OIII' in filt:
             out.write(str(nbOIII) + ',' + 'OIII' + ',' + '1' + '\n')
@@ -1310,25 +1310,25 @@ def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nb
                   nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbB is None:
-        nbB=3
+        nbB=5
     if nbz is None:
-        nbz=3
+        nbz=5
     if nbzcut is None:
-        nbzcut=3
+        nbzcut=5
     if nbV is None:
-        nbV=3
+        nbV=5
     if nbr is None:
-        nbr=3
+        nbr=5
     if nbi is None:
-        nbi=3
+        nbi=5
     if nbg is None:
-        nbg=3
+        nbg=5
     if nbIz is None:
-        nbIz=3
+        nbIz=7
     if nbExo is None:
-        nbExo=3
+        nbExo=5
     if nbClear is None:
-        nbClear=3
+        nbClear=5
     with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
         if ('B' in filt) or ('B\'' in filt):
             out.write(str(nbB) + ',' + 'B' + ',' + '1' + '\n')
@@ -1385,25 +1385,25 @@ def flatexo_euro(Path,t_now,filt, nbRc=None, nbB=None, nbz=None, nbV=None, nbr=N
                  nbi=None, nbg=None, nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbRc is None:
-        nbRc=3
+        nbRc = 5
     if nbB is None:
-        nbB=3
+        nbB = 5
     if nbz is None:
-        nbz=3
+        nbz = 5
     if nbV is None:
-        nbV=3
+        nbV = 5
     if nbr is None:
-        nbr=3
+        nbr = 5
     if nbi is None:
-        nbi=3
+        nbi = 5
     if nbg is None:
-        nbg=3
+        nbg = 5
     if nbIz is None:
-        nbIz=3
+        nbIz = 7
     if nbExo is None:
-        nbExo=3
+        nbExo = 5
     if nbClear is None:
-        nbClear=3
+        nbClear = 5
     with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
         if 'Rc' in filt:
             out.write(str(nbRc) + ',' + 'Rc' ',' + '1' + '\n')
@@ -1460,21 +1460,21 @@ def flatexo_saintex(Path, t_now, filt, nbu=None, nbz=None, nbr=None, nbi=None, n
                     nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbu is None:
-        nbu=3
+        nbu=5
     if nbz is None:
-        nbz=3
+        nbz=5
     if nbr is None:
-        nbr=3
+        nbr=5
     if nbi is None:
-        nbi=3
+        nbi=5
     if nbg is None:
-        nbg=3
+        nbg=5
     if nbIz is None:
-        nbIz=3
+        nbIz=7
     if nbExo is None:
-        nbExo=3
+        nbExo=5
     if nbClear is None:
-        nbClear=3
+        nbClear=5
     with open(os.path.join(Path, str(t_now), 'Cal_flatexo' + '_' +
                                            datetime.strptime(t_now, '%Y-%m-%d').strftime('%m%d%Y') +
                                            '.txt'), 'w') as out:
@@ -1523,25 +1523,25 @@ def flatexo_io(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=
                nbg=None, nbIz=None, nbExo=None, nbClear=None):
     str00=';'
     if nbu is None:
-        nbu=3
+        nbu=5
     if nbHa is None:
-        nbHa=3
+        nbHa=5
     if nbRc is None:
-        nbRc=3
+        nbRc=5
     if nbz is None:
-        nbz=3
+        nbz=5
     if nbr is None:
-        nbr=3
+        nbr=5
     if nbi is None:
-        nbi=3
+        nbi=5
     if nbg is None:
-        nbg=3
+        nbg=5
     if nbIz is None:
-        nbIz=3
+        nbIz=7
     if nbExo is None:
-        nbExo=3
+        nbExo=5
     if nbClear is None:
-        nbClear=3
+        nbClear=5
     with open(os.path.join(Path, str(t_now), 'Cal_flatexo.txt'), 'w') as out:
         if ('u' in filt) or ('u\'' in filt):
             out.write(str(nbu) + ',' + 'u' + ',' + '1' + '\n')
@@ -1881,8 +1881,8 @@ def haumea(t_now, date_start, date_end, count, filt, exptime,
         out.write(str6 + str(binning) + '\n')
         out.write(str7 + str(filt) + '\n')
         out.write(str8 + str(exptime) + '\n')
-        out.write('D6108    0.25  0.15 K20CH 218.20478  239.04083  122.16594   28.21367  0.1964232  0.00348135  '+
-                  '43.1159298  2 MPO600179  2875  27 1955-2021 0.36 M-v 3Ek Pan        000A (136108) Haumea  ' + '\n')
+        out.write('D6108    0.26  0.15 K221L 218.88410  239.71462  122.12608   28.21248  0.1989312  0.00349648' +
+                  '  42.9914375  1 MPO660785  3224  28 1955-2022 0.49 M-v 3Ek Pan        000A (136108) Haumea' + '\n')
         out.write(str(t_now) + '\n')
         out.write(str00 + '\n')
         out.write(str9 + str(hour1) + ':' + str(minute1) + '\n')
