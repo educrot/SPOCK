@@ -1289,6 +1289,7 @@ class Schedules:
                 # for j in range(len(list(other_SSO)))]) or
                 idx_init_first -= 1
                 self.idx_first_target = self.index_prio[idx_init_first]
+                #print(idx_init_first ,self.idx_first_target)
                 self.first_target = self.priority[self.idx_first_target]
 
         if (self.telescope == 'TS_La_Silla') or (self.telescope == 'TN_Oukaimeden'):
@@ -1303,7 +1304,7 @@ class Schedules:
                 self.first_target = self.priority[self.idx_first_target]
 
         for i in range(1, abs(idx_init_first)+len(self.index_prio)):
-            print(self.targets[self.idx_first_target].name)
+            #print(self.targets[self.idx_first_target].name)
             rise_first_target = self.observatory.target_rise_time(self.date_range[0] + t,
                                                                   self.targets[self.idx_first_target],
                                                                   which='next',
@@ -1561,11 +1562,15 @@ class Schedules:
             read_exposure_time_table = pd.read_csv(path_spock + '/SPOCK_files/exposure_time_table.csv', sep=',')
         if self.observatory.name == 'SSO':
             texp = read_exposure_time_table['SSO_texp']
-            idx_texp_too_long = np.where((texp > 100))
+            idx_texp_too_long = np.where((texp > 120))
             self.priority['priority'][idx_texp_too_long] = -1000
+            if self.telescope == 'Callisto':
+                texp = read_exposure_time_table['SSO_texp']
+                idx_texp_too_short = np.where((texp < 6))
+                self.priority['priority'][idx_texp_too_short] = -1000
         if self.observatory.name == 'SNO':
             texp = read_exposure_time_table['SNO_texp']
-            idx_texp_too_long = np.where((texp > 90))
+            idx_texp_too_long = np.where((texp > 120))
             self.priority['priority'][idx_texp_too_long] = -1000
         if self.observatory.name == 'Saint-Ex':
             texp = read_exposure_time_table['Saintex_texp']
@@ -2499,7 +2504,7 @@ class Schedules:
                 texp = a.exp_time_calculator(ADUpeak=45000)[0]
 
             elif self.telescope == 'Io' or self.telescope == 'Europa' \
-                    or self.telescope == 'Ganymede' or self.telescope == 'Callisto':
+                    or self.telescope == 'Ganymede':  # or self.telescope == 'Callisto'
                 if float(self.target_table_spc['J'][i]) != 0.:
                     a = (ETC.etc(mag_val=float(self.target_table_spc['J'][i]), mag_band='J', spt=spt_type,
                                  filt=filt_, airmass=1.1, moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
@@ -2519,6 +2524,10 @@ class Schedules:
             filt_idx += 1
             if self.telescope == 'Artemis':
                 filt_ = filt_.replace('\'', '')
+
+        if self.telescope == 'Callisto':
+            texp = self.target_table_spc['texp_spirit'][i]
+            filt_ = 'zYJ'
 
         self.target_table_spc['Filter_spc'][i] = filt_
 
@@ -2541,6 +2550,7 @@ class Schedules:
         if day is None:
             print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' Not using moon phase in ETC')
         sso_texp = np.zeros(len(self.target_table_spc))
+        sso_spirit_texp = np.zeros(len(self.target_table_spc))
         sno_texp = np.zeros(len(self.target_table_spc))
         saintex_texp = np.zeros(len(self.target_table_spc))
         ts_texp = np.zeros(len(self.target_table_spc))
@@ -2548,14 +2558,15 @@ class Schedules:
         for i in range(len(self.target_table_spc)):
             # print(i, self.target_table_spc['Sp_ID'][i])
             sso_texp[i] = self.exposure_time(day, i, 'Io')
+            sso_spirit_texp[i] = self.exposure_time(day, i, 'Callisto')
             sno_texp[i] = self.exposure_time(day, i, 'Artemis')
             saintex_texp[i] = self.exposure_time(day, i, 'Saint-Ex')
             ts_texp[i] = self.exposure_time(day, i, 'TS_La_Silla')
             tn_texp[i] = self.exposure_time(day, i, 'TN_Oukaimeden')
 
             df = pd.DataFrame({'Sp_ID': self.target_table_spc['Sp_ID'],
-                               'SSO_texp': sso_texp, 'SNO_texp': sno_texp, 'Saintex_texp': saintex_texp,
-                               'TS_texp': ts_texp, 'TN_texp': tn_texp, })
+                               'SSO_texp': sso_texp, 'SSO_SPIRIT_texp': sso_spirit_texp, 'SNO_texp': sno_texp,
+                                'Saintex_texp': saintex_texp,  'TS_texp': ts_texp, 'TN_texp': tn_texp, })
             df.to_csv(path_spock + '/SPOCK_files/exposure_time_table.csv', sep=',', index=False)
 
     def no_obs_with_different_tel(self):

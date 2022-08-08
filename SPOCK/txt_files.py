@@ -314,7 +314,7 @@ def startup_artemis(t_now,name,sun_set,date_start,Path):
 
 
 def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,filt,exptime,
-           ra1,ra2,ra3,dec1,dec2,dec3,name_2,Path,telescope):
+           ra1, ra2, ra3, dec1, dec2, dec3, name_2, Path, telescope):
     df = pd.read_csv(target_list_from_stargate_path, delimiter=',', index_col=False)
     idx_target = None
     if 'Trappist' in name:
@@ -452,11 +452,11 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             str10='#chain '
             s = ''
             s2 = ''
-            seq_ra = (str(int(ra1)),'h',str(int(ra2)),'m',str(ra3),'s')
-            seq_dec = (str(int(dec1)),'d',str(abs(int(dec2))),'m',str(abs(dec3)),'s')
+            seq_ra = (str(int(ra1)), 'h', str(int(ra2)), 'm', str(ra3), 's')
+            seq_dec = (str(int(dec1)), 'd', str(abs(int(dec2))), 'm', str(abs(dec3)), 's')
             s.join(seq_ra)
             s2.join(seq_dec)
-            c = SkyCoord(s.join( seq_ra ),s2.join(seq_dec), frame='icrs')
+            c = SkyCoord(s.join(seq_ra), s2.join(seq_dec), frame='icrs')
             for i in range(1,2):
                 out.write(str00 + '\n')
             out.write(str00 + ' ' + str(name).replace('_2', '') + '\n')
@@ -477,7 +477,10 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
                 else:
                     out.write('#chill -60\n')
             if name == 'dome_rot':
-                out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Dome_rot" + '\n')
+                if telescope == "Callisto":
+                    out.write(r"#dir C:\Users\SPIRIT\Documents\ACP Astronomy\Images\Dome_rot" + '\n')
+                else:
+                    out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Dome_rot" + '\n')
             if (name.find('Ch') != -1) or (name.find('ch') != -1) and gaia_id_target == 'None':
                 d = Time(t_now).tt.datetime
                 out.write(r"#dir C:\Users\speculoos\Documents\ACP Astronomy\Images\Chilean" + r"\ "[0] +
@@ -859,7 +862,6 @@ def first_target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,c
                           + ' ' + str('{:02d}'.format(int(abs(dec2)))) + ' ' + str(
                     '{:05.2f}'.format(abs(dec3))) + '\n')
             if int(dec1) > 0:
-                # print('la')
                 out.write(name.replace('_2', '') + '\t' + str('{:02d}'.format(int(ra1))) + ' ' + str(
                     '{:02d}'.format(int(ra2))) + ' ' + str('{:05.2f}'.format(float(ra3))) + '\t' + '+' + str(
                     '{:02d}'.format(int(dec1))) \
@@ -1307,7 +1309,7 @@ def flatexo_gany(Path,t_now,filt, nbOIII=None, nbHa=None, nbSII=None, nbz=None, 
 
 
 def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nbr=None, nbi=None, nbg=None,
-                  nbIz=None, nbExo=None, nbClear=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
+                  nbIz=None, nbExo=None, nbClear=None, nbxYJ=None):  # u=None, nbu=None, nbr=None, nbz=None, nbg=None, nbi=None, nbIz=None, nbExo=None):
     str00=';'
     if nbB is None:
         nbB=5
@@ -1328,7 +1330,9 @@ def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nb
     if nbExo is None:
         nbExo=5
     if nbClear is None:
-        nbClear=5
+        nbClear=20
+    if nbxYJ is None:
+        nbxYJ =20
     with open(os.path.join(Path,str(t_now),'Cal_flatexo.txt'),'w') as out:
         if ('B' in filt) or ('B\'' in filt):
             out.write(str(nbB) + ',' + 'B' + ',' + '1' + '\n')
@@ -1368,17 +1372,21 @@ def flatexo_calli(Path,t_now,filt, nbB=None, nbz=None, nbzcut=None, nbV=None, nb
         if ('I+z' in filt) or ('I+z\'' in filt):
             out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
         else:
-            out.write(str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
+            out.write(str00 + str(nbIz) + ',' + 'I+z' + ',' + '1' + '\n')
 
         if 'Exo' in filt:
             out.write(str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbExo) + ',' + 'Exo' + ',' + '1' + '\n')
-
+        if 'zYJ' in filt:
+            out.write(str(nbxYJ) + ',' + 'zYJ' + ',' + '1' + '\n')
+        else:
+            out.write(str00 + str(nbxYJ) + ',' + 'zYJ' + ',' + '1' + '\n')
         if 'Clear' in filt:
             out.write(str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbClear) + ',' + 'Clear' + ',' + '1' + '\n')
+
 
 
 def flatexo_euro(Path,t_now,filt, nbRc=None, nbB=None, nbz=None, nbV=None, nbr=None,
@@ -1520,7 +1528,7 @@ def flatexo_saintex(Path, t_now, filt, nbu=None, nbz=None, nbr=None, nbi=None, n
 
 
 def flatexo_io(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=None, nbi=None,
-               nbg=None, nbIz=None, nbExo=None, nbClear=None):
+               nbg=None, nbIz=None, nbExo=None, nbClear=None, nbzcut=None):
     str00=';'
     if nbu is None:
         nbu=5
@@ -1528,6 +1536,8 @@ def flatexo_io(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=
         nbHa=5
     if nbRc is None:
         nbRc=5
+    if nbzcut is None:
+        nbzcut=7
     if nbz is None:
         nbz=5
     if nbr is None:
@@ -1557,7 +1567,10 @@ def flatexo_io(Path, t_now, filt, nbu=None, nbHa=None, nbRc=None, nbz=None, nbr=
             out.write(str(nbRc) + ',' + 'Rc' + ',' + '1' + '\n')
         else:
             out.write(str00 + str(nbRc) + ',' + 'Rc' + ',' + '1' + '\n')
-
+        if ('zcut' in filt):
+            out.write(str(nbzcut) + ',' + 'zcut' ',' + '1' + '\n')
+        else:
+            out.write(str00 + str(nbzcut) + ',' + 'zcut' ',' + '1' + '\n')
         if ('z' in filt) or ('z\'' in filt):
             out.write(str(nbz) + ',' + 'z\'' ',' + '1' + '\n')
         else:
@@ -1747,8 +1760,35 @@ def biasdark(t_now, Path, telescope, texps=None,bining_2=False):
             str7 = '#dark \n'
             str8 = '#shutdown \n'
             str9 = 'END'
-            counts = ['9']*(len(texps))
-            binnings = ['1'] * (len(texps))
+            counts = ['9']*(len(texps)+1)
+            binnings = ['1'] * (len(texps)+1)
+            out.write(str1)
+            out.write(str2)
+            out.write(str00 + '\n')
+            out.write(str00 + str3 + '\n')
+            out.write(str00 + '\n')
+            out.write(str4 + ','.join([str(counts) for counts in counts]) + '\n')
+            out.write(str5 + ','.join([str(binnings) for binnings in binnings]) + '\n')
+            out.write(str6 + '0,' + ','.join([str(texps) for texps in texps]) + '\n')
+            out.write(str7)
+            out.write(str8)
+            out.write(str00 + '\n')
+            out.write(str00 + str9 + '\n')
+            out.write(str00 + '\n')
+    elif telescope != 'Saint-Ex' and texps is not None:
+        with open(os.path.join(Path, str(t_now), 'Cal_biasdark.txt'), 'w') as out:
+            str00 = ';'
+            str1 = '#domeclose \n'
+            str2 = '#nopreview \n'
+            str3 = ' == bias dark exoplanet =='
+            str4 = '#count '
+            str5 = '#binning '
+            str6 = '#interval '
+            str7 = '#dark \n'
+            str8 = '#shutdown \n'
+            str9 = 'END'
+            counts = ['9']*(len(texps)+1)
+            binnings = ['1'] * (len(texps)+1)
             out.write(str1)
             out.write(str2)
             out.write(str00 + '\n')

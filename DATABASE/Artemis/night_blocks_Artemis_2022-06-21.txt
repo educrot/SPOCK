@@ -1,0 +1,2 @@
+target "start time (UTC)" "end time (UTC)" "duration (minutes)" "ra (h)" "ra (m)" "ra (s)" "dec (d)" "dec (m)" "dec (s)" configuration
+TIC-291320884 "2022-06-21 20:49:40.013" "2022-06-22 05:26:40.013" 516.9999999999999 17.0 23.0 49.44998400000998 56.0 35.0 19.989600000008068 "{'filt': 'g', 'texp': '120'}"

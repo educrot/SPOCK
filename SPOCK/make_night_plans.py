@@ -155,12 +155,20 @@ def dome_rotation(day_of_night,telescope):
                                             dec=coords_dome_rotation.icrs.dec.value * u.degree),
                              name='dome_rot')
 
-        scheduled_table.add_row([target.name, start_dome_rot.iso,  end_dome_rot.iso,
+        if telescope == "Callisto":
+            scheduled_table.add_row([target.name, start_dome_rot.iso,  end_dome_rot.iso,
                            dur_dome_rotation * 24 * 60,
                             target.coord.ra.hms[0],
                             target.coord.ra.hms[1],  target.coord.ra.hms[2],
                             target.coord.dec.dms[0],  target.coord.dec.dms[1],
-                            target.coord.dec.dms[2],  "{'filt':'I+z', 'texp':'10'}"])
+                            target.coord.dec.dms[2],  "{'filt':'zYJ', 'texp':'10'}"])
+        else:
+            scheduled_table.add_row([target.name, start_dome_rot.iso,  end_dome_rot.iso,
+                               dur_dome_rotation * 24 * 60,
+                                target.coord.ra.hms[0],
+                                target.coord.ra.hms[1],  target.coord.ra.hms[2],
+                                target.coord.dec.dms[0],  target.coord.dec.dms[1],
+                                target.coord.dec.dms[2],  "{'filt':'I+z', 'texp':'10'}"])
 
         scheduled_table['start time (UTC)'][1] = end_dome_rot.iso
 
@@ -238,7 +246,7 @@ def make_np(t_now, nb_jours, tel):
         sun_rise_teide=teide.sun_rise_time(t+1, which='next')
         location_saintex = EarthLocation.from_geodetic(-115.48694444444445*u.deg, 31.029166666666665*u.deg,
                                                        2829.9999999997976*u.m)
-        san_pedro = Observer(location=location_saintex, name="saintex", timezone="UTC")
+        san_pedro = Observer(location=location_saintex, name= "saintex", timezone="UTC")
         sun_set_san_pedro=san_pedro.sun_set_time(t+1, which='next')
         sun_rise_san_pedro=san_pedro.sun_rise_time(t+1, which='next')
 
@@ -376,6 +384,7 @@ def make_np(t_now, nb_jours, tel):
                                    Path, telescope=telescope)
 
         if telescope.find('Callisto') is not -1:
+            filt.append("Clear")
             flatexo_calli(Path, t_now, filt)
         if telescope.find('Ganymede') is not -1:
             flatexo_gany(Path, t_now, filt)
@@ -393,11 +402,17 @@ def make_np(t_now, nb_jours, tel):
             list_texps = [texp[i] for i in range(len(texp))]
             list_texps = list(dict.fromkeys(list_texps))
             biasdark(t_now, Path, telescope, texps=list_texps)
-        else:
-            if np.any(name == 'haumea'):
-                biasdark(t_now, Path, telescope)
-            else:
-                biasdark(t_now, Path, telescope)
+
+        elif telescope.find('Callisto') is not -1 or telescope.find('Ganymede') is not -1 or (telescope.find('Europa') is not -1) or (telescope.find('Io') is not -1) or \
+                (telescope.find('Artemis') is not -1):
+            list_texps = [15., 30., 60., 120.] + [float(x) for x in texp]
+            list_texps = np.unique(np.sort(list_texps))
+            list_texps = [str(int(x)) for x in list_texps]
+            list_texps = list(dict.fromkeys(list_texps))
+            biasdark(t_now, Path, telescope, texps=list_texps)
+            # if np.any(name == 'haumea'):
+            #     biasdark(t_now, Path, telescope)
+
 
         p2 = os.path.join(path_spock + '/DATABASE', str(telescope), 'Zip_files', str(t_now))
         shutil.make_archive(p2, 'zip', p)

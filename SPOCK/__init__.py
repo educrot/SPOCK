@@ -14,6 +14,7 @@ from colorama import Fore
 from datetime import date, timedelta, datetime
 import pandas as pd
 import sys
+import numpy as np
 sys.path.append("/Users/ed268546/Documents/scripts/exoplanets_basics/")
 import useful_functions
 
@@ -155,7 +156,33 @@ def change_fmt_stargate_TL(file_name):
     idx_list1_in_list2, idx_list2_in_list1 = useful_functions.index_list1_list2(df_spirit["Sp_ID"], df["Sp_ID"])
     df["SNR_SPIRIT"][idx_list1_in_list2] = df_spirit["SNR_1"][idx_list2_in_list1]
     df["texp_spirit"][idx_list1_in_list2] = df_spirit["exp_time_2"][idx_list2_in_list1]
+
+    f = open(path_spock + '/target_lists//www.mrao.cam.ac.uk/SPECULOOS/speculoos-portal/php/get_hours.php', 'r')
+    f = f.read()
+    line = f#.strip()
+    columns = line.split('","')
+
+    names = []
+    hours = []
+
+    for c in columns:
+        if c.find('SP') != -1 and c.find('TESS') == -1 and c.find('WAS') == -1:
+            info = c.split(',')
+            names.append(info[0].replace(' ','').replace('SP','Sp'))
+            hours.append(float(info[1]))
+
+    df_portal = pd.DataFrame({"Sp_ID":names,"nb_hours_surved": hours})
+
+    idx_list1_in_list2, idx_list2_in_list1 = useful_functions.index_list1_list2(df["Sp_ID"],df_portal["Sp_ID"])
+
+    df["nb_hours_surved"][idx_list2_in_list1] = df_portal["nb_hours_surved"][idx_list1_in_list2]
+    idx_double_stars = np.where((df["Sp_ID"] == "Sp1633-6808_2") | (df["Sp_ID"] == "Sp1633-6808_1") |
+                             (df["Sp_ID"] == "Sp1953+4424_1") | (df["Sp_ID"] == "Sp1953+4424_2") |
+                           (df["Sp_ID"] == "Sp0933-4353_1") | (df["Sp_ID"] == "Sp0933-4353_2"))[0]
+    df["nb_hours_surved"][idx_double_stars] = 200
+
     df.to_csv(path_spock + '/target_lists/stargate/' + 'TL_spock_' + file_name, sep=',', index=None)
+
     return path_spock + '/target_lists/stargate/' + 'TL_spock_' + file_name
 
 pwd_appcs,pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_chart_studio, pwd_chart_studio, path_spock, path_credential_json, login_stargate, pwd_stargate = _get_files()

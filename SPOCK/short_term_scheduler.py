@@ -31,7 +31,7 @@ import sys
 import shutil
 import SPOCK.ETC as ETC
 from SPOCK import user_portal, pwd_portal, pwd_appcs, path_spock, path_credential_json, target_list_from_stargate_path
-
+import SPOCK.mphot as mphot
 
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
@@ -1144,6 +1144,41 @@ class Schedules:
 
             if self.telescope == 'Artemis':
                 filt_ = filt_.replace('\'', '')
+
+        if self.telescope == 'Callisto':
+            # example files used to generate SR
+            efficiencyFile2 = path_spock + '/SPOCK/files_ETC/SPIRIT/datafiles/systems/pirtSPC_-60.csv'
+            filterFile2 = path_spock + '/SPOCK/files_ETC/SPIRIT/datafiles/filters/zYJ.csv'
+
+            # name to refer to the generated file
+            name2 = efficiencyFile2.split('/')[-1][:-4] + '_' + filterFile2.split('/')[-1][:-4]
+
+            # generates a SR, saved locally as 'name1_instrumentSR.csv'
+            SRFile2 = path_spock + '/SPOCK/files_ETC/SPIRIT/datafiles/SRs/' + name2 + '_instrumentSR.csv'
+            mphot.generateSR(efficiencyFile2, filterFile2, SRFile2)
+            props_sky = {
+                            "pwv" : 2.5, # PWV [mm]
+                            "airmass" : 1.1, # Airmass
+                            "seeing" : 1.2 # Seeing/FWHM ["]
+                        }
+            props_callisto = {
+                                    "name" : name2,
+                                    "plate_scale" : 0.35 * (12/13.5),
+                                    "N_dc" : 230,
+                                    "N_rn" : 80,
+                                    "well_depth" : 55000,
+                                    "bias_level" : 0,
+                                    "well_fill" : 0.7,
+                                    "read_time" : 0.1,
+                                    "r0" : 0.5,
+                                    "r1" : 0.14,
+                                    "ap_rad" : 3
+                                }
+            spirit = mphot.get_precision(props_callisto, props_sky, target_list["Teff"][i].values,
+                                         target_list["distance"][i].values, override=False, mapping=True)
+
+            texp = int(spirit['components']['t [s]'])
+            filt_ = 'zYJ'
 
         target_list['Filter_spc'][i] = filt_
 
