@@ -15,8 +15,30 @@ from datetime import date, timedelta, datetime
 import pandas as pd
 import sys
 import numpy as np
-sys.path.append("/Users/ed268546/Documents/scripts/exoplanets_basics/")
-import useful_functions
+
+def index_list1_list2(list1, list2):  # list 2 longer than list 1
+    """ index of list1 in list2 and list2 in list1
+
+    Parameters
+    ----------
+    list1 : list
+
+    list2 : list
+
+    Returns
+    -------
+    list
+        list of index of list1 in list2 and list2 in list1
+
+    """
+    idx_list1_in_list2 = []
+    idx_list2_in_list1 = []
+    for i in range(len(list2)):
+        for j in range(len(list1)):
+            if list2[i] == list1[j]:
+                idx_list1_in_list2.append(i)
+                idx_list2_in_list1.append(j)
+    return idx_list1_in_list2, idx_list2_in_list1
 
 def _get_files():
     data_path = pkg_resources.resource_filename('SPOCK', 'credentials/')
@@ -153,7 +175,7 @@ def change_fmt_stargate_TL(file_name):
     df["SNR_SPIRIT"] = [0]*len(df)
     df["texp_spirit"] = [0]*len(df)
     df_spirit = pd.read_csv("/Users/ed268546/Documents/codes/SPOCK/SPIRIT/target_precision_df_1.2seeing_andorSPC_-60_I+z_pirtSPC_-60_real_zYJ_final_upgraded_2022-05-17T120501.csv", sep=',')
-    idx_list1_in_list2, idx_list2_in_list1 = useful_functions.index_list1_list2(df_spirit["Sp_ID"], df["Sp_ID"])
+    idx_list1_in_list2, idx_list2_in_list1 = index_list1_list2(df_spirit["Sp_ID"], df["Sp_ID"])
     df["SNR_SPIRIT"][idx_list1_in_list2] = df_spirit["SNR_1"][idx_list2_in_list1]
     df["texp_spirit"][idx_list1_in_list2] = df_spirit["exp_time_2"][idx_list2_in_list1]
 
@@ -173,7 +195,7 @@ def change_fmt_stargate_TL(file_name):
 
     df_portal = pd.DataFrame({"Sp_ID":names,"nb_hours_surved": hours})
 
-    idx_list1_in_list2, idx_list2_in_list1 = useful_functions.index_list1_list2(df["Sp_ID"],df_portal["Sp_ID"])
+    idx_list1_in_list2, idx_list2_in_list1 = index_list1_list2(df["Sp_ID"],df_portal["Sp_ID"])
 
     df["nb_hours_surved"][idx_list2_in_list1] = df_portal["nb_hours_surved"][idx_list1_in_list2]
     idx_double_stars = np.where((df["Sp_ID"] == "Sp1633-6808_2") | (df["Sp_ID"] == "Sp1633-6808_1") |
