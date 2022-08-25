@@ -108,7 +108,16 @@ def dome_rotation(day_of_night,telescope):
                                             dec=coords_dome_rotation.icrs.dec.value * u.degree),
                              name='dome_rot')
 
-        scheduled_table.add_row([target.name, start_dome_rot.iso,  end_dome_rot.iso,
+
+        if telescope == "Callisto":
+            scheduled_table.add_row([target.name, start_dome_rot.iso,  end_dome_rot.iso,
+                               dur_dome_rotation * 24 * 60,
+                                target.coord.ra.hms[0],
+                                target.coord.ra.hms[1],  target.coord.ra.hms[2],
+                                target.coord.dec.dms[0],  target.coord.dec.dms[1],
+                                target.coord.dec.dms[2],  "{'filt':'zYJ', 'texp':'10'}"])
+        else:
+            scheduled_table.add_row([target.name, start_dome_rot.iso,  end_dome_rot.iso,
                            dur_dome_rotation * 24 * 60,
                             target.coord.ra.hms[0],
                             target.coord.ra.hms[1],  target.coord.ra.hms[2],

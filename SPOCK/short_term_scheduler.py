@@ -156,7 +156,7 @@ class Schedules:
                                                self.day_of_night + 1, which='nearest')).value) / 2, format='jd')
         return end_between_nautical_civil
 
-    def load_parameters(self, filename_list_special=None, filename_follow_up=None):
+    def load_parameters(self, filename_list_special=None, filename_follow_up=None,mangos=None):
         """
 
         Parameters
@@ -172,7 +172,10 @@ class Schedules:
         if (filename_list_special is None) or (filename_follow_up is None):
             sh = client.open('SPECULOOS WG6')
             # Read stars lists
-            worksheet_follow_up = sh.worksheet("Annex_Targets_V1-PLANETS")
+            if mangos:
+                worksheet_follow_up = sh.worksheet("Annex_Targets_V1-MANGOs")
+            else:
+                worksheet_follow_up = sh.worksheet("Annex_Targets_V1-PLANETS")
             dataframe = pd.DataFrame(worksheet_follow_up.get_all_records())
             self.target_table_spc_follow_up = dataframe.rename(columns={"sp_id": "Sp_ID", "gaia_dr2": "Gaia_ID",
                                                                         "period": "P", "period_e": "P_err",
@@ -186,6 +189,7 @@ class Schedules:
             # Read follow up (planet candidates) list
             self.target_table_spc_follow_up['W'] /= 24
             self.target_table_spc_follow_up['W_err'] /= 24
+
             worksheet_special = sh.worksheet("Annex_Targets_V2-STARS")
             dataframe = pd.DataFrame(worksheet_special.get_all_records())
             self.target_table_spc = dataframe.rename(columns={"spc": "Sp_ID", "gaia": "Gaia_ID", "dec": "DEC",
