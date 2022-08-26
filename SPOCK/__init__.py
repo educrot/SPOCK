@@ -12,6 +12,7 @@ import yaml
 from ftplib import FTP
 from colorama import Fore
 from datetime import date, timedelta, datetime
+from SPOCK import path_spock
 import pandas as pd
 import sys
 import numpy as np
@@ -174,7 +175,7 @@ def change_fmt_stargate_TL(file_name):
     df['SNR_Spec_temp'] = df['SNR_Spec_temp'].fillna(0)
     df["SNR_SPIRIT"] = [0]*len(df)
     df["texp_spirit"] = [0]*len(df)
-    df_spirit = pd.read_csv("/Users/ed268546/Documents/codes/SPOCK/SPIRIT/target_precision_df_1.2seeing_andorSPC_-60_I+z_pirtSPC_-60_real_zYJ_final_upgraded_2022-05-17T120501.csv", sep=',')
+    df_spirit = pd.read_csv(path_spock + "/SPIRIT/target_precision_df_1.2seeing_andorSPC_-60_I+z_pirtSPC_-60_real_zYJ_final_upgraded_2022-05-17T120501.csv", sep=',')
     idx_list1_in_list2, idx_list2_in_list1 = index_list1_list2(df_spirit["Sp_ID"], df["Sp_ID"])
     df["SNR_SPIRIT"][idx_list1_in_list2] = df_spirit["SNR_1"][idx_list2_in_list1]
     df["texp_spirit"][idx_list1_in_list2] = df_spirit["exp_time_2"][idx_list2_in_list1]

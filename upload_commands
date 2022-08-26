@@ -6,29 +6,29 @@ sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/SPOCK_Figures
 
 Night blocks:
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Artemis/Archive_night_blocks/night_blocks_Artemis_2022-07-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Artemis/schedule/Archive_night_blocks/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Artemis/Archive_night_blocks/night_blocks_Artemis_2022-08-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Artemis/schedule/Archive_night_blocks/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Io/Archive_night_blocks/night_blocks_Io_2022-07-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Io/schedule/Archive_night_blocks/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Io/Archive_night_blocks/night_blocks_Io_2022-08-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Io/schedule/Archive_night_blocks/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Europa/Archive_night_blocks/night_blocks_Europa_2022-07-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Europa/schedule/Archive_night_blocks/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Europa/Archive_night_blocks/night_blocks_Europa_2022-08-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Europa/schedule/Archive_night_blocks/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Ganymede/Archive_night_blocks/night_blocks_Ganymede_2022-07-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Ganymede/schedule/Archive_night_blocks/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Ganymede/Archive_night_blocks/night_blocks_Ganymede_2022-08-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Ganymede/schedule/Archive_night_blocks/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Callisto/Archive_night_blocks/night_blocks_Callisto_2022-07-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Callisto/schedule/Archive_night_blocks/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Callisto/Archive_night_blocks/night_blocks_Callisto_2022-08-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Callisto/schedule/Archive_night_blocks/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Saint-Ex/Archive_night_blocks/night_blocks_Saint-Ex_2022-07-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Saint-Ex_Prince/schedule/Archive_night_blocks/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Saint-Ex/Archive_night_blocks/night_blocks_Saint-Ex_2022-08-*.txt speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Saint-Ex_Prince/schedule/Archive_night_blocks/
 
 
 Plans:
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Artemis/Plans_by_date/2022-07-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Artemis/schedule/Plans_by_date/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Artemis/Plans_by_date/2022-08-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Artemis/schedule/Plans_by_date/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Io/Plans_by_date/2022-07-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Io/schedule/Plans_by_date/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Io/Plans_by_date/2022-08-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Io/schedule/Plans_by_date/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Europa/Plans_by_date/2022-07-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Europa/schedule/Plans_by_date/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Europa/Plans_by_date/2022-08-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Europa/schedule/Plans_by_date/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Ganymede/Plans_by_date/2022-07-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Ganymede/schedule/Plans_by_date/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Ganymede/Plans_by_date/2022-08-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Ganymede/schedule/Plans_by_date/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Callisto/Plans_by_date/2022-07-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Callisto/schedule/Plans_by_date/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Callisto/Plans_by_date/2022-08-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Callisto/schedule/Plans_by_date/
 
-sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Saint-Ex/Plans_by_date/2022-07-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Saint-Ex_Prince/schedule/Plans_by_date/
+sshpass -p 'eij7iaXi' scp -r /Users/ed268546/Documents/codes/SPOCK/DATABASE/Saint-Ex/Plans_by_date/2022-08-* speculoos@appcs.ra.phy.cam.ac.uk:/appct/data/SPECULOOSPipeline/Saint-Ex_Prince/schedule/Plans_by_date/
