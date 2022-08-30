@@ -12,7 +12,6 @@ import yaml
 from ftplib import FTP
 from colorama import Fore
 from datetime import date, timedelta, datetime
-from SPOCK import path_spock
 import pandas as pd
 import sys
 import numpy as np
