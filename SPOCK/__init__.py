@@ -179,7 +179,7 @@ def change_fmt_stargate_TL(file_name):
     df["SNR_SPIRIT"][idx_list1_in_list2] = df_spirit["SNR_1"][idx_list2_in_list1]
     df["texp_spirit"][idx_list1_in_list2] = df_spirit["exp_time_2"][idx_list2_in_list1]
 
-    f = open(path_spock + '/target_lists//www.mrao.cam.ac.uk/SPECULOOS/speculoos-portal/php/get_hours.php', 'r')
+    f = open(path_spock + '/target_lists/www.mrao.cam.ac.uk/SPECULOOS/speculoos-portal/php/get_hours.php', 'r')
     f = f.read()
     line = f#.strip()
     columns = line.split('","')
