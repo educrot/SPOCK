@@ -74,7 +74,7 @@ DATABASE/Saint-Ex/Locked_obs/*.txt
 
 DATABASE/Artemis/Locked_obs/*.txt
 
-local_files/*
+local_files/*.csv
 
 .DS_STORE
 
