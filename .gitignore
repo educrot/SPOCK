@@ -74,19 +74,7 @@ DATABASE/Saint-Ex/Locked_obs/*.txt
 
 DATABASE/Artemis/Locked_obs/*.txt
 
-MANGOs Sample.ipynb
-
-J0608-59_pri+sec_transits_2021.rtf
-
-Untitled.ipynb
-
-upload_commands
-
-MANGOs_full_sample.csv
-
-SPECULOOS_observability_targets_2021.csv
-
-TOI_270_transits_from_Paranal_in_2022.csv
+./local_files/*
 
 .DS_STORE
 
