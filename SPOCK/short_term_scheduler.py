@@ -1117,11 +1117,11 @@ class Schedules:
             elif self.telescope == 'Artemis':
                 if float(target_list['J'][i]) != 0.:
                     a = (ETC.etc(mag_val=float(target_list['J'][i]), mag_band='J', spt=spt_type,
-                                 filt=filt_, airmass=1.1, moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.9, gain=1.1))
+                                 filt=filt_, airmass=1.1, moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
                 else:
                     if (float(target_list['J'][i]) == 0.) and (float(target_list['V'][i]) != 0.):
                         a = (ETC.etc(mag_val=float(target_list['V'][i]), mag_band='V', spt=spt_type,
-                                     filt=filt_, airmass=1.1, moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.9, gain=1.1))
+                                     filt=filt_, airmass=1.1, moonphase=0.5, irtf=0.8, num_tel=1, seeing=0.7, gain=1.1))
                     else:
                         sys.exit('ERROR: You must precise Vmag or Jmag for this target')
                 texp = a.exp_time_calculator(ADUpeak=45000)[0]
