@@ -531,7 +531,7 @@ def target(t_now,name,date_start,date_end,waitlimit,afinterval,autofocus,count,f
             out.write(str9 + str(hour1) + ':' + str(minute1) + '\n' )
             if name_2 is None:
                 if telescope == 'Artemis':
-                    out.write(str10 + 'Cal_flatdawn.txt' + '\n')
+                    out.write(str10 + 'Cal_biasdark.txt' + '\n')
                 else:
                     out.write(str10 + 'Cal_flatdawn' + '.txt' + '\n')
             else:
