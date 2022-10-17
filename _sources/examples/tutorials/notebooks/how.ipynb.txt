@@ -1,0 +1,251 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# How *spock* works"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "**Note:** If you wish to update the number of hours observe on the TRAPPIST telescopes as well you need to have acces to the **Hours_observation_TS_TN** spread sheet. For this contact Elsa Ducrot (educrot@uliege.be)\n",
+    "    \n",
+    "<div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1/ How `spock.long_term_scheduler` works"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The SPECULOOS target list was contructed as described in [*Sebastian et al. 2020*](http://arxiv.org/abs/2011.02069) and include 1657 photometrically classified late-type dwarfs. These targets are divided in three distinct programs:\n",
+    "* Program 1: 365 dwarfs that are small and nearby enough to make possible the detailed atmospheric characterisation of an \"Earth-like\" planet with the upcoming JWST\n",
+    "* Program 2: 171 dwarfs of M5-type and later for which a significant detection of a planet similar to TRAPPIST-1b should be within reach of TESS\n",
+    "* Program 3: 1121 dwarfs later than M6-type that aims to perform a statistical census of short-period planets around ultracool dwarf stars."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The final product delivered by *spock* are be daily scripts (ACP plans) for the SSO, SNO and SAINT-EX observatories. Before producing such files, *spock* identifies which targets are the most interesting to observe at a given time, for how long and with which telescope while respecting the strategy agreed for each observation program. To do so, *spock* relies on several criteria:\n",
+    "\n",
+    "* The planet detectability of a target. For program 1 targets, this is quantified with $SNR_{JWST}$ which essentially is the estimated SNR in transmission spectroscopy that we would theoretically obtain from 200hr of observation with JWST/NIRSPEC of an \"Earth-like\" planet orbiting a given target. For program 2 targets we rather use the TESS detection SNR for a temperate planet, while for program 3 targets, the selection criterion is the SPECULOOS detection SNR for a temperate planet.\n",
+    "\n",
+    "* The target's observability $obs_{cov}$ which indicates the most appropriate time to observe a given target. To do so, *spock* computes the best visibility window of the year for each target. Every time a schedule is made, *spock* selects new targets that are at their optimum visibility at this time of the year. The selected targets are then ranked and the one with the highest priority is scheduled (providing it respects constraints imposed by the facility like moon distance and minimum elevation). If observable all night, the target is simply scheduled all night, but if some gaps remain an additional target is added to complement the schedule and avoid losing observing time. Furthermore, to prevent having too short observation blocks (1 h or less) the duration of the two targets are set to be comparable. For instance, if one night is $\\simeq$8 h long and target~1 is observable for the first 7 h only, target 2 is not going to be scheduled for the last hour only but rather the night will be split in half such that target 1 and 2 are observed for approximately the same amount of time. We say approximately because we do not exactly split the night in half, instead we adapt nightly the duration to each target's visibility (which shifts from night to night as the target visibility shifts from sunrise to sunset). This situation of observing two targets per night rather than one can happen frequently since many targets have latitudes that do not allow to fill up all the night time available for a given site, and this even at their peak visibility. To implement those constraints, *spock* makes use of the *astroplan* package [*Morris et al. 2018*](http://arxiv.org/abs/1712.09631), a flexible python toolbox for astronomical observation planning and scheduling. *spock* also optimises on the period of the year for which the target is the most visible at a relatively low airmass.\n",
+    "* The target's completion ratio, $r_{comp}=\\frac{hours_{observed}}{hours_{threshold}}$, which embodies the fraction of hours of observation completed versus the number of hours required for each target. Note that the value of $hours_{threshold}$ depends on the program to which the target belongs, 200 hr for Program 1 and 100 hr for Program~2 and 3. Using this completion ratio to rank targets is useful to favour the quick completion of on-going targets rather than starting new ones continually.\n",
+    "* The program to which the target belongs, $p$. This criteria is useful if the user wants to favour a program more than the others. For instance, our current strategy is to complete observations of program 1 targets, such that $p=1$ for program 1 targets,  $p=0$ for program 3 targets, $p=0.3$ for TESS targets (program 2) to have back up targets in case no program 1 targets are observable.\n",
+    "* The coordination potential of observations with multiple sites. Indeed, as SPECULOOS uses a multi-site telescope network, one of the main roles of *spock* is to handle the coordination of multi-site observations. For instance, between two targets with similar priority but one observable only from one site and the other from several sites, *spock* will choose the target that yields the best coverage. Besides, when possible, 1 hour overlap between observations from two different sites is scheduled to help the recombination of the light curves.\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "*spock* ranks all targets by multiplying these four criteria to compute the target's priority, which is simply defined as:\n",
+    "\n",
+    "$priority = (SNR_{JWST})^{a} * (obs_{cov})^{b} * (r_{comp})^{c} * p + coordination$,\n",
+    "\n",
+    "where $a, b, c$ are specific orders that we apply to each criteria based on their importance (higher order for planet detectability than completion ratio for instance) such that $a>b>c$. We note that coordination is the only additive criterion as coordination of observations between observatories has no incidence on our ability to observe a target nor on its interest for exoplanet search, such that a target with lack of coordination potential should not be discarded.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Once the priority of each target for a given day is computed, *spock* picks the one with the highest score as the first target. Then, a function checks the observability window of the target, that is to say if it is observable all night, from sun set to mid-night, from mid-night to sun rise or from after sun set to before sun rise. In the latter scenario the target is discarded and the first target becomes the one with the second highest priority score (and so on) in order to avoid having short observations sequences of a second and third targets before and after the rise and set times of the first target. Then, another *spock* function checks that the selected first target respects the moon distance and elevation constraint, and if not, this target is discarded and *spock* picks the next target in descending order of priority as the first target. For all telescopes the moon distance constraint is set to a minimum of $30^{\\circ}$ and the elevation constraint is set to a minimum of $25^{\\circ}$ for SSO, SNO, TS/TN but a minimum of $28^{\\circ}$ for Saint-Ex (decided by the consortium). We note that AstelOS also has an intrinsic elevation lower limit of $21^{\\circ}$. Finally, if the selected target fulfils all these conditions it is scheduled and if not observable all night a second target is picked via the same selection process. As I mentioned in the description of the observability criterion, we avoid to observe more than two SPECULOOS targets per night to maximise on-target time and phase coverage. The exposure time for each target is computed using the SPECULOOS exposure time calculator (ETC) which is integrated in *spock* in the form of a python class. The SPECULOOS ETC allows to compute the exposure time that will enable to reach a certain level of flux in a certain filter on a target, given its spectral type and magnitude (in either J or V), given the technical characteristics of the SPECULOOS telescopes (mirror size, focal ratio and coating) and cameras (quantum efficiency, temperature, gain, pixel scale, dark current, binning, read out noise) and given a set of conditions (seeing, airmass, moon phase, observatory altitude)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2/ How `spock.short_term_scheduler` works"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Besides the three core programs detailed above, SPECULOOS dedicates 20\\% of its observing time to external programs (and even up to 50\\% in the special case of SAINT-EX with CHEOPS follow-up). For this reason, I developed another mode on *spock* that allows to schedule the observation of external targets either for a defined period of time, with a given ephemeris or as long as physically possible. In that regard, *spock* distinguishes four distinct cases of external programs: \n",
+    "\n",
+    "* Monitoring of a target for a given duration and in specific conditions (fixed airmass for instance). \n",
+    "\n",
+    "* Observation of a target as long as possible given the site constraints (moon distance, elevation, twilight limits). \n",
+    "\n",
+    "* Observation of a target given specific start/ end times for the observations. If the input times do not respect the intrinsic constraints of the observatory a warning is triggered and the start/end times are automatically adapted. \n",
+    "\n",
+    "* Follow-up observation of an up-coming transit or occultation event given a set of ephemeris. \n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The aim of the `short_term_scheduler` is to modify existing plan by inserting a new block (corresponding to a *special* or *follow-up* target). Almost every night 1 ou 2 targets are observed per telescope. In that regards, the existing <span style=\"background-color:lightyellow\"><font color='orangered'> **night_block** </font></span>  can be either situation A or situation B, see below:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![situationsAB](../../../_static/css/situations_AB.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Situation A"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If we consider we are in situation A, four different modifications can happend when the new block is inserted. \n",
+    "\n",
+    "* First, the new block can be scheduled in between the existing blocks, in this case the `end_time` of the first target and `start_time` of the second target are modified."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![situation_A1b](../../../_static/css/situation_A1b.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "* Second, the new block can be scheduled on the first target's slot (from sun set), in this case only the `start_time` of the first target is modified."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![situationA2](../../../_static/css/situation_A2.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "* Third, the new block can be scheduled on the second target's slot (up to sun rise), in this case only the `end_time` of the second target is modified."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![situationA3](../../../_static/css/situation_A3.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "* Second, the new block is scheduled in the middle of an existing block, in this case the target is splited in two distinct blocks:\n",
+    "    * The first one (named target as the original block) with `start_time = old_start_time` and `end_time = start_time_new_block` \n",
+    "    * The second one (named target_2) `start_time = end_time_new_block` and `end_time = old_end_time` "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![situationA4](../../../_static/css/situation_A4b.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Situation B"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If we consider we are in situation B, three different modifications can happend when the new block is inserted. \n",
+    "\n",
+    "* First, the new block can be scheduled in the second part of the night (up to sun rise), in this case only the `end_time` is modified."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![title](../../../_static/css/situation_B1.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "* Second, the new block is scheduled in the middle of the night, in this case the target is splited in two distinct blocks:\n",
+    "    * The first one (named target as the original block)  with `start_time = old_start_time` and `end_time = start_time_new_block` \n",
+    "    * The second one (named target_2) `start_time = end_time_new_block` and `end_time = old_end_time` "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![situationB2](../../../_static/css/situation_B2.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "* Third, the new block is scheduled in the first part of the night (from sun set), in this case only the `start_time` is modified."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![situationB3](../../../_static/css/situation_B3.png)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

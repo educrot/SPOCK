@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How spock works &mdash; SPOCK 0.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/style.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/jupyter-sphinx.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/thebelab.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="prev" title="Useful tools" href="tutorials_spocktools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> SPOCK
+          </a>
+              <div class="version">
+                0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/installation.html#using-spock">Using <em>SPOCK</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/installation.html#upgrading">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/installation.html#more-details-on-spock">More details on <em>SPOCK</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/quick-ref.html">Quick reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">SPOCKApp</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_SPOCKApp.html">SPOCKApp, core programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_SPOCKApp.html#SPOCKApp,-external-programs">SPOCKApp, external programs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples &amp; Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_spocklt.html">Long-term scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_spockst.html">Short-term scheduling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_spockplot.html">Plot with SPOCK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_spocktools.html">Useful tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How spock works ?</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How <em>spock</em> works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#1/-How-spock.long_term_scheduler-works">1/ How <code class="docutils literal notranslate"><span class="pre">spock.long_term_scheduler</span></code> works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2/-How-spock.short_term_scheduler-works">2/ How <code class="docutils literal notranslate"><span class="pre">spock.short_term_scheduler</span></code> works</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Situation-A">Situation A</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Situation-B">Situation B</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SPOCK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>How <em>spock</em> works</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/examples/tutorials/notebooks/how.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="How-spock-works">
+<h1>How <em>spock</em> works<a class="headerlink" href="#How-spock-works" title="Permalink to this heading"></a></h1>
+<div class="alert alert-info"><p><strong>Note:</strong> If you wish to update the number of hours observe on the TRAPPIST telescopes as well you need to have acces to the <strong>Hours_observation_TS_TN</strong> spread sheet. For this contact Elsa Ducrot (<a class="reference external" href="mailto:educrot&#37;&#52;&#48;uliege&#46;be">educrot<span>&#64;</span>uliege<span>&#46;</span>be</a>)</p>
+<div><div class="section" id="1/-How-spock.long_term_scheduler-works">
+<h2>1/ How <code class="docutils literal notranslate"><span class="pre">spock.long_term_scheduler</span></code> works<a class="headerlink" href="#1/-How-spock.long_term_scheduler-works" title="Permalink to this heading"></a></h2>
+<p>The SPECULOOS target list was contructed as described in <a class="reference external" href="http://arxiv.org/abs/2011.02069">*Sebastian et al. 2020*</a> and include 1657 photometrically classified late-type dwarfs. These targets are divided in three distinct programs: * Program 1: 365 dwarfs that are small and nearby enough to make possible the detailed atmospheric characterisation of an “Earth-like” planet with the upcoming JWST * Program 2: 171 dwarfs of M5-type and later for which a significant detection of a planet similar
+to TRAPPIST-1b should be within reach of TESS * Program 3: 1121 dwarfs later than M6-type that aims to perform a statistical census of short-period planets around ultracool dwarf stars.</p>
+<p>The final product delivered by <em>spock</em> are be daily scripts (ACP plans) for the SSO, SNO and SAINT-EX observatories. Before producing such files, <em>spock</em> identifies which targets are the most interesting to observe at a given time, for how long and with which telescope while respecting the strategy agreed for each observation program. To do so, <em>spock</em> relies on several criteria:</p>
+<ul class="simple">
+<li><p>The planet detectability of a target. For program 1 targets, this is quantified with <span class="math notranslate nohighlight">\(SNR_{JWST}\)</span> which essentially is the estimated SNR in transmission spectroscopy that we would theoretically obtain from 200hr of observation with JWST/NIRSPEC of an “Earth-like” planet orbiting a given target. For program 2 targets we rather use the TESS detection SNR for a temperate planet, while for program 3 targets, the selection criterion is the SPECULOOS detection SNR for a temperate planet.</p></li>
+<li><p>The target’s observability <span class="math notranslate nohighlight">\(obs_{cov}\)</span> which indicates the most appropriate time to observe a given target. To do so, <em>spock</em> computes the best visibility window of the year for each target. Every time a schedule is made, <em>spock</em> selects new targets that are at their optimum visibility at this time of the year. The selected targets are then ranked and the one with the highest priority is scheduled (providing it respects constraints imposed by the facility like moon distance and minimum
+elevation). If observable all night, the target is simply scheduled all night, but if some gaps remain an additional target is added to complement the schedule and avoid losing observing time. Furthermore, to prevent having too short observation blocks (1 h or less) the duration of the two targets are set to be comparable. For instance, if one night is $:nbsphinx-math:<a class="reference external" href="http://arxiv.org/abs/1712.09631">simeq`$8 h long and target~1 is observable for the first 7 h only, target 2 is not going to be scheduled for the last hour
+only but rather the night will be split in half such that target 1 and 2 are observed for approximately the same amount of time. We say approximately because we do not exactly split the night in half, instead we adapt nightly the duration to each target’s visibility (which shifts from night to night as the target visibility shifts from sunrise to sunset). This situation of observing two targets per night rather than one can happen frequently since many targets have latitudes that do not allow
+to fill up all the night time available for a given site, and this even at their peak visibility. To implement those constraints, *spock* makes use of the *astroplan* package `*Morris et al. 2018*</a>, a flexible python toolbox for astronomical observation planning and scheduling. <em>spock</em> also optimises on the period of the year for which the target is the most visible at a relatively low airmass.</p></li>
+<li><p>The target’s completion ratio, <span class="math notranslate nohighlight">\(r_{comp}=\frac{hours_{observed}}{hours_{threshold}}\)</span>, which embodies the fraction of hours of observation completed versus the number of hours required for each target. Note that the value of <span class="math notranslate nohighlight">\(hours_{threshold}\)</span> depends on the program to which the target belongs, 200 hr for Program 1 and 100 hr for Program~2 and 3. Using this completion ratio to rank targets is useful to favour the quick completion of on-going targets rather than starting new ones
+continually.</p></li>
+<li><p>The program to which the target belongs, <span class="math notranslate nohighlight">\(p\)</span>. This criteria is useful if the user wants to favour a program more than the others. For instance, our current strategy is to complete observations of program 1 targets, such that <span class="math notranslate nohighlight">\(p=1\)</span> for program 1 targets, <span class="math notranslate nohighlight">\(p=0\)</span> for program 3 targets, <span class="math notranslate nohighlight">\(p=0.3\)</span> for TESS targets (program 2) to have back up targets in case no program 1 targets are observable.</p></li>
+<li><p>The coordination potential of observations with multiple sites. Indeed, as SPECULOOS uses a multi-site telescope network, one of the main roles of <em>spock</em> is to handle the coordination of multi-site observations. For instance, between two targets with similar priority but one observable only from one site and the other from several sites, <em>spock</em> will choose the target that yields the best coverage. Besides, when possible, 1 hour overlap between observations from two different sites is
+scheduled to help the recombination of the light curves.</p></li>
+</ul>
+<p><em>spock</em> ranks all targets by multiplying these four criteria to compute the target’s priority, which is simply defined as:</p>
+<p><span class="math notranslate nohighlight">\(priority = (SNR_{JWST})^{a} * (obs_{cov})^{b} * (r_{comp})^{c} * p + coordination\)</span>,</p>
+<p>where <span class="math notranslate nohighlight">\(a, b, c\)</span> are specific orders that we apply to each criteria based on their importance (higher order for planet detectability than completion ratio for instance) such that <span class="math notranslate nohighlight">\(a&gt;b&gt;c\)</span>. We note that coordination is the only additive criterion as coordination of observations between observatories has no incidence on our ability to observe a target nor on its interest for exoplanet search, such that a target with lack of coordination potential should not be discarded.</p>
+<p>Once the priority of each target for a given day is computed, <em>spock</em> picks the one with the highest score as the first target. Then, a function checks the observability window of the target, that is to say if it is observable all night, from sun set to mid-night, from mid-night to sun rise or from after sun set to before sun rise. In the latter scenario the target is discarded and the first target becomes the one with the second highest priority score (and so on) in order to avoid having short
+observations sequences of a second and third targets before and after the rise and set times of the first target. Then, another <em>spock</em> function checks that the selected first target respects the moon distance and elevation constraint, and if not, this target is discarded and <em>spock</em> picks the next target in descending order of priority as the first target. For all telescopes the moon distance constraint is set to a minimum of <span class="math notranslate nohighlight">\(30^{\circ}\)</span> and the elevation constraint is set to a minimum
+of <span class="math notranslate nohighlight">\(25^{\circ}\)</span> for SSO, SNO, TS/TN but a minimum of <span class="math notranslate nohighlight">\(28^{\circ}\)</span> for Saint-Ex (decided by the consortium). We note that AstelOS also has an intrinsic elevation lower limit of <span class="math notranslate nohighlight">\(21^{\circ}\)</span>. Finally, if the selected target fulfils all these conditions it is scheduled and if not observable all night a second target is picked via the same selection process. As I mentioned in the description of the observability criterion, we avoid to observe more than two SPECULOOS targets per
+night to maximise on-target time and phase coverage. The exposure time for each target is computed using the SPECULOOS exposure time calculator (ETC) which is integrated in <em>spock</em> in the form of a python class. The SPECULOOS ETC allows to compute the exposure time that will enable to reach a certain level of flux in a certain filter on a target, given its spectral type and magnitude (in either J or V), given the technical characteristics of the SPECULOOS telescopes (mirror size, focal ratio and
+coating) and cameras (quantum efficiency, temperature, gain, pixel scale, dark current, binning, read out noise) and given a set of conditions (seeing, airmass, moon phase, observatory altitude).</p>
+</div>
+<div class="section" id="2/-How-spock.short_term_scheduler-works">
+<h2>2/ How <code class="docutils literal notranslate"><span class="pre">spock.short_term_scheduler</span></code> works<a class="headerlink" href="#2/-How-spock.short_term_scheduler-works" title="Permalink to this heading"></a></h2>
+<p>Besides the three core programs detailed above, SPECULOOS dedicates 20% of its observing time to external programs (and even up to 50% in the special case of SAINT-EX with CHEOPS follow-up). For this reason, I developed another mode on <em>spock</em> that allows to schedule the observation of external targets either for a defined period of time, with a given ephemeris or as long as physically possible. In that regard, <em>spock</em> distinguishes four distinct cases of external programs:</p>
+<ul class="simple">
+<li><p>Monitoring of a target for a given duration and in specific conditions (fixed airmass for instance).</p></li>
+<li><p>Observation of a target as long as possible given the site constraints (moon distance, elevation, twilight limits).</p></li>
+<li><p>Observation of a target given specific start/ end times for the observations. If the input times do not respect the intrinsic constraints of the observatory a warning is triggered and the start/end times are automatically adapted.</p></li>
+<li><p>Follow-up observation of an up-coming transit or occultation event given a set of ephemeris.</p></li>
+</ul>
+<p>The aim of the <code class="docutils literal notranslate"><span class="pre">short_term_scheduler</span></code> is to modify existing plan by inserting a new block (corresponding to a <em>special</em> or <em>follow-up</em> target). Almost every night 1 ou 2 targets are observed per telescope. In that regards, the existing <strong>night_block</strong> can be either situation A or situation B, see below:</p>
+<p><img alt="situationsAB" src="../../../_images/situations_AB.png" /></p>
+<div class="section" id="Situation-A">
+<h3>Situation A<a class="headerlink" href="#Situation-A" title="Permalink to this heading"></a></h3>
+<p>If we consider we are in situation A, four different modifications can happend when the new block is inserted.</p>
+<ul class="simple">
+<li><p>First, the new block can be scheduled in between the existing blocks, in this case the <code class="docutils literal notranslate"><span class="pre">end_time</span></code> of the first target and <code class="docutils literal notranslate"><span class="pre">start_time</span></code> of the second target are modified.</p></li>
+</ul>
+<p><a href="#id1"><span class="problematic" id="id2">|situation\_A1b|</span></a></p>
+<ul class="simple">
+<li><p>Second, the new block can be scheduled on the first target’s slot (from sun set), in this case only the <code class="docutils literal notranslate"><span class="pre">start_time</span></code> of the first target is modified.</p></li>
+</ul>
+<p><img alt="situationA2" src="../../../_images/situation_A2.png" /></p>
+<ul class="simple">
+<li><p>Third, the new block can be scheduled on the second target’s slot (up to sun rise), in this case only the <code class="docutils literal notranslate"><span class="pre">end_time</span></code> of the second target is modified.</p></li>
+</ul>
+<p><img alt="situationA3" src="../../../_images/situation_A3.png" /></p>
+<ul class="simple">
+<li><p>Second, the new block is scheduled in the middle of an existing block, in this case the target is splited in two distinct blocks:</p>
+<ul>
+<li><p>The first one (named target as the original block) with <code class="docutils literal notranslate"><span class="pre">start_time</span> <span class="pre">=</span> <span class="pre">old_start_time</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span> <span class="pre">=</span> <span class="pre">start_time_new_block</span></code></p></li>
+<li><p>The second one (named target_2) <code class="docutils literal notranslate"><span class="pre">start_time</span> <span class="pre">=</span> <span class="pre">end_time_new_block</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span> <span class="pre">=</span> <span class="pre">old_end_time</span></code></p></li>
+</ul>
+</li>
+</ul>
+<p><img alt="situationA4" src="../../../_images/situation_A4b.png" /></p>
+</div>
+<div class="section" id="Situation-B">
+<h3>Situation B<a class="headerlink" href="#Situation-B" title="Permalink to this heading"></a></h3>
+<p>If we consider we are in situation B, three different modifications can happend when the new block is inserted.</p>
+<ul class="simple">
+<li><p>First, the new block can be scheduled in the second part of the night (up to sun rise), in this case only the <code class="docutils literal notranslate"><span class="pre">end_time</span></code> is modified.</p></li>
+</ul>
+<p><img alt="title" src="../../../_images/situation_B1.png" /></p>
+<ul class="simple">
+<li><p>Second, the new block is scheduled in the middle of the night, in this case the target is splited in two distinct blocks:</p>
+<ul>
+<li><p>The first one (named target as the original block) with <code class="docutils literal notranslate"><span class="pre">start_time</span> <span class="pre">=</span> <span class="pre">old_start_time</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span> <span class="pre">=</span> <span class="pre">start_time_new_block</span></code></p></li>
+<li><p>The second one (named target_2) <code class="docutils literal notranslate"><span class="pre">start_time</span> <span class="pre">=</span> <span class="pre">end_time_new_block</span></code> and <code class="docutils literal notranslate"><span class="pre">end_time</span> <span class="pre">=</span> <span class="pre">old_end_time</span></code></p></li>
+</ul>
+</li>
+</ul>
+<p><img alt="situationB2" src="../../../_images/situation_B2.png" /></p>
+<ul class="simple">
+<li><p>Third, the new block is scheduled in the first part of the night (from sun set), in this case only the <code class="docutils literal notranslate"><span class="pre">start_time</span></code> is modified.</p></li>
+</ul>
+<p><img alt="situationB3" src="../../../_images/situation_B3.png" /></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tutorials_spocktools.html" class="btn btn-neutral float-left" title="Useful tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Elsa Ducrot.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
