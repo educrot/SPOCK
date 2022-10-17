@@ -385,7 +385,6 @@ class Schedules:
             sys.exit(Fore.RED + 'ERROR: ' + Fore.BLACK
                      + " Observation impossible due to unrespected altitude and/or moon constraints. ")
 
-
     def special_target(self, input_name):
         """
         Function to add a special target night block in the plans
@@ -423,7 +422,7 @@ class Schedules:
         sequen_scheduler_ss1 = SPECULOOSScheduler(constraints=constraints_special_target,
                                                   observer=self.observatory, transitioner=transitioner)
         sequen_scheduler_ss1(blocks,seq_schedule_ss1)
-        self.SS1_night_blocks=seq_schedule_ss1.to_table()
+        self.SS1_night_blocks = seq_schedule_ss1.to_table()
         if len(self.SS1_night_blocks) == 0:
             print(Fore.YELLOW + 'WARNING: ' + Fore.BLACK + 'Impossible to schedule target ' + input_name +
                   ' at this time range and/or with those constraints')
@@ -716,6 +715,8 @@ class Schedules:
               Time(self.day_of_night, out_subfmt='date').iso+'.txt')
 
     def planification(self):
+
+        self.make_scheduled_table()
         end_scheduled_table = pd.DataFrame(columns=['target', 'start time (UTC)', 'end time (UTC)',
                                                     'duration (minutes)', 'ra (h)', 'ra (m)', 'ra (s)',
                                                     'dec (d)', 'dec (m)', 'dec (s)', 'configuration'])
@@ -850,7 +851,7 @@ class Schedules:
                         else:
                             print(Fore.GREEN + 'INFO: ' + Fore.BLACK + ' situation 7b')
                             self.scheduled_table['end time (UTC)'][i] = self.SS1_night_blocks['start time (UTC)'][0]
-                            self.scheduled_table['duration (minutes)'] = \
+                            self.scheduled_table['duration (minutes)'][i] = \
                                 (Time(self.scheduled_table['end time (UTC)'][i])
                                  - Time(self.scheduled_table['start time (UTC)'][i])).value * 24 * 60
 

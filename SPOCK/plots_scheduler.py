@@ -357,14 +357,18 @@ def gantt_chart(date_start, date_end, telescope, local=False):
     # Read night block from archive
     if local is False:
         for tel in telescope:
-            for i in range(0, date_range_in_days):
-                day = date_start + i
-                df = SPOCKST.read_night_block(telescope=tel, day=day.tt.datetime.strftime("%Y-%m-%d"))
-                start.append(list(df["start time (UTC)"]))
-                finish.append(list(df["end time (UTC)"]))
-                targets.append(list(df['target']))
-                configuration.append(list(df['configuration']))
-                telescopes.append(tel)
+            try:
+                df = SPOCKST.read_night_block(telescope=tel, day=date_start.tt.datetime.strftime("%Y-%m-%d"))
+                for i in range(0, date_range_in_days):
+                    day = date_start + i
+                    df = SPOCKST.read_night_block(telescope=tel, day=day.tt.datetime.strftime("%Y-%m-%d"))
+                    start.append(list(df["start time (UTC)"]))
+                    finish.append(list(df["end time (UTC)"]))
+                    targets.append(list(df['target']))
+                    configuration.append(list(df['configuration']))
+                    telescopes.append(tel)
+            except SystemExit:
+                print(Fore.YELLOW + 'WARNING:  ' + Fore.BLACK + "Cannot find plans for tlescope "+tel)
 
         df2 = pd.DataFrame(
         {'start': start, 'finish': finish, 'targets': targets, 'telescope': telescopes, 'configuration': configuration})
@@ -417,7 +421,7 @@ def gantt_chart(date_start, date_end, telescope, local=False):
                         configuration.append(list(df['configuration']))
                         telescopes.append(tel)
 
-        df2 = pd.DataFrame(   {'start': start, 'finish': finish, 'targets': targets, 'telescope': telescopes,
+        df2 = pd.DataFrame({'start': start, 'finish': finish, 'targets': targets, 'telescope': telescopes,
                                'configuration': configuration})
         Resource = df2['telescope']
         Task = df2['targets']
