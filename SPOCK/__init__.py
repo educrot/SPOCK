@@ -9,6 +9,7 @@ import pkg_resources
 import os
 import requests
 import yaml
+import glob
 from ftplib import FTP
 from colorama import Fore
 from datetime import date, timedelta, datetime
@@ -214,7 +215,11 @@ pwd_appcs,pwd_HUB, user_portal, pwd_portal, pwd_appcs, pwd_SNO_Reduc1, user_char
 
 today = date.today() - timedelta(days=1)
 today = today.strftime("%Y-%m-%d")
-target_list_from_stargate_path = change_fmt_stargate_TL(get_target_list_stargate(today))
+try:
+    target_list_from_stargate_path = change_fmt_stargate_TL(get_target_list_stargate(today))
+except:
+    print("Are you offline ? I will the latest stargate target list that you downloaded")
+    target_list_from_stargate_path = glob.glob(path_spock + '/target_lists/stargate/' + "TL_spock_stargate_*.csv")[-1]
 
 
 from .long_term_scheduler import *
