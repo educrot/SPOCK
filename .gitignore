@@ -6,6 +6,22 @@ survey_hours/
 
 target_lists/
 
+DATABASE/Io/*
+
+DATABASE/Europa/*
+
+DATABASE/Ganymede/*
+
+DATABASE/Callisto/*
+
+DATABASE/Artemis/*
+
+DATABASE/Saint-Ex/*
+
+DATABASE/TN_Oukaimeden/*
+
+DATABASE/TS_La_Silla/*
+
 DATABASE/Io/Archive_night_blocks/
 
 DATABASE/Europa/Archive_night_blocks/
